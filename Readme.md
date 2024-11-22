@@ -8,3 +8,4 @@
 * UUID: https://github.com/google/uuid
 * 环境变量加载: https://github.com/joho/godotenv
 * CLI增强: https://github.com/urfave/cli
+* 结构体复制: https://github.com/jinzhu/copier

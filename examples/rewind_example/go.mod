@@ -7,6 +7,7 @@ require (
 	github.com/acmestack/gorm-plus v0.1.5
 	github.com/gofiber/contrib/fiberi18n/v2 v2.0.4
 	github.com/gofiber/fiber/v2 v2.52.5
+	github.com/jinzhu/copier v0.4.0
 	github.com/swaggo/swag v1.16.4
 	github.com/urfave/cli/v2 v2.27.5
 	golang.org/x/text v0.20.0
