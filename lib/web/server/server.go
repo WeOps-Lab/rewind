@@ -3,7 +3,9 @@ package server
 import (
 	"context"
 	"fmt"
+	kc "github.com/WeOps-Lab/rewind/lib/pkgs/keycloak"
 	"github.com/WeOps-Lab/rewind/lib/web/enviroments"
+	"github.com/WeOps-Lab/rewind/lib/web/middleware/keycloak"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/gofiber/fiber/v2/middleware/compress"
@@ -18,17 +20,35 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/requestid"
 	"github.com/gofiber/swagger"
 	"net/http"
+	"os"
 )
 
 var app *fiber.App
 
 func Startup(ctx context.Context) error {
 	app = fiber.New()
+	RewindAppHooks.PreAppSetup(app)
 
-	RewindAppHooks.SetupDataSource()
+	RewindAppHooks.InstallDataSource()
+
 	setupMiddleware()
-	RewindAppHooks.ExtendMiddleware(app)
-	RewindAppHooks.ExtendRouter(app)
+
+	api := app.Group("/api")
+	publicApi := api.Group("/public")
+	RewindAppHooks.InstallMiddleware(app)
+	RewindAppHooks.InstallPublicRouter(publicApi)
+
+	kcClient := kc.NewKeyCloakBasicClient(
+		os.Getenv("KEYCLOAK_ENDPOINT"),
+		os.Getenv("KEYCLOAK_REALM"),
+		os.Getenv("KEYCLOAK_CLIENT_ID"),
+		os.Getenv("KEYCLOAK_CLIENT_SECRET"),
+	)
+	keycloakInstance := keycloak.KeycloakMiddleware(kcClient)
+	internalApi := api.Group("/internal", keycloakInstance)
+	RewindAppHooks.InstallInternalRouter(internalApi)
+
+	RewindAppHooks.PostAppSetup(app)
 
 	err := run(ctx)
 

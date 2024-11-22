@@ -5,6 +5,6 @@ import (
 	"rewind_example/global"
 )
 
-func (e ExampleAppHooks) SetupDataSource() {
+func (e ExampleAppHooks) InstallDataSource() {
 	global.DBClient = database.NewDataBaseInstanceFromEnv(true)
 }

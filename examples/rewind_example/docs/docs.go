@@ -15,7 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/v1/example": {
+        "/api/internal/example": {
             "put": {
                 "consumes": [
                     "application/json"
@@ -34,7 +34,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entity.ExampleWrapperEntity"
+                            "$ref": "#/definitions/entity.ExampleUpdateRequest"
                         }
                     }
                 ],
@@ -62,7 +62,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entity.ExampleEntity"
+                            "$ref": "#/definitions/entity.ExampleCreateRequest"
                         }
                     }
                 ],
@@ -74,26 +74,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/example/hello": {
-            "get": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Example"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {}
-                    }
-                }
-            }
-        },
-        "/api/v1/example/list": {
+        "/api/internal/example/list": {
             "get": {
                 "consumes": [
                     "application/json"
@@ -108,13 +89,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/entity.ExampleListEntity"
+                            "$ref": "#/definitions/entity.ExampleListResponse"
                         }
                     }
                 }
             }
         },
-        "/api/v1/example/{id}": {
+        "/api/internal/example/{id}": {
             "get": {
                 "consumes": [
                     "application/json"
@@ -138,7 +119,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/entity.ExampleWrapperEntity"
+                            "$ref": "#/definitions/entity.ExampleItemResponse"
                         }
                     }
                 }
@@ -169,18 +150,51 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/api/public/example/hello": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Example"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {}
+                    }
+                }
+            }
         }
     },
     "definitions": {
-        "entity.ExampleEntity": {
+        "entity.ExampleCreateRequest": {
             "type": "object",
+            "required": [
+                "name"
+            ],
             "properties": {
                 "name": {
                     "type": "string"
                 }
             }
         },
-        "entity.ExampleListEntity": {
+        "entity.ExampleItemResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.ExampleListResponse": {
             "type": "object",
             "properties": {
                 "current": {
@@ -189,7 +203,7 @@ const docTemplate = `{
                 "items": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/entity.ExampleWrapperEntity"
+                        "$ref": "#/definitions/entity.ExampleItemResponse"
                     }
                 },
                 "size": {
@@ -200,8 +214,12 @@ const docTemplate = `{
                 }
             }
         },
-        "entity.ExampleWrapperEntity": {
+        "entity.ExampleUpdateRequest": {
             "type": "object",
+            "required": [
+                "id",
+                "name"
+            ],
             "properties": {
                 "id": {
                     "type": "integer"

@@ -6,7 +6,7 @@ import (
 	"golang.org/x/text/language"
 )
 
-func (e ExampleAppHooks) ExtendMiddleware(app *fiber.App) {
+func (e ExampleAppHooks) InstallMiddleware(app *fiber.App) {
 	app.Use(
 		fiberi18n.New(&fiberi18n.Config{
 			RootPath:        "localize",
