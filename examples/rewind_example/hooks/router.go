@@ -7,14 +7,17 @@ import (
 
 func (e ExampleAppHooks) InstallInternalRouter(router fiber.Router) {
 	exampleGroup := router.Group("/example")
-	exampleGroup.Get("/list", controllers.List)
-	exampleGroup.Get("/:id", controllers.GetEntity)
-	exampleGroup.Delete("/:id", controllers.DeleteEntity)
-	exampleGroup.Post("/", controllers.CreateEntity)
-	exampleGroup.Put("/", controllers.UpdateEntity)
+	exampleContoller := controllers.ExampleController{}
+
+	exampleGroup.Get("/list", exampleContoller.List)
+	exampleGroup.Get("/:id", exampleContoller.GetEntity)
+	exampleGroup.Delete("/:id", exampleContoller.DeleteEntity)
+	exampleGroup.Post("/", exampleContoller.CreateEntity)
+	exampleGroup.Put("/", exampleContoller.UpdateEntity)
 }
 
 func (e ExampleAppHooks) InstallPublicRouter(router fiber.Router) {
 	exampleGroup := router.Group("/example")
-	exampleGroup.Get("/hello", controllers.HelloWorld)
+	exampleContoller := controllers.ExampleController{}
+	exampleGroup.Get("/hello", exampleContoller.HelloWorld)
 }

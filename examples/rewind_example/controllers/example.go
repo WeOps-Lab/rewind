@@ -1,25 +1,22 @@
 package controllers
 
 import (
-	"github.com/WeOps-Lab/rewind/lib/web/response"
 	"github.com/WeOps-Lab/rewind/lib/web/server"
-	"github.com/acmestack/gorm-plus/gplus"
 	"github.com/gofiber/contrib/fiberi18n/v2"
 	"github.com/gofiber/fiber/v2"
-	"github.com/jinzhu/copier"
-	"net/http"
 	"rewind_example/entity"
 	"rewind_example/models"
 )
+
+type ExampleController struct{}
 
 // @Tags Example
 // @Accept json
 // @Produce json
 // @Success 200 {object} interface{}
 // @Router /api/public/example/hello [get]
-func HelloWorld(c *fiber.Ctx) error {
+func (receiver ExampleController) HelloWorld(c *fiber.Ctx) error {
 	helloMsg, _ := fiberi18n.Localize(c, "hello")
-
 	m := map[string]interface{}{}
 	m["hello"] = helloMsg
 	return c.JSON(m)
@@ -30,26 +27,8 @@ func HelloWorld(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Success 200 {object} entity.ExampleListResponse
-func List(c *fiber.Ctx) error {
-	current, size, urlValues := response.ExtractPageParam(c)
-
-	pagerList, _ := gplus.SelectPage(
-		gplus.NewPage[models.Example](current, size),
-		gplus.BuildQuery[models.Example](urlValues))
-
-	items := make([]entity.ExampleItemResponse, len(pagerList.Records))
-	copier.Copy(&items, &pagerList.Records)
-
-	responseData := entity.ExampleListResponse{
-		PageEntity: response.PageEntity{
-			Current: pagerList.Current,
-			Size:    pagerList.Size,
-			Total:   pagerList.Total,
-		},
-		Items: items,
-	}
-
-	return c.Status(fiber.StatusOK).JSON(responseData)
+func (receiver ExampleController) List(c *fiber.Ctx) error {
+	return server.ListEntities[models.Example, entity.ExampleItemResponse](c)
 }
 
 // @Tags Example
@@ -58,23 +37,8 @@ func List(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Success 200 {object} entity.ExampleItemResponse
-func GetEntity(c *fiber.Ctx) error {
-	id := c.Params("id")
-	if id == "" {
-		return c.SendStatus(fiber.StatusBadRequest)
-	}
-
-	m, t := gplus.SelectById[models.Example](id)
-	if t.Error != nil {
-		return c.Status(fiber.StatusNotFound).SendString(t.Error.Error())
-	}
-
-	var target entity.ExampleItemResponse
-	if err := copier.Copy(&target, m); err != nil {
-		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
-	}
-
-	return c.Status(fiber.StatusOK).JSON(target)
+func (receiver ExampleController) GetEntity(c *fiber.Ctx) error {
+	return server.GetEntityById[models.Example, entity.ExampleItemResponse](c)
 }
 
 // @Tags Example
@@ -83,18 +47,8 @@ func GetEntity(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Success 200 {object} interface{}
-func DeleteEntity(c *fiber.Ctx) error {
-	id := c.Params("id")
-	if id == "" {
-		return c.SendStatus(fiber.StatusBadRequest)
-	}
-
-	err := gplus.DeleteById[models.Example](id).Error
-	if err != nil {
-		return c.SendStatus(fiber.StatusInternalServerError)
-	}
-
-	return c.SendStatus(fiber.StatusOK)
+func (receiver ExampleController) DeleteEntity(c *fiber.Ctx) error {
+	return server.DeleteEntityById[models.Example](c)
 }
 
 // @Tags Example
@@ -103,28 +57,18 @@ func DeleteEntity(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Success 200 {object} interface{}
-func CreateEntity(c *fiber.Ctx) error {
-	m := entity.ExampleCreateRequest{}
-	if err := c.BodyParser(&m); err != nil {
-		return c.SendStatus(http.StatusBadRequest)
-	}
-
-	validate, msg := server.ValidateRequest(m)
-	if !validate {
-		return c.Status(fiber.StatusBadRequest).SendString(msg)
+func (receiver ExampleController) CreateEntity(c *fiber.Ctx) error {
+	req, err := server.ParseAndValidateRequest[entity.ExampleCreateRequest](c)
+	if err != nil {
+		return err
 	}
 
 	var example models.Example
-	if err := copier.Copy(&example, &m); err != nil {
-		return c.SendStatus(http.StatusInternalServerError)
+	if err := server.CopyRequestToModel(c, req, &example); err != nil {
+		return err
 	}
 
-	err := gplus.Insert[models.Example](&example).Error
-	if err != nil {
-		return c.SendStatus(fiber.StatusBadRequest)
-	}
-
-	return c.SendStatus(fiber.StatusOK)
+	return server.InsertEntity[models.Example](c, &example)
 }
 
 // @Tags Example
@@ -134,30 +78,16 @@ func CreateEntity(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Success 200 {object} interface{}
-func UpdateEntity(c *fiber.Ctx) error {
-	req := entity.ExampleUpdateRequest{}
-	if err := c.BodyParser(&req); err != nil {
-		return c.SendStatus(fiber.StatusBadRequest)
-	}
-
-	validate, msg := server.ValidateRequest(req)
-	if !validate {
-		return c.Status(fiber.StatusBadRequest).SendString(msg)
-	}
-
-	m, t := gplus.SelectById[models.Example](req.ID)
-	if t.Error != nil {
-		return c.Status(fiber.StatusNotFound).SendString(t.Error.Error())
-	}
-
-	if err := copier.Copy(m, &req); err != nil {
-		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
-	}
-
-	err := gplus.UpdateById[models.Example](m).Error
+func (receiver ExampleController) UpdateEntity(c *fiber.Ctx) error {
+	req, err := server.ParseAndValidateRequest[entity.ExampleUpdateRequest](c)
 	if err != nil {
-		return c.SendStatus(fiber.StatusInternalServerError)
+		return err
 	}
 
-	return c.SendStatus(fiber.StatusOK)
+	m, err := server.SelectAndCopyToModel[models.Example, entity.ExampleUpdateRequest](c, req.ID, req)
+	if err != nil {
+		return err
+	}
+
+	return server.UpdateEntityById[models.Example](c, m)
 }
