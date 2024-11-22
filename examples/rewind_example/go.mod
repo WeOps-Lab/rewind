@@ -5,9 +5,7 @@ go 1.23.0
 require (
 	github.com/WeOps-Lab/rewind v0.0.0
 	github.com/acmestack/gorm-plus v0.1.5
-	github.com/caitlinelfring/go-env-default v1.1.0
 	github.com/gofiber/contrib/fiberi18n/v2 v2.0.4
-	github.com/gofiber/contrib/jwt v1.0.10
 	github.com/gofiber/fiber/v2 v2.52.5
 	github.com/swaggo/swag v1.16.4
 	github.com/urfave/cli/v2 v2.27.5
@@ -17,11 +15,11 @@ require (
 
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
-	github.com/MicahParks/keyfunc/v2 v2.1.0 // indirect
 	github.com/Nerzal/gocloak/v13 v13.9.0 // indirect
 	github.com/PuerkitoBio/purell v1.1.1 // indirect
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
 	github.com/andybalholm/brotli v1.0.5 // indirect
+	github.com/caitlinelfring/go-env-default v1.1.0 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.5 // indirect
 	github.com/go-openapi/jsonpointer v0.19.5 // indirect
 	github.com/go-openapi/jsonreference v0.19.6 // indirect
