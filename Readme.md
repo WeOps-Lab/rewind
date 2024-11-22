@@ -7,3 +7,4 @@
 * ORM增强: https://github.com/acmestack/gorm-plus
 * UUID: https://github.com/google/uuid
 * 环境变量加载: https://github.com/joho/godotenv
+* CLI增强: https://github.com/urfave/cli
