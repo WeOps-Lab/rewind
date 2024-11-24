@@ -15,7 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/internal/example": {
+        "/reqApi/internal/example": {
             "put": {
                 "consumes": [
                     "application/json"
@@ -74,7 +74,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/internal/example/list": {
+        "/reqApi/internal/example/list": {
             "get": {
                 "consumes": [
                     "application/json"
@@ -95,7 +95,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/internal/example/{id}": {
+        "/reqApi/internal/example/{id}": {
             "get": {
                 "consumes": [
                     "application/json"
@@ -151,7 +151,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/public/example/hello": {
+        "/reqApi/public/example/hello": {
             "get": {
                 "consumes": [
                     "application/json"

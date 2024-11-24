@@ -3,6 +3,9 @@ package server
 import (
 	"context"
 	"fmt"
+	"net/http"
+	"os"
+
 	kc "github.com/WeOps-Lab/rewind/lib/pkgs/keycloak"
 	"github.com/WeOps-Lab/rewind/lib/web/enviroments"
 	"github.com/WeOps-Lab/rewind/lib/web/middleware/keycloak"
@@ -19,8 +22,6 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
 	"github.com/gofiber/swagger"
-	"net/http"
-	"os"
 )
 
 var app *fiber.App
@@ -33,20 +34,28 @@ func Startup(ctx context.Context) error {
 
 	setupMiddleware()
 
-	api := app.Group("/api")
+	api := app.Group(enviroments.GetAPIPrefix())
 	publicApi := api.Group("/public")
 	RewindAppHooks.InstallMiddleware(app)
 	RewindAppHooks.InstallPublicRouter(publicApi)
 
-	kcClient := kc.NewKeyCloakBasicClient(
-		os.Getenv("KEYCLOAK_ENDPOINT"),
-		os.Getenv("KEYCLOAK_REALM"),
-		os.Getenv("KEYCLOAK_CLIENT_ID"),
-		os.Getenv("KEYCLOAK_CLIENT_SECRET"),
-	)
-	keycloakInstance := keycloak.KeycloakMiddleware(kcClient)
-	internalApi := api.Group("/internal", keycloakInstance)
-	RewindAppHooks.InstallInternalRouter(internalApi)
+	if enviroments.GetAuthProvider() == "none" {
+		log.Info("No auth provider is set, skipping registration of internal API")
+	} else {
+		var authMiddleware fiber.Handler
+		if enviroments.GetAuthProvider() == "keycloak" {
+			log.Info("Using Keycloak as auth provider")
+			kcClient := kc.NewKeyCloakBasicClient(
+				os.Getenv("KEYCLOAK_ENDPOINT"),
+				os.Getenv("KEYCLOAK_REALM"),
+				os.Getenv("KEYCLOAK_CLIENT_ID"),
+				os.Getenv("KEYCLOAK_CLIENT_SECRET"),
+			)
+			authMiddleware = keycloak.KeycloakMiddleware(kcClient)
+		}
+		internalApi := api.Group("/internal", authMiddleware)
+		RewindAppHooks.InstallInternalRouter(internalApi)
+	}
 
 	RewindAppHooks.PostAppSetup(app)
 

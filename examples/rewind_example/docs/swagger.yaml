@@ -39,7 +39,7 @@ definitions:
 info:
   contact: {}
 paths:
-  /api/internal/example:
+  /reqApi/internal/example:
     post:
       consumes:
       - application/json
@@ -77,7 +77,7 @@ paths:
           schema: {}
       tags:
       - Example
-  /api/internal/example/{id}:
+  /reqApi/internal/example/{id}:
     delete:
       consumes:
       - application/json
@@ -113,7 +113,7 @@ paths:
             $ref: '#/definitions/entity.ExampleItemResponse'
       tags:
       - Example
-  /api/internal/example/list:
+  /reqApi/internal/example/list:
     get:
       consumes:
       - application/json
@@ -126,7 +126,7 @@ paths:
             $ref: '#/definitions/entity.ExampleListResponse'
       tags:
       - Example
-  /api/public/example/hello:
+  /reqApi/public/example/hello:
     get:
       consumes:
       - application/json
