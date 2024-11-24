@@ -11,6 +11,7 @@ import (
 	"github.com/WeOps-Lab/rewind/lib/web/middleware/keycloak"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
+	"github.com/gofiber/fiber/v2/middleware/basicauth"
 	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/etag"
@@ -52,6 +53,22 @@ func Startup(ctx context.Context) error {
 				os.Getenv("KEYCLOAK_CLIENT_SECRET"),
 			)
 			authMiddleware = keycloak.KeycloakMiddleware(kcClient)
+		}
+		if enviroments.GetAuthProvider() == "basicauth" {
+			log.Info("Using Basic Auth as auth provider")
+			authMiddleware = basicauth.New(basicauth.Config{
+				Users: enviroments.GetBasicAuthUserList(),
+				Authorizer: func(user, pass string) bool {
+					users := enviroments.GetBasicAuthUserList()
+					if password, ok := users[user]; ok {
+						return password == pass
+					}
+					return false
+				},
+				Unauthorized: func(c *fiber.Ctx) error {
+					return c.SendStatus(fiber.StatusUnauthorized)
+				},
+			})
 		}
 		internalApi := api.Group("/internal", authMiddleware)
 		RewindAppHooks.InstallInternalRouter(internalApi)

@@ -1,6 +1,9 @@
 package enviroments
 
-import "github.com/caitlinelfring/go-env-default"
+import (
+	"github.com/caitlinelfring/go-env-default"
+	"strings"
+)
 
 func GetAppHost() string {
 	return env.GetDefault("APP_HOST", "localhost")
@@ -24,4 +27,16 @@ func GetAuthProvider() string {
 
 func GetAPIPrefix() string {
 	return env.GetDefault("API_PREFIX", "/reqApi")
+}
+
+func GetBasicAuthUserList() map[string]string {
+	userList := env.GetDefault("BASIC_AUTH_USER_LIST", "")
+	users := make(map[string]string)
+	for _, user := range strings.Split(userList, ",") {
+		parts := strings.SplitN(user, ":", 2)
+		if len(parts) == 2 {
+			users[parts[0]] = parts[1]
+		}
+	}
+	return users
 }
