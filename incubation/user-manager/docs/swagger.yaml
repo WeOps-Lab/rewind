@@ -1,4 +1,53 @@
+definitions:
+  gocloak.Group:
+    properties:
+      access:
+        additionalProperties:
+          type: boolean
+        type: object
+      attributes:
+        additionalProperties:
+          items:
+            type: string
+          type: array
+        type: object
+      clientRoles:
+        additionalProperties:
+          items:
+            type: string
+          type: array
+        type: object
+      id:
+        type: string
+      name:
+        type: string
+      path:
+        type: string
+      realmRoles:
+        items:
+          type: string
+        type: array
+      subGroups:
+        items:
+          $ref: '#/definitions/gocloak.Group'
+        type: array
+    type: object
 info:
   contact: {}
-paths: {}
+paths:
+  /reqApi/internal/group/list:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/gocloak.Group'
+            type: array
+      tags:
+      - Group
 swagger: "2.0"
