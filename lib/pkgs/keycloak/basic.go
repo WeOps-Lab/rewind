@@ -6,11 +6,11 @@ import (
 )
 
 type KeycloakBasicClient struct {
-	token        *gocloak.JWT
-	client       *gocloak.GoCloak
-	realm        string
-	clientID     string
-	clientSecret string
+	Token        *gocloak.JWT
+	Client       *gocloak.GoCloak
+	Realm        string
+	ClientID     string
+	ClientSecret string
 }
 
 func NewKeyCloakBasicClient(endpoint string, realm string, clientID string, clientSecret string) *KeycloakBasicClient {
@@ -20,16 +20,16 @@ func NewKeyCloakBasicClient(endpoint string, realm string, clientID string, clie
 		panic(err)
 	}
 	return &KeycloakBasicClient{
-		token:        token,
-		client:       client,
-		realm:        realm,
-		clientID:     clientID,
-		clientSecret: clientSecret,
+		Token:        token,
+		Client:       client,
+		Realm:        realm,
+		ClientID:     clientID,
+		ClientSecret: clientSecret,
 	}
 }
 
 func (receiver KeycloakBasicClient) IntrospectToken(token string) (*gocloak.IntroSpectTokenResult, error) {
-	result, err := receiver.client.RetrospectToken(context.Background(), token, receiver.clientID, receiver.clientSecret, receiver.realm)
+	result, err := receiver.Client.RetrospectToken(context.Background(), token, receiver.ClientID, receiver.ClientSecret, receiver.Realm)
 	return result, err
 }
 
@@ -40,7 +40,7 @@ type KeyCloakUserInfo struct {
 }
 
 func (receiver KeycloakBasicClient) DecodeToken(token string) KeyCloakUserInfo {
-	_, rs, _ := receiver.client.DecodeAccessToken(context.Background(), token, receiver.realm)
+	_, rs, _ := receiver.Client.DecodeAccessToken(context.Background(), token, receiver.Realm)
 	claimMaps := *rs
 
 	userLocale := "zh"
@@ -56,9 +56,9 @@ func (receiver KeycloakBasicClient) DecodeToken(token string) KeyCloakUserInfo {
 }
 
 func (receiver KeycloakBasicClient) GetToken(username string, password string) (*gocloak.JWT, error) {
-	return receiver.client.GetToken(context.Background(), receiver.realm, gocloak.TokenOptions{
-		ClientID:     &receiver.clientID,
-		ClientSecret: &receiver.clientSecret,
+	return receiver.Client.GetToken(context.Background(), receiver.Realm, gocloak.TokenOptions{
+		ClientID:     &receiver.ClientID,
+		ClientSecret: &receiver.ClientSecret,
 		GrantType:    gocloak.StringP("password"),
 		Username:     gocloak.StringP(username),
 		Password:     gocloak.StringP(password),

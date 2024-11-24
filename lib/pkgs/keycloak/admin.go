@@ -8,9 +8,9 @@ import (
 )
 
 type KeycloakAdminClient struct {
-	token  *gocloak.JWT
-	client *gocloak.GoCloak
-	realm  string
+	Token  *gocloak.JWT
+	Client *gocloak.GoCloak
+	Realm  string
 	ctx    context.Context
 }
 
@@ -22,9 +22,9 @@ func NewKeyCloakAdminClient(endpoint string, realm string, username string, pass
 		panic(err)
 	}
 	return &KeycloakAdminClient{
-		token:  token,
-		client: client,
-		realm:  realm,
+		Token:  token,
+		Client: client,
+		Realm:  realm,
 		ctx:    ctx,
 	}
 }

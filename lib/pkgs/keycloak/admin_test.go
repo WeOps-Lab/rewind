@@ -13,7 +13,7 @@ func TestNewKeyCloakAdminClient(t *testing.T) {
 		env.GetDefault("KEYCLOAK_ADMIN_USERNAME", "admin"),
 		env.GetDefault("KEYCLOAK_ADMIN_PASSWORD", "admin"),
 	)
-	log.Infof("Get Admin Token: %+v", instance.token.AccessToken)
+	log.Infof("Get Admin Token: %+v", instance.Token.AccessToken)
 
 	rs, _ := instance.GetUserList(0, 1)
 	log.Infof("Get User List: %+v", rs)
