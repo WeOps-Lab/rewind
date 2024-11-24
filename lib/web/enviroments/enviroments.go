@@ -40,3 +40,7 @@ func GetBasicAuthUserList() map[string]string {
 	}
 	return users
 }
+
+func GetKeyAuthAPIKey() []byte {
+	return []byte(env.GetDefault("KEY_AUTH_API_KEY", ""))
+}

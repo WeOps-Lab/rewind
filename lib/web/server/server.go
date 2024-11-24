@@ -2,7 +2,10 @@ package server
 
 import (
 	"context"
+	"crypto/sha256"
+	"crypto/subtle"
 	"fmt"
+	"github.com/gofiber/fiber/v2/middleware/keyauth"
 	"net/http"
 	"os"
 
@@ -67,6 +70,20 @@ func Startup(ctx context.Context) error {
 				},
 				Unauthorized: func(c *fiber.Ctx) error {
 					return c.SendStatus(fiber.StatusUnauthorized)
+				},
+			})
+		}
+		if enviroments.GetAuthProvider() == "keyauth" {
+			log.Info("Using KeyAuth as auth provider")
+			authMiddleware = keyauth.New(keyauth.Config{
+				Validator: func(c *fiber.Ctx, key string) (bool, error) {
+					hashedAPIKey := sha256.Sum256(enviroments.GetKeyAuthAPIKey())
+					hashedKey := sha256.Sum256([]byte(key))
+
+					if subtle.ConstantTimeCompare(hashedAPIKey[:], hashedKey[:]) == 1 {
+						return true, nil
+					}
+					return false, keyauth.ErrMissingOrMalformedAPIKey
 				},
 			})
 		}
