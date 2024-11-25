@@ -21,3 +21,7 @@ func (e ExampleAppHooks) InstallPublicRouter(router fiber.Router) {
 	exampleContoller := controllers.ExampleController{}
 	exampleGroup.Get("/hello", exampleContoller.HelloWorld)
 }
+
+func (e ExampleAppHooks) InstallMeshRouter(router fiber.Router) {
+
+}
