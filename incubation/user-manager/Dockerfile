@@ -13,6 +13,8 @@ FROM ubuntu
 WORKDIR /app
 COPY --from=builder /app/user-manager .
 
+ENTRYPOINT ["/entrypoint.sh"]
+
 CMD ["./user-manager"]
 
 
