@@ -56,9 +56,7 @@ pipeline {
        stage('更新环境'){
             steps {
                 script {
-                    sh """
                     sh "ansible ${env.ANSIBLE_HOST}  -m shell -a 'chdir=${env.KUBE_DIR}/user-manager/overlays/lite sudo kubectl delete -k . && sudo kubectl apply -k .'"
-                    """
                 }
             }
        }
