@@ -1,11 +1,13 @@
 FROM golang:1.23.0 AS builder
-WORKDIR /app
+WORKDIR /app/rewind
+
 ADD . .
+
 RUN go install github.com/swaggo/swag/cmd/swag@latest
 RUN cd incubation/user-manager && \
     swag init --parseDependency
 RUN cd incubation/user-manager && \
-    go mod tidy && go mod vendor && go build
+    go mod tidy && go mod vendor && go build -o /app/user-manager
 
 FROM ubuntu
 WORKDIR /app
