@@ -39,9 +39,12 @@ pipeline {
             steps {
                 script {
                     sh """
+                    go mod tidy && \
+                    go mod vendor &&\
                     cd incubation/user-manager && \
                     go mod tidy && \
                     go mod vendor &&\
+                    swag init --parseDependency && \
                     go build && \
                     sudo docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
                     """
