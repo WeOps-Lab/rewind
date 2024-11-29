@@ -3,6 +3,7 @@ module user-manager
 go 1.23.0
 
 require (
+	github.com/Nerzal/gocloak/v13 v13.9.0
 	github.com/WeOps-Lab/rewind v0.0.0
 	github.com/gofiber/contrib/fiberi18n/v2 v2.0.4
 	github.com/gofiber/fiber/v2 v2.52.5
@@ -13,7 +14,6 @@ require (
 
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
-	github.com/Nerzal/gocloak/v13 v13.9.0 // indirect
 	github.com/PuerkitoBio/purell v1.1.1 // indirect
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
 	github.com/acmestack/gorm-plus v0.1.5 // indirect
@@ -67,4 +67,4 @@ require (
 	gorm.io/gorm v1.25.12 // indirect
 )
 
-replace github.com/WeOps-Lab/rewind => ../../../rewind
+replace github.com/WeOps-Lab/rewind => ../../rewind
