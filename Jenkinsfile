@@ -40,6 +40,9 @@ pipeline {
                 script {
                     sh """
                     cd incubation/user-manager && \
+                    go mod tidy && \
+                    go mod vendor &&\
+                    go build && \
                     sudo docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
                     """
                 }
