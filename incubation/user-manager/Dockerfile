@@ -1,6 +1,8 @@
 FROM golang:1.23.0 AS builder
-WORKDIR /app
+WORKDIR /app/rewind
+
 ADD . .
+
 RUN go install github.com/swaggo/swag/cmd/swag@latest
 RUN cd incubation/user-manager && \
     swag init --parseDependency

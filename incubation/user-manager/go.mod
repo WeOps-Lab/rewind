@@ -67,4 +67,4 @@ require (
 	gorm.io/gorm v1.25.12 // indirect
 )
 
-replace github.com/WeOps-Lab/rewind => ../../rewind
+replace github.com/WeOps-Lab/rewind => ../../../rewind
