@@ -60,7 +60,9 @@ pipeline {
        stage('更新环境'){
             steps {
                 script {
-
+                    sh """
+                    echo 'upgrade'
+                    """
                 }
             }
        }
