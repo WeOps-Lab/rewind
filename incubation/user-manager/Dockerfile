@@ -1,9 +1,6 @@
 FROM golang:1.23.0 AS builder
 WORKDIR /app/rewind
-RUN apt-get update && \
-    apt-get install -y curl pkg-config libssl-dev ca-certificates  &&\
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+
 ADD . .
 
 RUN go install github.com/swaggo/swag/cmd/swag@latest
@@ -13,6 +10,10 @@ RUN cd incubation/user-manager && \
     go mod tidy && go mod vendor && go build -o /app/user-manager
 
 FROM ubuntu
+RUN apt-get update && \
+    apt-get install -y curl pkg-config libssl-dev ca-certificates  &&\
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY --from=builder /app/user-manager .
 
