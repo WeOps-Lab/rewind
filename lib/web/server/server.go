@@ -31,7 +31,7 @@ import (
 var app *fiber.App
 
 func Startup(ctx context.Context) error {
-	app = fiber.New()
+	app = fiber.New(fiber.Config{ReadBufferSize: 1024 * 1024})
 	RewindAppHooks.PreAppSetup(app)
 
 	RewindAppHooks.InstallDataSource()
