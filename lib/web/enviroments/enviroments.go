@@ -44,3 +44,7 @@ func GetBasicAuthUserList() map[string]string {
 func GetKeyAuthAPIKey() []byte {
 	return []byte(env.GetDefault("KEY_AUTH_API_KEY", ""))
 }
+
+func GetMeshAPIKey() []byte {
+	return []byte(env.GetDefault("MESH_API_KEY", "mesh"))
+}

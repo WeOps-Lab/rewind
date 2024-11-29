@@ -87,8 +87,23 @@ func Startup(ctx context.Context) error {
 				},
 			})
 		}
+
 		internalApi := api.Group("/internal", authMiddleware)
 		RewindAppHooks.InstallInternalRouter(internalApi)
+
+		meshMiddleware := keyauth.New(keyauth.Config{
+			Validator: func(c *fiber.Ctx, key string) (bool, error) {
+				hashedAPIKey := sha256.Sum256(enviroments.GetMeshAPIKey())
+				hashedKey := sha256.Sum256([]byte(key))
+
+				if subtle.ConstantTimeCompare(hashedAPIKey[:], hashedKey[:]) == 1 {
+					return true, nil
+				}
+				return false, keyauth.ErrMissingOrMalformedAPIKey
+			},
+		})
+		meshApi := api.Group("/mesh", meshMiddleware)
+		RewindAppHooks.InstallMeshRouter(meshApi)
 	}
 
 	RewindAppHooks.PostAppSetup(app)

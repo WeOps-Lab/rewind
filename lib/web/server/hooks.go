@@ -9,7 +9,7 @@ type AppHooks interface {
 	InstallMiddleware(app *fiber.App)
 	InstallPublicRouter(router fiber.Router)
 	InstallInternalRouter(router fiber.Router)
-
+	InstallMeshRouter(router fiber.Router)
 	PostAppSetup(app *fiber.App)
 }
 
