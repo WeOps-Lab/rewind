@@ -1,7 +1,7 @@
 FROM golang:1.23.0 AS builder
 WORKDIR /app/rewind
 RUN apt-get update && \
-    apt-get install -y curl pkg-config libssl-dev  &&\
+    apt-get install -y curl pkg-config libssl-dev ca-certificates  &&\
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 ADD . .
