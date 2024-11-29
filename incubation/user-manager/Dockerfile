@@ -13,6 +13,9 @@ FROM ubuntu
 WORKDIR /app
 COPY --from=builder /app/user-manager .
 
+ADD ./incubation/user-manager/entrypoint.sh /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
+
 CMD ["./user-manager"]
 
 
