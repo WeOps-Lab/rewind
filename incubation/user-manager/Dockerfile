@@ -14,9 +14,10 @@ WORKDIR /app
 COPY --from=builder /app/user-manager .
 
 ADD ./incubation/user-manager/entrypoint.sh /entrypoint.sh
+ADD ./incubation/user-manager/localize localize
+
 RUN chmod 777 /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 
-CMD ["./user-manager"]
 
 
