@@ -10,12 +10,18 @@ RUN cd incubation/user-manager && \
     go mod tidy && go mod vendor && go build -o /app/user-manager
 
 FROM ubuntu
+RUN apt-get update && \
+    apt-get install -y curl pkg-config libssl-dev ca-certificates  &&\
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY --from=builder /app/user-manager .
 
 ADD ./incubation/user-manager/entrypoint.sh /entrypoint.sh
+ADD ./incubation/user-manager/localize localize
+
+RUN chmod 777 /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 
-CMD ["./user-manager"]
 
 
