@@ -11,30 +11,24 @@ type UserController struct {
 }
 
 // @Tags CreateUser
-// @Router /internal/user [post]
+// @Router /user-manager/internal/user [post]
 // @Accept json
 // @Produce json
+// @Param user body gocloak.User true "User"
 // @Success 200 {object} string
-// @Param username query string true "Username"
-// @Param email query string true "Email"
-// @Param firstName query string true "First Name"
-// @Param lastName query string true "Last Name"
 func (receiver UserController) Create(c *fiber.Ctx) error {
-	username := c.Query("username")
-	email := c.Query("email")
-	firstName := c.Query("firstName")
-	lastName := c.Query("lastName")
+	user := gocloak.User{}
+	if err := c.BodyParser(&user); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "Invalid request body",
+		})
+	}
 	adminClient := keycloak.NewKeyCloakAdminClientFromEnv()
 	userId, err := adminClient.Client.CreateUser(
 		context.Background(),
 		adminClient.Token.AccessToken,
 		adminClient.Realm,
-		gocloak.User{
-			Username:  &username,
-			Email:     &email,
-			FirstName: &firstName,
-			LastName:  &lastName,
-		},
+		user,
 	)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -47,7 +41,7 @@ func (receiver UserController) Create(c *fiber.Ctx) error {
 }
 
 // @Tags SetPassword
-// @Router /internal/user/{userId}/password [put]
+// @Router /user-manager/internal/user/{userId}/password [put]
 // @Accept json
 // @Produce json
 // @Success 200 {object} string
@@ -76,7 +70,7 @@ func (receiver UserController) SetPassword(c *fiber.Ctx) error {
 }
 
 // @Tags UpdateUser
-// @Router /internal/user/{userId} [put]
+// @Router /user-manager/internal/user/{userId} [put]
 // @Accept json
 // @Produce json
 // @Success 200 {object} string
@@ -115,7 +109,7 @@ func (receiver UserController) Update(c *fiber.Ctx) error {
 }
 
 // @Tags DeleteUser
-// @Router /internal/user/{userId} [delete]
+// @Router /user-manager/internal/user/{userId} [delete]
 // @Accept json
 // @Produce json
 // @Success 200 {object} string
@@ -140,7 +134,7 @@ func (receiver UserController) Delete(c *fiber.Ctx) error {
 }
 
 // @Tags UserList
-// @Router /internal/user/list [get]
+// @Router /user-manager/internal/user/list [get]
 // @Accept json
 // @Produce json
 // @Param search query string false "Search"
@@ -190,7 +184,7 @@ func (receiver UserController) List(c *fiber.Ctx) error {
 }
 
 // @Tags AddUserToGroup
-// @Router /internal/user/{userId}/group/{groupId} [post]
+// @Router /user-manager/internal/user/{userId}/group/{groupId} [post]
 // @Accept json
 // @Produce json
 // @Success 200 {object} string
@@ -218,7 +212,7 @@ func (receiver UserController) AddUserToGroup(c *fiber.Ctx) error {
 }
 
 // @Tags DeleteUserFromGroup
-// @Router /internal/user/{userId}/group/{groupId} [delete]
+// @Router /user-manager/internal/user/{userId}/group/{groupId} [delete]
 // @Accept json
 // @Produce json
 // @Success 200 {object} string
@@ -246,7 +240,7 @@ func (receiver UserController) DeleteUserFromGroup(c *fiber.Ctx) error {
 }
 
 // @Tags AddRealmRoleToUser
-// @Router /internal/user/{userId}/add_roles [post]
+// @Router /user-manager/internal/user/{userId}/add_roles [post]
 // @Accept json
 // @Produce json
 // @Success 200 {object} string
@@ -279,7 +273,7 @@ func (receiver UserController) AddRoleToUser(c *fiber.Ctx) error {
 }
 
 // @Tags RemoveRoleFromUser
-// @Router /internal/user/{userId}/remove_roles [post]
+// @Router /user-manager/internal/user/{userId}/remove_roles [post]
 // @Accept json
 // @Produce json
 // @Success 200 {object} string

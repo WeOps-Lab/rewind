@@ -1,12 +1,20 @@
 package entity
 
-import "github.com/WeOps-Lab/rewind/lib/web/response"
-
-type GroupItemResponse struct {
+type GroupReq struct {
 	Name string `json:"name"`
 }
 
-type GroupListResponse struct {
-	response.PageEntity
-	Items []GroupItemResponse `json:"items"`
+type GroupIdRes struct {
+	Id string `json:"id"`
+}
+
+type GroupActionRes struct {
+	Mes string `json:"message"`
+}
+
+type GroupRes struct {
+	Id        string     `json:"id"`
+	Name      string     `json:"name"`
+	Path      string     `json:"path"`
+	SubGroups []GroupRes `json:"subGroups"`
 }

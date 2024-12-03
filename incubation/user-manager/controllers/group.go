@@ -5,17 +5,16 @@ import (
 	"github.com/Nerzal/gocloak/v13"
 	"github.com/WeOps-Lab/rewind/lib/pkgs/keycloak"
 	"github.com/gofiber/fiber/v2"
-	//"user-manager/global"
 )
 
 type GroupController struct {
 }
 
 // @Tags GroupList
-// @Router /internal/group/list [get]
+// @Router /user-manager/internal/group/list [get]
 // @Accept json
 // @Produce json
-// @Success 200 {object} []gocloak.Group
+// @Success 200 {object} []entity.GroupRes
 func (receiver GroupController) List(c *fiber.Ctx) error {
 	adminClient := keycloak.NewKeyCloakAdminClientFromEnv()
 	groups, err := adminClient.Client.GetGroups(
@@ -33,11 +32,11 @@ func (receiver GroupController) List(c *fiber.Ctx) error {
 }
 
 // @Tags UserGroup
-// @Router /internal/group/{userId}/list [get]
+// @Router /user-manager/internal/group/{userId}/list [get]
 // @Accept json
 // @Produce json
-// @Success 200 {object} []gocloak.Group
 // @Param userId path string true "User ID"
+// @Success 200 {object} []entity.GroupRes
 func (receiver GroupController) ListByUserId(c *fiber.Ctx) error {
 	userId := c.Params("userId")
 	adminClient := keycloak.NewKeyCloakAdminClientFromEnv()
@@ -57,11 +56,11 @@ func (receiver GroupController) ListByUserId(c *fiber.Ctx) error {
 }
 
 // @Tags GroupCreate
-// @Router /internal/group [post]
+// @Router /user-manager/internal/group [post]
 // @Accept json
 // @Produce json
-// @Success 200 {object} string
-// @Param group body gocloak.Group true "Group"
+// @Param group body entity.GroupReq true "Group"
+// @Success 200 {object} entity.GroupIdRes
 func (receiver GroupController) Create(c *fiber.Ctx) error {
 	var group gocloak.Group
 	if err := c.BodyParser(&group); err != nil {
@@ -82,19 +81,19 @@ func (receiver GroupController) Create(c *fiber.Ctx) error {
 		})
 	}
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"groupId": groupId,
+		"Id": groupId,
 	})
 }
 
 // @Tags CreateChildGroup
-// @Router /internal/group/{parentId}/child [post]
+// @Router /user-manager/internal/group/{groupId}/child [post]
 // @Accept json
 // @Produce json
-// @Success 200 {object} string
 // @Param parentId path string true "Parent ID"
-// @Param group body gocloak.Group true "Group"
+// @Param group body entity.GroupReq true "Group"
+// @Success 200 {object} entity.GroupIdRes
 func (receiver GroupController) CreateChildGroup(c *fiber.Ctx) error {
-	parentId := c.Params("parentId")
+	parentId := c.Params("groupId")
 	var group gocloak.Group
 	if err := c.BodyParser(&group); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -115,17 +114,17 @@ func (receiver GroupController) CreateChildGroup(c *fiber.Ctx) error {
 		})
 	}
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"groupId": groupId,
+		"Id": groupId,
 	})
 }
 
 // @Tags GroupUpdate
-// @Router /internal/group/{groupId} [put]
+// @Router /user-manager/internal/group/{groupId} [put]
 // @Accept json
 // @Produce json
-// @Success 200 {object} string
 // @Param groupId path string true "Group ID"
-// @Param group body gocloak.Group true "Group"
+// @Param group body entity.GroupReq true "Group"
+// @Success 200 {object} entity.GroupActionRes
 func (receiver GroupController) Update(c *fiber.Ctx) error {
 	groupId := c.Params("groupId")
 	var group gocloak.Group
@@ -153,11 +152,11 @@ func (receiver GroupController) Update(c *fiber.Ctx) error {
 }
 
 // @Tags GroupDelete
-// @Router /internal/group/{groupId} [delete]
+// @Router /user-manager/internal/group/{groupId} [delete]
 // @Accept json
 // @Produce json
-// @Success 200 {object} string
 // @Param groupId path string true "Group ID"
+// @Success 200 {object} entity.GroupActionRes
 func (receiver GroupController) Delete(c *fiber.Ctx) error {
 	groupId := c.Params("groupId")
 	adminClient := keycloak.NewKeyCloakAdminClientFromEnv()

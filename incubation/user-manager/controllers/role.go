@@ -11,7 +11,7 @@ type RoleController struct {
 }
 
 // @Tags RoleList
-// @Router /internal/role/list [get]
+// @Router /user-manager/internal/role/list [get]
 // @Accept json
 // @Produce json
 // @Success 200 {object} []gocloak.Role
@@ -32,7 +32,7 @@ func (receiver RoleController) List(c *fiber.Ctx) error {
 }
 
 // @Tags RoleCreate
-// @Router /internal/role [post]
+// @Router /user-manager/internal/role [post]
 // @Accept json
 // @Produce json
 // @Success 200 {object} string
@@ -62,7 +62,7 @@ func (receiver RoleController) Create(c *fiber.Ctx) error {
 }
 
 // @Tags RoleDelete
-// @Router /internal/role/{roleId} [delete]
+// @Router /user-manager/internal/role/{roleId} [delete]
 // @Accept json
 // @Produce json
 // @Success 200 {object} string
@@ -87,7 +87,7 @@ func (receiver RoleController) Delete(c *fiber.Ctx) error {
 }
 
 // @Tags RoleUpdate
-// @Router /internal/role/{roleId} [put]
+// @Router /user-manager/internal/role/{roleId} [put]
 // @Accept json
 // @Produce json
 // @Success 200 {object} string
@@ -120,7 +120,7 @@ func (receiver RoleController) Update(c *fiber.Ctx) error {
 }
 
 // @Tags GetRealmRolesByUserID
-// @Router /internal/role/{userId}/list [get]
+// @Router /user-manager/internal/role/{userId}/list [get]
 // @Accept json
 // @Produce json
 // @Success 200 {object} []gocloak.Role
