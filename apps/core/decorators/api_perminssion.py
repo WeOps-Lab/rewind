@@ -10,10 +10,6 @@ logger = logging.getLogger("app")
 
 
 class HasRole(object):
-    """
-    decorator. log exception if task_definition has
-    """
-
     def __init__(self, roles=None):
         if roles is None:
             roles = []
