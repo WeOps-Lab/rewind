@@ -71,7 +71,7 @@ MIDDLEWARE = (
     "django.middleware.locale.LocaleMiddleware",
     "apps.core.middlewares.app_exception_middleware.AppExceptionMiddleware",
     "apps.core.middlewares.drf_middleware.DisableCSRFMiddleware",
-    "apps.core.middlewares.api_middleware.APISecretFMiddleware",
+    "apps.core.middlewares.api_middleware.APISecretMiddleware",
     "apps.core.middlewares.keycloak_auth_middleware.KeyCloakAuthMiddleware",
 )
 AUTHENTICATION_BACKENDS = (

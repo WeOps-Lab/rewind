@@ -7,7 +7,7 @@ from rest_framework import status
 from apps.core.utils.web_utils import WebUtils
 
 
-class APISecretFMiddleware(MiddlewareMixin):
+class APISecretMiddleware(MiddlewareMixin):
     def process_request(self, request):
         token = request.META.get(settings.API_TOKEN_HEADER_NAME)
         if token is None:
