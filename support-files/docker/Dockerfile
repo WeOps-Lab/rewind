@@ -10,7 +10,7 @@ RUN apt-get install -y vim
 
 ADD . .
 
-RUN pip install -r ./requirements/requirements.txt
+RUN pip install -r ./requirements/requirements-core.txt
 RUN pip install -r ./requirements/requirements-dev.txt
 RUN pip install -r ./requirements/requirements-ops.txt
 RUN pip install -r ./requirements/requirements-extra.txt
