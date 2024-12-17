@@ -6,7 +6,7 @@ from django.core.cache import caches
 from django.db import IntegrityError
 from django.utils import translation
 
-from apps.core.models import User
+from apps.core.models import User, UserAPISecret
 from apps.core.utils.keycloak_client import KeyCloakClient
 
 logger = logging.getLogger("app")

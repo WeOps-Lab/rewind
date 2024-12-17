@@ -44,10 +44,10 @@ init-buckets:
 	python manage.py initialize_buckets
 
 celery:
-	celery -A common.celery worker -B --loglevel=info --pool threads
+	celery -A apps.core.celery worker -B --loglevel=info --pool threads
 
 celery-inspect:
-	celery -A common.celery inspect scheduled
+	celery -A apps.core.celery inspect scheduled
 
 celery-flower:
-	celery -A common.celery flower
+	celery -A apps.core.celery flower

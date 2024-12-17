@@ -1,8 +1,9 @@
 import hashlib
 from Crypto.Cipher import AES
 
-from weops_lite.components.base import SECRET_KEY
 from base64 import urlsafe_b64decode, urlsafe_b64encode
+
+from config.default import SECRET_KEY
 
 
 class AESCryptor:
