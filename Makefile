@@ -6,13 +6,17 @@ setup:
 	./.venv/bin/pip install pip-tools
 
 install:
-	./.venv/bin/pip-compile ./requirements/requirements.txt \
+	./.venv/bin/pip-compile ./requirements/requirements-core.txt \
 							./requirements/requirements-dev.txt \
 							./requirements/requirements-ops.txt \
 							./requirements/requirements-extra.txt \
 							-v --output-file ./requirements.txt
 	./.venv/bin/pip-sync -v
 
+win-install:
+	.\.venv\Scripts\pip-compile.exe ./requirements/requirements-core.txt ./requirements/requirements-dev.txt ./requirements/requirements-ops.txt  ./requirements/requirements-extra.txt -v --output-file ./requirements.txt
+	.\.venv\Scripts\pip-sync.exe -v	
+	
 i18n:
 	python manage.py makemessages -l zh_Hans
 	python manage.py makemessages -l en
