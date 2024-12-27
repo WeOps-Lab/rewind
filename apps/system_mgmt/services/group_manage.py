@@ -10,7 +10,7 @@ class GroupManage(object):
 
     def group_list(self, query_params=None):
         """用户组列表"""
-        if query_params is None:
+        if not query_params:
             query_params = {"search": ""}
         groups = self.keycloak_client.realm_client.get_groups(query_params)
         return groups
