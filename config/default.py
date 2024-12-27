@@ -48,7 +48,7 @@ INSTALLED_APPS = (
     "rest_framework.authtoken",
     "django_minio_backend",
     "django_filters",
-
+    "mptt",
     "django_comment_migrate",
     "import_export",
     "django_select2",
@@ -77,7 +77,7 @@ MIDDLEWARE = (
 AUTHENTICATION_BACKENDS = (
     "apps.core.backends.KeycloakAuthBackend",  # this is default
     "apps.core.backends.APISecretAuthBackend",
-    'django.contrib.auth.backends.ModelBackend',
+    "django.contrib.auth.backends.ModelBackend",
 )
 ROOT_URLCONF = "urls"
 
@@ -96,7 +96,10 @@ if DEBUG:
         "debug_toolbar",
     )  # noqa
     # 该跨域中间件需要放在前面
-    MIDDLEWARE = ("corsheaders.middleware.CorsMiddleware",) + MIDDLEWARE  # noqa
+    MIDDLEWARE = (
+        "corsheaders.middleware.CorsMiddleware",
+        "debug_toolbar.middleware.DebugToolbarMiddleware",
+    ) + MIDDLEWARE  # noqa
     CORS_ORIGIN_ALLOW_ALL = True
     CORS_ALLOW_CREDENTIALS = True
     CORS_ALLOW_HEADERS = [
@@ -166,7 +169,9 @@ DATABASES = {
 # celery
 CELERY_IMPORTS = ()
 CELERY_TIMEZONE = TIME_ZONE  # celery 时区问题
-CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "amqp://admin:password@rabbitmq.lite/")
+CELERY_BROKER_URL = os.getenv(
+    "CELERY_BROKER_URL", "amqp://admin:password@rabbitmq.lite/"
+)
 
 if IS_USE_CELERY:
     INSTALLED_APPS = locals().get("INSTALLED_APPS", [])
@@ -188,7 +193,9 @@ if IS_USE_CELERY:
 APPS_DIR = os.path.join(BASE_DIR, "apps")
 if os.path.exists(APPS_DIR):
     app_folders = [
-        name for name in os.listdir(APPS_DIR) if os.path.isdir(os.path.join(APPS_DIR, name)) and name != "__pycache__"
+        name
+        for name in os.listdir(APPS_DIR)
+        if os.path.isdir(os.path.join(APPS_DIR, name)) and name != "__pycache__"
     ]
 else:
     app_folders = []
@@ -247,8 +254,8 @@ LOGGING = {
         "simple": {"format": "%(levelname)s %(message)s \n"},
         "verbose": {
             "format": "%(levelname)s [%(asctime)s] %(pathname)s "
-                      "%(lineno)d %(funcName)s %(process)d %(thread)d "
-                      "\n \t %(message)s \n",
+            "%(lineno)d %(funcName)s %(process)d %(thread)d "
+            "\n \t %(message)s \n",
             "datefmt": "%Y-%m-%d %H:%M:%S",
         },
     },
