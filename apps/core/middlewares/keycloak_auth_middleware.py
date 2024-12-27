@@ -13,26 +13,27 @@ class KeyCloakAuthMiddleware(MiddlewareMixin):
         super().__init__(get_response)
         self.logger = logging.getLogger(__name__)
 
+    def process_view(self, request, view, args, kwargs):
+        if any(
+            [
+                getattr(view, "api_exempt", False),
+                getattr(request, "api_pass", False),
+                request.path == "/swagger/",
+                request.path.startswith("/admin/"),
+            ]
+        ):
+            return None
 
-def process_view(self, request, view, args, kwargs):
-    if any([
-        getattr(view, "api_exempt", False),
-        getattr(request, "api_pass", False),
-        request.path == "/swagger/",
-        request.path.startswith("/admin/")
-    ]):
-        return None
+        token = request.META.get(settings.AUTH_TOKEN_HEADER_NAME)
+        if not token:
+            return WebUtils.response_401(_("please provide Token"))
 
-    token = request.META.get(settings.AUTH_TOKEN_HEADER_NAME)
-    if not token:
+        token = token.split("Bearer ")[-1]
+        user = auth.authenticate(request=request, token=token)
+        if user:
+            auth.login(request, user)
+            if not request.session.session_key:
+                request.session.cycle_key()
+            return None
+
         return WebUtils.response_401(_("please provide Token"))
-
-    token = token.split("Bearer ")[-1]
-    user = auth.authenticate(request=request, token=token)
-    if user:
-        auth.login(request, user)
-        if not request.session.session_key:
-            request.session.cycle_key()
-        return None
-
-    return WebUtils.response_401(_("please provide Token"))

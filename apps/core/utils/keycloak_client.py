@@ -3,6 +3,7 @@ import logging
 from keycloak import KeycloakAdmin, KeycloakOpenID
 from singleton_decorator import singleton
 
+from apps.core.constants import BUILT_IN_ROLES
 from apps.core.entities.user_token_entity import UserTokenEntity
 from config.default import (
     KEYCLOAK_ADMIN_PASSWORD,
@@ -113,7 +114,9 @@ class KeyCloakClient:
         try:
             openid_client = self.get_openid_client()
             token = openid_client.token(username, password)
-            return UserTokenEntity(token=token["access_token"], error_message="", success=True)
+            return UserTokenEntity(
+                token=token["access_token"], error_message="", success=True
+            )
         except Exception as e:
             self.logger.error(e)
             return UserTokenEntity(token=None, error_message="用户名密码不匹配", success=False)
@@ -127,13 +130,19 @@ class KeyCloakClient:
 
     def get_normal_user_all_groups(self, res, all_groups):
         exist_data = [i["id"] for i in res]
-        return_data = [{"id": i["id"], "name": i["name"], "path": i["path"]} for i in res]
+        return_data = [
+            {"id": i["id"], "name": i["name"], "path": i["path"]} for i in res
+        ]
         group_ids = [i["id"] for i in return_data]
         for i in all_groups:
             if i["id"] not in group_ids:
                 continue
             sub_groups = i.pop("subGroups", [])
-            group_children = [u for u in self.get_child_groups(sub_groups) if u["id"] not in exist_data]
+            group_children = [
+                u
+                for u in self.get_child_groups(sub_groups)
+                if u["id"] not in exist_data
+            ]
             return_data.extend(group_children)
             exist_data.extend([u["id"] for u in group_children])
         return return_data
@@ -144,10 +153,37 @@ class KeyCloakClient:
         for i in groups:
             sub_groups = i.pop("subGroups", [])
             if i["id"] not in return_data:
-                return_data.append({"id": i["id"], "name": i["name"], "path": i["path"]})
+                return_data.append(
+                    {"id": i["id"], "name": i["name"], "path": i["path"]}
+                )
                 exist_data.append(i["id"])
             if sub_groups:
-                group_children = [u for u in self.get_child_groups(sub_groups) if u["id"] not in exist_data]
+                group_children = [
+                    u
+                    for u in self.get_child_groups(sub_groups)
+                    if u["id"] not in exist_data
+                ]
                 return_data.extend(group_children)
                 exist_data.extend([u["id"] for u in group_children])
         return return_data
+
+    def get_realm_roles(self):
+        result = self.realm_client.get_realm_roles()
+        roles = [i for i in result if i.get("name") not in BUILT_IN_ROLES]
+        return roles
+
+    def get_realm_roles_of_user(self, user_id):
+        """获取用户关联的角色，并过滤掉内置角色"""
+        self_roles = self.realm_client.get_realm_roles_of_user(user_id)
+        self_role_name_set = {i["name"] for i in self_roles}
+        all_roles = self.realm_client.get_composite_realm_roles_of_user(user_id)
+        roles = []
+        for role_info in all_roles:
+            if role_info.get("name") in BUILT_IN_ROLES:
+                continue
+            if role_info.get("name") in self_role_name_set:
+                role_info.update(role_type="user")
+            else:
+                role_info.update(role_type="group")
+            roles.append(role_info)
+        return roles

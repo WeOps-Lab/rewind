@@ -21,6 +21,7 @@ i18n:
 migrate:
 	python manage.py makemigrations
 	python manage.py migrate
+	python manage.py createcachetable
 
 collect-static:
 	python manage.py collectstatic --noinput
