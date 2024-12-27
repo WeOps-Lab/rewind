@@ -1,0 +1,87 @@
+{
+  "plugin": "Website General",
+  "plugin_desc": "The purpose of the website monitoring plugin is to periodically check the availability and performance of HTTP/HTTPS connections.",
+  "name": "Website",
+  "type": "Web",
+  "description": "",
+  "metrics": [
+    {
+      "metric_group": "HTTP",
+      "name": "http_success.rate",
+      "display_name": "Probe Status",
+      "type": "gauge",
+      "query": "sum(probe_success_gauge{__$labels__}) by (instance_id)",
+      "unit": "[{\"name\":\"success\",\"id\":1},{\"name\":\"failure\",\"id\":0}]",
+      "data_type": "Enum",
+      "description": "This metric indicates the success status of the probe operation. A successful status is represented by 1, while a failure is represented by 0. Monitoring this metric is crucial for ensuring the availability of the system, as it provides a quick indication of the health status of the monitored target. If the value is 0, further investigation is needed to determine the cause of the failure.",
+      "dimensions": []
+    },
+    {
+      "metric_group": "HTTP",
+      "name": "http_total.duration",
+      "display_name": "HTTP Duration",
+      "type": "gauge",
+      "query": "sum(probe_http_duration_seconds_gauge{phase=~'connect|resolve|tls|processing|transfer',__$labels__}) by (instance_id)",
+      "unit": "s",
+      "data_type": "Number",
+      "description": "This metric represents the total time taken from initiating an HTTP request to receiving the HTTP response. It is used to assess the performance of web services, especially when handling user requests. An extended duration may indicate lower backend processing efficiency or network latency, which can adversely affect the user experience. It is crucial for enhancing system responsiveness and optimizing performance.",
+      "dimensions": []
+    },
+    {
+      "metric_group": "HTTP",
+      "name": "http_dns.lookup.time",
+      "display_name": "DNS Lookup Time",
+      "type": "gauge",
+      "query": "probe_dns_lookup_time_seconds_gauge{__$labels__}",
+      "unit": "s",
+      "data_type": "Number",
+      "description": "This metric indicates the time taken to perform DNS resolution. DNS resolution is the process of converting a domain name to an IP address, and higher lookup times can lead to delays and affect user access speeds. Monitoring this metric can help identify potential DNS issues and optimize the performance of domain name resolution in the system.",
+      "dimensions": []
+    },
+    {
+      "metric_group": "HTTP",
+      "name": "http_ssl",
+      "display_name": "HTTP SSL",
+      "type": "gauge",
+      "query": "probe_http_ssl_gauge{__$labels__}",
+      "unit": "[{\"name\":\"success\",\"id\":1},{\"name\":\"failure\",\"id\":0}]",
+      "data_type": "Enum",
+      "description": "This metric represents the status of the SSL/TLS connection during an HTTP request. A value of 1 indicates that the connection was successful and encrypted using SSL/TLS, while a value of 0 indicates that encryption is not in use or that the connection has failed. It is commonly used to monitor and confirm whether a web service is securely delivered over SSL/TLS.",
+      "dimensions": []
+    },
+    {
+      "metric_group": "HTTP",
+      "name": "http_status_code",
+      "display_name": "HTTP Status Code",
+      "type": "gauge",
+      "query": "probe_http_status_code_gauge{__$labels__}",
+      "unit": "none",
+      "data_type": "Number",
+      "description": "This metric represents the HTTP response status code for an HTTP request. It captures the value of the HTTP response status codes, such as 200 (OK), 404 (Not Found), 500 (Internal Server Error), etc. These status codes are vital for monitoring the health and performance of web applications, assisting in identifying potential issues.",
+      "dimensions": []
+    },
+    {
+      "metric_group": "HTTP",
+      "name": "http.redirects.count",
+      "display_name": "Redirects Count",
+      "type": "gauge",
+      "query": "probe_http_redirects_gauge{__$labels__}",
+      "unit": "short",
+      "data_type": "Number",
+      "description": "This metric records the number of redirects that occurred during the processing of an HTTP request. Frequent redirects may indicate overly complex URL structures, leading to prolonged user waiting times. Monitoring this metric aids in identifying unnecessary redirects, allowing for the optimization of URL structures and enhancing user experience.",
+      "dimensions": []
+    },
+    {
+      "metric_group": "HTTP",
+      "name": "http_content.length.gauge",
+      "display_name": "HTTP Content Length",
+      "type": "gauge",
+      "query": "probe_http_content_length_gauge{__$labels__}",
+      "unit": "bytes",
+      "data_type": "Number",
+      "description": "This metric indicates the length of the HTTP response content in bytes. Larger content lengths can result in extended data transfer times and consume more bandwidth. Monitoring this metric is crucial for optimizing website performance or analyzing bandwidth usage. Understanding the size of the response content can assist developers in making optimizations.",
+      "dimensions": []
+    }
+  ]
+}
+    
