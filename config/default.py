@@ -28,6 +28,50 @@ LANGUAGES = (
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 7 * 2
 SESSION_COOKIE_NAME = f"{APP_CODE}_sessionid"
 LOGIN_CACHE_EXPIRED = 60 * 60
+
+# email配置
+
+# 指定邮件发送的后端，用于处理邮件发送逻辑。
+# 默认使用SMTP后端，支持通过SMTP服务器发送邮件。
+EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
+
+# SMTP服务器的主机地址，例如 Gmail 的是 'smtp.gmail.com'。
+EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.example.com')
+
+# SMTP服务器端口号。
+# 通常：
+# - 587 用于 TLS 加密连接。
+# - 465 用于 SSL 加密连接。
+# - 25 用于非加密连接（不推荐）。
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
+
+# 是否启用 TLS（传输层安全协议），用于加密邮件传输。
+# 如果SMTP服务支持TLS，通常设置为True（典型端口号为587）。
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
+
+# 是否启用 SSL（安全套接字层协议），用于加密邮件传输。
+# 如果SMTP服务只支持SSL，通常设置为True（典型端口号为465）。
+# 注意：EMAIL_USE_SSL 和 EMAIL_USE_TLS 不能同时为 True。
+EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL', 'False') == 'True'
+
+# 邮件服务器的登录用户名，通常是完整的邮箱地址。
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', 'your_email@example.com')
+
+# 邮件服务器的登录密码或授权码（某些邮箱需要单独设置授权码）。
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', 'your_password')
+
+# 发件人的默认邮箱地址，显示在收件人邮箱的“发件人”字段。
+# 格式可以是简单的邮箱地址或带有昵称的形式，如 'Your App <your_email@example.com>'。
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'Your App <your_email@example.com>')
+
+# 设置邮件发送超时时间（以秒为单位）。
+# 如果邮件服务器在指定时间内没有响应，Django 会抛出超时异常。
+EMAIL_TIMEOUT = int(os.getenv('EMAIL_TIMEOUT', 5))
+
+# 邮件主题的前缀，会附加到每封邮件的主题开头。
+# 便于在用户的收件箱中快速识别邮件来源。
+EMAIL_SUBJECT_PREFIX = os.getenv('EMAIL_SUBJECT_PREFIX', '[WeOps]')
+
 # CSRF配置
 CSRF_COOKIE_NAME = f"{APP_CODE}_csrftoken"
 
