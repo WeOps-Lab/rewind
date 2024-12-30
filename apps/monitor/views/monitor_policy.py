@@ -4,6 +4,7 @@ from django_celery_beat.models import PeriodicTask, CrontabSchedule
 from rest_framework import viewsets
 
 from apps.monitor.filters.monitor_policy import MonitorPolicyFilter
+from apps.monitor.models import PolicyOrganization
 from apps.monitor.models.monitor_policy import MonitorPolicy
 from apps.monitor.serializers.monitor_policy import MonitorPolicySerializer
 from config.drf.pagination import CustomPageNumberPagination
@@ -15,13 +16,21 @@ class MonitorPolicyVieSet(viewsets.ModelViewSet):
     filterset_class = MonitorPolicyFilter
     pagination_class = CustomPageNumberPagination
 
+    def list(self, request, *args, **kwargs):
+        # 如果不是超管还没有传递组织ID就抛错
+        if not request.user.is_superuser and not request.query_params.get('organization'):
+            raise ValueError('organization is empty')
+        return super().list(request, *args, **kwargs)
+
     def create(self, request, *args, **kwargs):
         # 补充创建人
         request.data['created_by'] = request.user.username
         response = super().create(request, *args, **kwargs)
         policy_id = response.data['id']
         schedule = request.data.get('schedule')
+        organizations = request.data.get('organizations', [])
         self.update_or_create_task(policy_id, schedule)
+        self.update_policy_organizations(policy_id, organizations)
         return response
 
     def update(self, request, *args, **kwargs):
@@ -32,6 +41,9 @@ class MonitorPolicyVieSet(viewsets.ModelViewSet):
         schedule = request.data.get('schedule')
         if schedule:
             self.update_or_create_task(policy_id, schedule)
+        organizations = request.data.get('organizations', [])
+        if organizations:
+            self.update_policy_organizations(policy_id, organizations)
         return response
 
     def partial_update(self, request, *args, **kwargs):
@@ -42,6 +54,9 @@ class MonitorPolicyVieSet(viewsets.ModelViewSet):
         schedule = request.data.get('schedule')
         if schedule:
             self.update_or_create_task(policy_id, schedule)
+        organizations = request.data.get('organizations', [])
+        if organizations:
+            self.update_policy_organizations(policy_id, organizations)
         return response
 
     def format_crontab(self, schedule):
@@ -82,3 +97,16 @@ class MonitorPolicyVieSet(viewsets.ModelViewSet):
             crontab=format_crontab,
             enabled=True
         )
+
+    def update_policy_organizations(self, policy_id, organizations):
+        """更新策略的组织"""
+        old_organizations = PolicyOrganization.objects.filter(policy_id=policy_id)
+        old_set = set([org.organization_id for org in old_organizations])
+        new_set = set(organizations)
+        # 删除不存在的组织
+        delete_set = old_set - new_set
+        PolicyOrganization.objects.filter(policy_id=policy_id, organization_id__in=delete_set).delete()
+        # 添加新的组织
+        create_set = new_set - old_set
+        create_objs = [PolicyOrganization(policy_id=policy_id, organization_id=org_id) for org_id in create_set]
+        PolicyOrganization.objects.bulk_create(create_objs, batch_size=200)

@@ -8,7 +8,6 @@ from apps.monitor.filters.monitor_object import MonitorInstanceGroupingRuleFilte
 from apps.monitor.models import MonitorInstanceGroupingRule
 from apps.monitor.serializers.monitor_object import MonitorInstanceGroupingRuleSerializer
 from apps.monitor.services.monitor_object import MonitorObjectService
-from config.default import AUTH_TOKEN_HEADER_NAME
 from config.drf.pagination import CustomPageNumberPagination
 
 
@@ -23,20 +22,22 @@ class MonitorInstanceVieSet(viewsets.ViewSet):
             openapi.Parameter("page_size", openapi.IN_QUERY, description="每页数据条数", type=openapi.TYPE_INTEGER),
             openapi.Parameter("add_metrics", openapi.IN_QUERY, description="是否添加指标", type=openapi.TYPE_BOOLEAN),
             openapi.Parameter("name", openapi.IN_QUERY, description="监控实例名称", type=openapi.TYPE_STRING),
-            openapi.Parameter("organizations", openapi.IN_QUERY, description="组织ID(多个用逗号分隔)", type=openapi.TYPE_INTEGER),
+            openapi.Parameter("organization_id", openapi.IN_QUERY, description="当前选用的组织ID", type=openapi.TYPE_STRING),
         ],
     )
     @action(methods=['get'], detail=False, url_path='(?P<monitor_object_id>[^/.]+)/list')
     def monitor_instance_list(self, request, monitor_object_id):
+        # 如果不是超管还没有传递组织ID就抛错
+        if not request.user.is_superuser and not request.query_params.get('organization'):
+            raise ValueError('organization is empty')
         page, page_size = request.GET.get("page", 1), request.GET.get("page_size", 10)
         data = MonitorObjectService.get_monitor_instance(
             int(monitor_object_id),
             int(page),
             int(page_size),
             request.GET.get("name"),
-            request.GET.get("organizations",""),
-            request.META.get(AUTH_TOKEN_HEADER_NAME).split("Bearer ")[-1],
-            bool(request.GET.get("add_metrics", False))
+            request.GET.get("organization_id", None),
+            bool(request.GET.get("add_metrics", False)),
         )
         return WebUtils.response_success(data)
 

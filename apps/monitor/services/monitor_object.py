@@ -6,7 +6,7 @@ from apps.core.utils.keycloak_client import KeyCloakClient
 from apps.monitor.constants import MONITOR_OBJS
 from apps.monitor.models.monitor_metrics import Metric
 from apps.monitor.models.monitor_object import MonitorInstance, MonitorObject
-from apps.core.utils.group import Group
+from apps.core.utils.group import get_group_and_subgroup_ids
 from apps.monitor.utils.victoriametrics_api import VictoriaMetricsAPI
 from apps.monitor.tasks.grouping_rule import sync_instance_and_group
 
@@ -33,25 +33,17 @@ class MonitorObjectService:
         return instance_map
 
     @staticmethod
-    def get_monitor_instance(monitor_object_id, page, page_size, name, organizations, token, add_metrics=False):
+    def get_monitor_instance(monitor_object_id, page, page_size, name, group_id=None, add_metrics=False):
         """获取监控对象实例"""
-        keycloak_client = KeyCloakClient()
-        roles = keycloak_client.get_roles(token)
         start = (page - 1) * page_size
         end = start + page_size
-        if "admin" in roles:
-            qs = MonitorInstance.objects.filter(monitor_object_id=monitor_object_id,).prefetch_related(
-                Prefetch('monitorinstanceorganization_set', to_attr='organizations'))
-        else:
-            user_group_and_subgroup_ids = Group(token).get_user_group_and_subgroup_ids()
-            qs = MonitorInstance.objects.filter(
-                monitor_object_id=monitor_object_id,
-                monitorinstanceorganization__organization__in=user_group_and_subgroup_ids
-            ).prefetch_related(Prefetch('monitorinstanceorganization_set', to_attr='organizations'))
+        qs = MonitorInstance.objects.filter(monitor_object_id=monitor_object_id)
+        if group_id:
+            group_and_subgroup_ids = get_group_and_subgroup_ids(group_id)
+            qs = qs.filter(monitorinstanceorganization__organization__in=group_and_subgroup_ids)
+        qs = qs.prefetch_related(Prefetch('monitorinstanceorganization_set', to_attr='organizations'))
         if name:
             qs = qs.filter(name__icontains=name)
-        if organizations:
-            qs = qs.filter(monitorinstanceorganization__organization__in=organizations.split(","))
         if page_size == -1:
             count = qs.count()
             objs = qs

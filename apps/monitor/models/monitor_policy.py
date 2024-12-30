@@ -38,6 +38,16 @@ class MonitorPolicy(TimeInfo, MaintainerInfo):
         verbose_name_plural = '监控策略'
 
 
+class PolicyOrganization(TimeInfo, MaintainerInfo):
+    policy = models.ForeignKey(MonitorPolicy, on_delete=models.CASCADE, verbose_name='监控策略')
+    organization = models.CharField(db_index=True, max_length=100, verbose_name='组织id')
+
+    class Meta:
+        verbose_name = '监控策略组织'
+        verbose_name_plural = '监控策略组织'
+        unique_together = ('policy', 'organization')
+
+
 class MonitorEvent(models.Model):
     LEVEL_CHOICES = [("no_data", "No Data"), ('info', 'Info'), ('warning', 'Warning'), ('error', 'Error'), ('critical', 'Critical')]
     id = models.CharField(primary_key=True, max_length=50, verbose_name='事件ID')

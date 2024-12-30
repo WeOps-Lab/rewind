@@ -81,3 +81,10 @@ class Group:
         user_group_and_subgroup_ids = list(set(user_group_and_subgroup_ids))
 
         return user_group_and_subgroup_ids
+
+
+def get_group_and_subgroup_ids(group_id: str):
+    """获取组织ID与子组ID的列表"""
+    keycloak_client = KeyCloakClient()
+    groups = keycloak_client.realm_client.get_groups({"search": ""})
+    return SubGroup(group_id, groups).get_group_id_and_subgroup_id()

@@ -22,14 +22,12 @@ def scan_policy_task(policy_id):
 
     policy_obj = MonitorPolicy.objects.filter(id=policy_id).select_related("metric", "monitor_object").first()
     if not policy_obj:
-        logger.warning(f"No MonitorPolicy found with id {policy_id}")
-    if not policy_obj.enable:
-        logger.info(f"MonitorPolicy {policy_id} is disabled")
+        raise ValueError(f"No MonitorPolicy found with id {policy_id}")
 
-    policy_obj.last_run_time = datetime.now(timezone.utc)           # 更新最后执行时间
-    policy_obj.save()
-
-    MonitorPolicyScan(policy_obj).run()                        # 执行监控策略
+    if policy_obj.enable:
+        policy_obj.last_run_time = datetime.now(timezone.utc)           # 更新最后执行时间
+        policy_obj.save()
+        MonitorPolicyScan(policy_obj).run()                        # 执行监控策略
 
     logger.info("end to update monitor instance grouping rule")
 

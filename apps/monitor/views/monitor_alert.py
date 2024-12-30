@@ -30,6 +30,9 @@ class MonitorAlertVieSet(
     pagination_class = CustomPageNumberPagination
 
     def list(self, request, *args, **kwargs):
+        # 如果不是超管还没有传递组织ID就抛错
+        if not request.user.is_superuser and not request.query_params.get('organization'):
+            raise ValueError('organization is empty')
         # 获取分页参数
         page = int(request.GET.get('page', 1))  # 默认第1页
         page_size = int(request.GET.get('page_size', 10))  # 默认每页10条数据
