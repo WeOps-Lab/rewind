@@ -15,7 +15,6 @@ class CommaSeparatedCharInFilter(BaseInFilter, CharFilter):
                 return super().filter(qs, values)
         return qs
 
-
 class MonitorAlertFilter(FilterSet):
     status_in = CommaSeparatedCharInFilter(field_name="status", lookup_expr="in", label="状态")
     level_in = CommaSeparatedCharInFilter(field_name="level", lookup_expr="in", label="告警级别")
