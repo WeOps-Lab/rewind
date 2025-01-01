@@ -4,7 +4,7 @@ WORKDIR /apps
 RUN apt-get update -y
 RUN apt-get install -y vim
 
-#ADD ./support-files/supervisor/app.conf  /etc/supervisor/conf.d/app.conf
+ADD ./support-files/supervisor/app.conf  /etc/supervisor/conf.d/app.conf
 #ADD ./support-files/supervisor/celery.conf  /etc/supervisor/conf.d/celery.conf
 #ADD ./support-files/supervisor/beat.conf  /etc/supervisor/conf.d/beat.conf
 
@@ -15,4 +15,5 @@ RUN pip install -r ./requirements/requirements-dev.txt
 RUN pip install -r ./requirements/requirements-ops.txt
 RUN pip install -r ./requirements/requirements-extra.txt
 
-#CMD [ "supervisord","-n" ]
+RUN chmod +x ./support-files/docker/startup.sh
+ENTRYPOINT ["./support-files/docker/startup.sh"]
