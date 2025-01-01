@@ -52,12 +52,17 @@ pipeline {
        }
 
        stage('更新环境'){
+            agent { 
+                label 'docker' 
+            }
+            options {
+                skipDefaultCheckout true
+            }
             steps {
                 script {
                     sh """
-                    cd ${env.KUBE_DIR}/system-manager/overlays/lite/ && \
-                        sudo kubectl delete -k . || true &&\
-                        sudo kubectl apply -k .
+                    docker pull ${IMAGE_NAME}:${IMAGE_TAG}
+                    docker restart system-manager || true
                     """
                 }
             }
