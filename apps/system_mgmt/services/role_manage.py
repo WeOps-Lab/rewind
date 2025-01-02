@@ -24,6 +24,7 @@ class RoleManage(object):
             {
                 "id": i["id"],
                 "display_name": i["name"],
+                "role_id": json.loads(i["config"]["roles"])[0]["id"],
                 "role_name": role_map.get(
                     json.loads(i["config"]["roles"])[0]["id"], ""
                 ),

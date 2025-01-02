@@ -2,6 +2,7 @@ from django.http import JsonResponse
 from rest_framework import viewsets
 from rest_framework.decorators import action
 
+from apps.core.logger import logger
 from apps.system_mgmt.services.user_manage import UserManage
 
 
@@ -35,8 +36,13 @@ class UserViewSet(viewsets.ViewSet):
 
     @action(detail=False, methods=["POST"])
     def create_user(self, request):
-        data = UserManage().user_create(request.data)
-        return JsonResponse({"result": True, "data": data})
+        try:
+            data = UserManage().user_create(request.data)
+
+            return JsonResponse({"result": True, "data": data})
+        except Exception as e:
+            logger.exception(e)
+            return JsonResponse({"result": False, "message": str(e)})
 
     @action(detail=False, methods=["POST"])
     def delete_user(self, request):

@@ -33,7 +33,15 @@ class UserManage(object):
             except Exception:
                 roles = []
             # 用户补充用户组信息
+            try:
+                groups = self.keycloak_client.realm_client.get_user_groups(
+                    user_info["id"]
+                )
+            except Exception:
+                groups = []
+            # 用户补充用户组信息
             user_info.update(roles=roles)
+            user_info.update(groups=groups)
         return {"count": len(users), "users": users}
 
     def user_all(self):

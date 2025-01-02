@@ -30,7 +30,6 @@ class GroupManage(object):
 
     def group_update(self, data):
         """更新用户组"""
-        GroupManage().group_retrieve(data["group_id"])
         self.keycloak_client.realm_client.update_group(
             data["group_id"], {"name": data["group_name"]}
         )

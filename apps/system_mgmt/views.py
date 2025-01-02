@@ -13,12 +13,24 @@ def get_client(request):
         {
             "result": True,
             "data": [
-                {"id": i["id"], "name": i["clientId"]}
+                {
+                    "id": i["id"],
+                    "name": i["name"],
+                    "client_id": i["clientId"],
+                    "description": i["description"],
+                }
                 for i in res
                 if i["clientId"] in ["munchkin", "system_mgmt"]
             ],
         }
     )
+
+
+@csrf_exempt
+def get_client_detail(request):
+    client = KeyCloakClient()
+    res = client.realm_client.get_client(client_id=request.GET["client_id"])
+    return JsonResponse({"result": True, "data": res})
 
 
 def verify_token(request):
