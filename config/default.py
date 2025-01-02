@@ -125,7 +125,7 @@ AUTHENTICATION_BACKENDS = (
 )
 ROOT_URLCONF = "urls"
 
-AUTH_USER_MODEL = "core.User"
+AUTH_USER_MODEL = "base.User"
 
 DEBUG = os.getenv("DEBUG", "0") == "1"
 
@@ -141,9 +141,9 @@ if DEBUG:
     )  # noqa
     # 该跨域中间件需要放在前面
     MIDDLEWARE = (
-        "corsheaders.middleware.CorsMiddleware",
-        "debug_toolbar.middleware.DebugToolbarMiddleware",
-    ) + MIDDLEWARE  # noqa
+                     "corsheaders.middleware.CorsMiddleware",
+                     "debug_toolbar.middleware.DebugToolbarMiddleware",
+                 ) + MIDDLEWARE  # noqa
     CORS_ORIGIN_ALLOW_ALL = True
     CORS_ALLOW_CREDENTIALS = True
     CORS_ALLOW_HEADERS = [
@@ -298,8 +298,8 @@ LOGGING = {
         "simple": {"format": "%(levelname)s %(message)s \n"},
         "verbose": {
             "format": "%(levelname)s [%(asctime)s] %(pathname)s "
-            "%(lineno)d %(funcName)s %(process)d %(thread)d "
-            "\n \t %(message)s \n",
+                      "%(lineno)d %(funcName)s %(process)d %(thread)d "
+                      "\n \t %(message)s \n",
             "datefmt": "%Y-%m-%d %H:%M:%S",
         },
     },
@@ -348,6 +348,8 @@ MINIO_CONSISTENCY_CHECK_ON_START = False
 MINIO_PRIVATE_BUCKETS = ["rewind-private"]
 MINIO_PUBLIC_BUCKETS = ["rewind-public"]
 MINIO_POLICY_HOOKS: List[Tuple[str, dict]] = []
+
+from apps.config import *  # noqa
 
 # 本地设置
 try:

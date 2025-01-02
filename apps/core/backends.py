@@ -6,7 +6,7 @@ from django.core.cache import caches
 from django.db import IntegrityError
 from django.utils import translation
 
-from apps.core.models import User, UserAPISecret
+from apps.base.models import User, UserAPISecret
 from apps.core.utils.keycloak_client import KeyCloakClient
 
 logger = logging.getLogger("app")
@@ -53,7 +53,7 @@ class KeycloakAuthBackend(ModelBackend):
             user.is_staff = user.is_superuser
             user.group_list = groups
             user.roles = roles
-            user.locale = user_info.get("locale", "zh-Hans")
+            user.locale = user_info.get("locale", "en")
             user.save()
             return user
         except IntegrityError:
