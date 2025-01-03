@@ -9,7 +9,8 @@ from rest_framework.viewsets import GenericViewSet
 
 from apps.core.utils.web_utils import WebUtils
 from apps.monitor.language.service import SettingLanguage
-from apps.monitor.models import MonitorAlert, MonitorEvent, MonitorPolicy, MonitorInstance, MonitorObject
+from apps.monitor.models import MonitorAlert, MonitorEvent, MonitorPolicy, MonitorInstance, MonitorObject, \
+    PolicyOrganization
 from apps.monitor.filters.monitor_alert import MonitorAlertFilter
 from apps.monitor.serializers.monitor_alert import MonitorAlertSerializer
 from apps.monitor.serializers.monitor_instance import MonitorInstanceSerializer
@@ -30,15 +31,16 @@ class MonitorAlertVieSet(
     pagination_class = CustomPageNumberPagination
 
     def list(self, request, *args, **kwargs):
-        # 如果不是超管还没有传递组织ID就抛错
-        if not request.user.is_superuser and not request.query_params.get('organization'):
-            raise ValueError('organization is empty')
-        # 获取分页参数
-        page = int(request.GET.get('page', 1))  # 默认第1页
-        page_size = int(request.GET.get('page_size', 10))  # 默认每页10条数据
 
         # 获取经过过滤器处理的数据
         queryset = self.filter_queryset(self.get_queryset())
+        group_ids = [i["id"] for i in request.user.group_list]
+        policy_ids = PolicyOrganization.objects.filter(organization__in=group_ids).values_list("policy_id", flat=True)
+        queryset = queryset.filter(policy_id__in=list(policy_ids)).distinct()
+
+        # 获取分页参数
+        page = int(request.GET.get('page', 1))  # 默认第1页
+        page_size = int(request.GET.get('page_size', 10))  # 默认每页10条数据
 
         # 计算分页的起始位置
         start = (page - 1) * page_size

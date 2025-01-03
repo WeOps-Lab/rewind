@@ -3,6 +3,7 @@ import json
 from django_celery_beat.models import PeriodicTask, CrontabSchedule
 from rest_framework import viewsets
 
+from apps.core.utils.web_utils import WebUtils
 from apps.monitor.filters.monitor_policy import MonitorPolicyFilter
 from apps.monitor.models import PolicyOrganization
 from apps.monitor.models.monitor_policy import MonitorPolicy
@@ -17,10 +18,18 @@ class MonitorPolicyVieSet(viewsets.ModelViewSet):
     pagination_class = CustomPageNumberPagination
 
     def list(self, request, *args, **kwargs):
-        # 如果不是超管还没有传递组织ID就抛错
-        if not request.user.is_superuser and not request.query_params.get('organization'):
-            raise ValueError('organization is empty')
-        return super().list(request, *args, **kwargs)
+        queryset = self.filter_queryset(self.get_queryset())
+
+        group_ids = [i["id"] for i in request.user.group_list]
+        queryset = queryset.filter(policyorganization__organization__in=group_ids).distinct()
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return WebUtils.response_success(serializer.data)
 
     def create(self, request, *args, **kwargs):
         # 补充创建人

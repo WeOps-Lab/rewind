@@ -33,15 +33,14 @@ class MonitorObjectService:
         return instance_map
 
     @staticmethod
-    def get_monitor_instance(monitor_object_id, page, page_size, name, group_id=None, add_metrics=False):
+    def get_monitor_instance(monitor_object_id, page, page_size, name, group_ids, add_metrics=False):
         """获取监控对象实例"""
         start = (page - 1) * page_size
         end = start + page_size
-        qs = MonitorInstance.objects.filter(monitor_object_id=monitor_object_id)
-        if group_id:
-            group_and_subgroup_ids = get_group_and_subgroup_ids(group_id)
-            qs = qs.filter(monitorinstanceorganization__organization__in=group_and_subgroup_ids)
-        qs = qs.prefetch_related(Prefetch('monitorinstanceorganization_set', to_attr='organizations'))
+        qs = MonitorInstance.objects.filter(
+            monitor_object_id=monitor_object_id,
+            monitorinstanceorganization__organization__in=group_ids,
+        ).prefetch_related(Prefetch('monitorinstanceorganization_set', to_attr='organizations'))
         if name:
             qs = qs.filter(name__icontains=name)
         if page_size == -1:
