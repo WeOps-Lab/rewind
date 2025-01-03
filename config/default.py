@@ -82,6 +82,7 @@ LOCALE_PATHS = (os.path.join(BASE_DIR, "locale"),)
 ALLOWED_HOSTS = ["*"]
 
 INSTALLED_APPS = (
+    "apps.base",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -96,6 +97,7 @@ INSTALLED_APPS = (
     "django_comment_migrate",
     "import_export",
     "django_select2",
+    "apps.core",
 )
 IS_USE_CELERY = True
 
@@ -121,7 +123,7 @@ MIDDLEWARE = (
 AUTHENTICATION_BACKENDS = (
     "apps.core.backends.KeycloakAuthBackend",  # this is default
     "apps.core.backends.APISecretAuthBackend",
-    "django.contrib.auth.backends.ModelBackend",
+    # "django.contrib.auth.backends.ModelBackend",
 )
 ROOT_URLCONF = "urls"
 
@@ -239,7 +241,7 @@ if os.path.exists(APPS_DIR):
     app_folders = [
         name
         for name in os.listdir(APPS_DIR)
-        if os.path.isdir(os.path.join(APPS_DIR, name)) and name != "__pycache__"
+        if os.path.isdir(os.path.join(APPS_DIR, name)) and name not in  ["__pycache__", "base", "core"]
     ]
 else:
     app_folders = []
