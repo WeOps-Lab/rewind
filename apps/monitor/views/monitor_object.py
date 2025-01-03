@@ -31,13 +31,21 @@ class MonitorObjectVieSet(viewsets.ModelViewSet):
             result["display_name"] = lan.get_val("MONITOR_OBJECT", result["name"]) or result["name"]
 
         if request.GET.get("add_instance_count") in ["true", "True"]:
-            count_data = MonitorInstance.objects.values('monitor_object_id').annotate(instance_count=Count('id'))
+            inst_qs = MonitorInstance.objects.filter()
+            if not request.user.is_superuser:
+                group_ids = [i["id"] for i in request.user.group_list]
+                inst_qs = inst_qs.filter(monitorinstanceorganization__organization__in=group_ids)
+            count_data = inst_qs.values('monitor_object_id').annotate(instance_count=Count('id'))
             count_map = {i["monitor_object_id"]: i["instance_count"] for i in count_data}
             for result in results:
                 result["instance_count"] = count_map.get(result["id"], 0)
 
         if request.GET.get("add_policy_count") in ["true", "True"]:
-            count_data = MonitorPolicy.objects.values('monitor_object_id').annotate(policy_count=Count('id'))
+            policy_qs = MonitorPolicy.objects.filter()
+            if not request.user.is_superuser:
+                group_ids = [i["id"] for i in request.user.group_list]
+                policy_qs = policy_qs.filter(policyorganization__organization__in=group_ids)
+            count_data = policy_qs.values('monitor_object_id').annotate(policy_count=Count('id'))
             count_map = {i["monitor_object_id"]: i["policy_count"] for i in count_data}
             for result in results:
                 result["policy_count"] = count_map.get(result["id"], 0)

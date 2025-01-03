@@ -7,6 +7,7 @@ from apps.monitor.views.metrics_instance import MetricsInstanceVieSet
 from apps.monitor.views.monitor_object import MonitorObjectVieSet
 from apps.monitor.views.monitor_policy import MonitorPolicyVieSet
 from apps.monitor.views.plugin import MonitorPluginVieSet
+from apps.monitor.views.system_mgmt import SystemMgmtView
 
 router = routers.DefaultRouter()
 router.register(r"api/monitor_object", MonitorObjectVieSet, basename="MonitorObject")
@@ -21,4 +22,5 @@ router.register(r"api/monitor_plugin", MonitorPluginVieSet, basename="MonitorPlu
 router.register(r"api/monitor_alert", MonitorAlertVieSet, basename="MonitorAlertVieSet")
 router.register(r"api/monitor_event", MonitorEventVieSet, basename="MonitorEventVieSet")
 
+router.register(r"api/system_mgmt", SystemMgmtView, basename="SystemMgmtView")
 urlpatterns = router.urls

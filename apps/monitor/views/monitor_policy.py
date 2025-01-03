@@ -110,12 +110,12 @@ class MonitorPolicyVieSet(viewsets.ModelViewSet):
     def update_policy_organizations(self, policy_id, organizations):
         """更新策略的组织"""
         old_organizations = PolicyOrganization.objects.filter(policy_id=policy_id)
-        old_set = set([org.organization_id for org in old_organizations])
+        old_set = set([org.organization for org in old_organizations])
         new_set = set(organizations)
         # 删除不存在的组织
         delete_set = old_set - new_set
-        PolicyOrganization.objects.filter(policy_id=policy_id, organization_id__in=delete_set).delete()
+        PolicyOrganization.objects.filter(policy_id=policy_id, organization__in=delete_set).delete()
         # 添加新的组织
         create_set = new_set - old_set
-        create_objs = [PolicyOrganization(policy_id=policy_id, organization_id=org_id) for org_id in create_set]
+        create_objs = [PolicyOrganization(policy_id=policy_id, organization=org_id) for org_id in create_set]
         PolicyOrganization.objects.bulk_create(create_objs, batch_size=200)

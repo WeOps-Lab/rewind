@@ -33,6 +33,7 @@ class MonitorInstanceVieSet(viewsets.ViewSet):
             int(page_size),
             request.GET.get("name"),
             [i["id"] for i in request.user.group_list],
+            request.user.is_superuser,
             bool(request.GET.get("add_metrics", False)),
         )
         return WebUtils.response_success(data)

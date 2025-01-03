@@ -6,7 +6,13 @@ import requests
 class NodeApi:
     def __init__(self, token):
         self.token = token
-        self.host = os.getenv("NODE_API_URL")
+        self.host = self.get_url()
+
+    def get_url(self):
+        url = os.getenv("NODE_MANAGE_URL")
+        if not url:
+            raise ValueError("NODE_MANAGE_URL is not set")
+        return url
 
     def get_nodes(self):
         url = f"{self.host}/api/v1/nodes"
