@@ -1,12 +1,6 @@
-from django.conf import settings
 from django.http import JsonResponse
 from django.shortcuts import render
-from django.utils import translation
-from django.utils.translation import gettext as _
-from rest_framework import status
-
-from apps.core.utils.keycloak_client import KeyCloakClient
-from apps.core.utils.web_utils import WebUtils
+from rest_framework.decorators import api_view
 
 
 def index(request):
@@ -15,6 +9,7 @@ def index(request):
     return response
 
 
+@api_view(['GET'])
 def login_info(request):
     return JsonResponse(
         {
