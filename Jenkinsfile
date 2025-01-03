@@ -61,7 +61,8 @@ pipeline {
             steps {
                 script {
                     sh """
-                     echo "pass"
+                        docker pull ${IMAGE_NAME}:${IMAGE_TAG}
+                        docker restart monitor || true
                     """
                 }
             }
