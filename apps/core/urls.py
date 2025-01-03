@@ -13,7 +13,7 @@ public_router.register(r"api/public/user_view", UserView, basename="user_view")
 public_router.register(r"user_api_secret", UserAPISecretViewSet)
 
 urlpatterns = [
-    re_path(r"^login_info/$", index_view.login_info),
+    re_path(r"api/login_info/", index_view.login_info),
 ]
 
 urlpatterns += public_router.urls

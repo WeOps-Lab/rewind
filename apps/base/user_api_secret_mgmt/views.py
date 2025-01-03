@@ -5,8 +5,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from apps.base.models import UserAPISecret
+from apps.base.user_api_secret_mgmt.serializers import UserAPISecretSerializer
 from apps.core.decorators.api_perminssion import HasRole
-from apps.core.serializers.user_auth_serializer import UserAPISecretSerializer
 
 
 class UserAPISecretViewSet(viewsets.ModelViewSet):
@@ -15,7 +15,8 @@ class UserAPISecretViewSet(viewsets.ModelViewSet):
     ordering = ("-id",)
 
     def list(self, request, *args, **kwargs):
-        query = self.get_queryset().filter(username=request.user.username)
+        current_team = request.COOKIES.get("current_team")
+        query = self.get_queryset().filter(username=request.user.username, team=current_team)
         queryset = self.filter_queryset(query)
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
@@ -28,12 +29,13 @@ class UserAPISecretViewSet(viewsets.ModelViewSet):
     @HasRole()
     def create(self, request, *args, **kwargs):
         username = request.user.username
-        if UserAPISecret.objects.filter(username=username).exists():
+        current_team = request.COOKIES.get("current_team")
+        if UserAPISecret.objects.filter(username=username, team=current_team).exists():
             return JsonResponse({"result": False, "message": _("This user already has an API Secret")})
         kwargs = {
             "username": username,
             "api_secret": UserAPISecret.generate_api_secret(),
-            "team": request.data.get("team"),
+            "team": current_team,
         }
         serializer = self.get_serializer(data=kwargs)
         serializer.is_valid(raise_exception=True)

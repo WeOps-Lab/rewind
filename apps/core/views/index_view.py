@@ -1,5 +1,6 @@
 from django.http import JsonResponse
 from django.shortcuts import render
+from rest_framework.decorators import api_view
 
 
 def index(request):
@@ -8,6 +9,7 @@ def index(request):
     return response
 
 
+@api_view(['GET'])
 def login_info(request):
     return JsonResponse(
         {
@@ -20,3 +22,4 @@ def login_info(request):
             },
         }
     )
+

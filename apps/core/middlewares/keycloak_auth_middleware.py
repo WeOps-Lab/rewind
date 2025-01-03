@@ -14,14 +14,12 @@ class KeyCloakAuthMiddleware(MiddlewareMixin):
         self.logger = logging.getLogger(__name__)
 
     def process_view(self, request, view, args, kwargs):
-        if any(
-            [
-                getattr(view, "api_exempt", False),
-                getattr(request, "api_pass", False),
-                request.path == "/swagger/",
-                request.path.startswith("/admin/"),
-            ]
-        ):
+        if any([
+            getattr(view, "api_exempt", False),
+            getattr(request, "api_pass", False),
+            request.path == "/swagger/",
+            request.path.startswith("/admin/")
+        ]):
             return None
 
         token = request.META.get(settings.AUTH_TOKEN_HEADER_NAME)

@@ -189,9 +189,7 @@ def handle_create_model(file_path, library):
             suggested_naming = library.get(field)
             if suggested_naming:
                 err_list.append(
-                    "Field ({}) in Model ({}) might be replaced by ({})".format(
-                        field, model_name, suggested_naming
-                    )
+                    "Field ({}) in Model ({}) might be replaced by ({})".format(field, model_name, suggested_naming)
                 )
     return err_list
 
