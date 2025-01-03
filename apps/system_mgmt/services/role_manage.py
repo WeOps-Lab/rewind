@@ -61,12 +61,13 @@ class RoleManage(object):
 
     def role_create(self, data):
         """创建角色，先创建角色再创建角色对应的策略"""
-        role_name, _ = data["name"], data.pop("superior_role", "")
+        role_name = data["name"]
+        client_id = data.pop("client_id")
+        data.pop("superior_role", "")
         self.keycloak_client.realm_client.create_realm_role(data, True)
         role_info = self.keycloak_client.realm_client.get_realm_role(
             role_name=role_name
         )
-        client_id = self.keycloak_client.get_client_id()
         policy_data = {
             "type": "role",
             "logic": "POSITIVE",
