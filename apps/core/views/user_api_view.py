@@ -4,8 +4,8 @@ from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from apps.base.models import UserAPISecret
 from apps.core.decorators.api_perminssion import HasRole
-from apps.core.models import UserAPISecret
 from apps.core.serializers.user_auth_serializer import UserAPISecretSerializer
 
 

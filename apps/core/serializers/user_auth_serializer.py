@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from apps.core.models import UserAPISecret
+from apps.base.models import UserAPISecret
 
 
 class UserAuthSerializer(serializers.Serializer):

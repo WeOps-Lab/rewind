@@ -1,11 +1,6 @@
-from django.conf import settings
+from django.http import JsonResponse
 from django.shortcuts import render
-from django.utils import translation
-from django.utils.translation import gettext as _
-from rest_framework import status
-
-from apps.core.utils.keycloak_client import KeyCloakClient
-from apps.core.utils.web_utils import WebUtils
+from rest_framework.decorators import api_view
 
 
 def index(request):
@@ -14,20 +9,17 @@ def index(request):
     return response
 
 
+@api_view(['GET'])
 def login_info(request):
-    token = request.META.get(settings.AUTH_TOKEN_HEADER_NAME).split("Bearer ")[-1]
-    if token is None:
-        return WebUtils.response_error(
-            error_message=_("please provide Token"),
-            status_code=status.HTTP_401_UNAUTHORIZED,
-        )
-    client = KeyCloakClient()
-    is_active, user_info = client.token_is_valid(token)
-    if not is_active:
-        return WebUtils.response_error(
-            error_message=_("token validation failed"),
-            status_code=status.HTTP_401_UNAUTHORIZED,
-        )
-    if user_info.get("locale"):
-        translation.activate(user_info["locale"])
-    return WebUtils.response_success({"result": True})
+    return JsonResponse(
+        {
+            "result": True,
+            "data": {
+                "username": request.user.username,
+                "is_superuser": request.user.is_superuser,
+                "group_list": request.user.group_list,
+                "roles": request.user.roles,
+            },
+        }
+    )
+
