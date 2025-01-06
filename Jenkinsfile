@@ -8,7 +8,7 @@ pipeline {
     }
 
     environment {
-        BRANCH_NAME = 'node_manager'
+        BRANCH_NAME = 'node_mgmt'
         IMAGE_NAME = "etherfurnace/node-manager"
         IMAGE_TAG='latest'
     }
