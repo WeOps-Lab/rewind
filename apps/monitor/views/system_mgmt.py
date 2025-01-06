@@ -9,6 +9,7 @@ from apps.monitor.utils.system_mgmt_api import SystemMgmtApi
 class SystemMgmtView(ViewSet):
     @swagger_auto_schema(
         operation_description="查询所有用户",
+        tags=['SystemMgmt']
     )
     @action(methods=['get'], detail=False, url_path='user_all')
     def get_user_all(self, request):
