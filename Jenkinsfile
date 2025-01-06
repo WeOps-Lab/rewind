@@ -62,7 +62,12 @@ pipeline {
                 script {
                     sh """
                         docker pull ${IMAGE_NAME}:${IMAGE_TAG}
-                        docker restart monitor || true
+                        docker stop monitor || true
+                        docker rm monitor|| true
+                        docker run -itd --name monitor --restart always \
+                            -v /root/codes/conf/monitor/.env:/apps/.env \
+                            --network lite \
+                            etherfurnace/monitor
                     """
                 }
             }
