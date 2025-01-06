@@ -2,6 +2,8 @@
 import os
 from datetime import timedelta
 from typing import List, Tuple
+from dotenv import load_dotenv
+load_dotenv()
 
 SECRET_KEY = os.getenv("SECRET_KEY", "")
 APP_CODE = os.getenv("APP_CODE", "munchkin")
