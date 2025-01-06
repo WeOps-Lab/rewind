@@ -1,5 +1,4 @@
-from rest_framework import viewsets, mixins
-from rest_framework.viewsets import GenericViewSet
+from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -15,11 +14,7 @@ from apps.node_mgmt.filters.collector_configuration import CollectorConfiguratio
 from apps.node_mgmt.services.collector_configuration import CollectorConfigurationService
 
 
-class CollectorConfigurationViewSet(mixins.CreateModelMixin,
-                                    mixins.UpdateModelMixin,
-                                    mixins.DestroyModelMixin,
-                                    mixins.ListModelMixin,
-                                    GenericViewSet):
+class CollectorConfigurationViewSet(ModelViewSet):
     queryset = CollectorConfiguration.objects.all().order_by("-created_at")
     serializer_class = CollectorConfigurationSerializer
     filterset_class = CollectorConfigurationFilter
@@ -67,6 +62,20 @@ class CollectorConfigurationViewSet(mixins.CreateModelMixin,
     )
     def destroy(self, request, *args, **kwargs):
         return super().destroy(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_summary="更新采集器配置",
+        tags=['CollectorConfiguration']
+    )
+    def update(self, request, *args, **kwargs):
+        return super().update(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_summary="查询采集器配置详情",
+        tags=['CollectorConfiguration']
+    )
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
 
     @swagger_auto_schema(
         operation_summary="批量删除采集器配置",
