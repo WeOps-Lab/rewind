@@ -62,7 +62,12 @@ pipeline {
                 script {
                     sh """
                     docker pull ${IMAGE_NAME}:${IMAGE_TAG}
-                    docker restart system-manager || true
+                    docker stop system-manager || true
+                    docker rm system-manager || true
+                    docker run -itd --name system-manager --restart always \
+                        -v /root/codes/conf/system-manager/.env:/apps/.env \
+                        --network lite \
+                        etherfurnace/system-manager
                     """
                 }
             }
