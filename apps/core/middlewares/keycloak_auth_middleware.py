@@ -4,6 +4,7 @@ from django.conf import settings
 from django.contrib import auth
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.translation import gettext as _
+from rest_framework.permissions import AllowAny
 
 from apps.core.utils.web_utils import WebUtils
 
@@ -20,6 +21,10 @@ class KeyCloakAuthMiddleware(MiddlewareMixin):
             request.path == "/swagger/",
             request.path.startswith("/admin/")
         ]):
+            return None
+
+        # 检查是否豁免登录
+        if getattr(view, "login_exempt", False):
             return None
 
         token = request.META.get(settings.AUTH_TOKEN_HEADER_NAME)
