@@ -44,14 +44,22 @@ class RoleViewSet(viewsets.ViewSet):
 
     @action(detail=False, methods=["POST"])
     def delete_role(self, request):
-        pk = request.data.get("role_id")
-        data = RoleManage().role_delete(pk)
-        return JsonResponse({"result": True, "data": data})
+        policy_id = request.data.get("policy_id")
+        policy_name = request.data.get("display_name")
+        client_id = request.data.get("id")
+        role_name = request.data.get("role_name")
+        try:
+            RoleManage().role_delete(client_id, policy_id, policy_name, role_name)
+        except Exception as e:
+            return JsonResponse({"result": False, "message": str(e)})
+        return JsonResponse({"result": True})
 
     @action(detail=False, methods=["POST"])
     def update_role(self, request):
-        pk = request.data.get("role_id")
-        RoleManage().role_update(request.data.get("description", ""), pk)
+        client_id = request.data.get("id")
+        policy_id = request.data.get("policy_id")
+        policy_name = request.data.get("policy_name")
+        RoleManage().role_update(client_id, policy_id, policy_name)
         return JsonResponse({"result": True})
 
     @action(detail=False, methods=["POST"])
@@ -64,8 +72,8 @@ class RoleViewSet(viewsets.ViewSet):
     @action(detail=False, methods=["POST"])
     def delete_user(self, request):
         pk = request.data.get("role_id")
-        user_id = request.data.get("role_id")
-        RoleManage().role_remove_user(pk, user_id)
+        user_ids = request.data.get("user_ids")
+        RoleManage().role_remove_user(pk, user_ids)
         return JsonResponse({"result": True})
 
     @action(detail=False, methods=["POST"])
@@ -84,3 +92,13 @@ class RoleViewSet(viewsets.ViewSet):
     def get_groups_by_role(self, request):
         data = RoleManage().role_groups(request.GET.get("role_name"))
         return JsonResponse({"result": True, "data": data})
+
+    @action(detail=False, methods=["POST"])
+    def set_role_menus(self, request):
+        params = request.data
+        policy_id = params.get("policy_id")
+        policy_name = params.get("policy_name")
+        client_id = params.get("id")
+        menus = params.get("menus")
+        RoleManage().set_role_menus(policy_id, menus, policy_name, client_id)
+        return JsonResponse({"result": True})

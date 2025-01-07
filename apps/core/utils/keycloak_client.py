@@ -114,9 +114,7 @@ class KeyCloakClient:
         try:
             openid_client = self.get_openid_client()
             token = openid_client.token(username, password)
-            return UserTokenEntity(
-                token=token["access_token"], error_message="", success=True
-            )
+            return UserTokenEntity(token=token["access_token"], error_message="", success=True)
         except Exception as e:
             self.logger.error(e)
             return UserTokenEntity(token=None, error_message="用户名密码不匹配", success=False)
@@ -130,19 +128,13 @@ class KeyCloakClient:
 
     def get_normal_user_all_groups(self, res, all_groups):
         exist_data = [i["id"] for i in res]
-        return_data = [
-            {"id": i["id"], "name": i["name"], "path": i["path"]} for i in res
-        ]
+        return_data = [{"id": i["id"], "name": i["name"], "path": i["path"]} for i in res]
         group_ids = [i["id"] for i in return_data]
         for i in all_groups:
             if i["id"] not in group_ids:
                 continue
             sub_groups = i.pop("subGroups", [])
-            group_children = [
-                u
-                for u in self.get_child_groups(sub_groups)
-                if u["id"] not in exist_data
-            ]
+            group_children = [u for u in self.get_child_groups(sub_groups) if u["id"] not in exist_data]
             return_data.extend(group_children)
             exist_data.extend([u["id"] for u in group_children])
         return return_data
@@ -153,16 +145,10 @@ class KeyCloakClient:
         for i in groups:
             sub_groups = i.pop("subGroups", [])
             if i["id"] not in return_data:
-                return_data.append(
-                    {"id": i["id"], "name": i["name"], "path": i["path"]}
-                )
+                return_data.append({"id": i["id"], "name": i["name"], "path": i["path"]})
                 exist_data.append(i["id"])
             if sub_groups:
-                group_children = [
-                    u
-                    for u in self.get_child_groups(sub_groups)
-                    if u["id"] not in exist_data
-                ]
+                group_children = [u for u in self.get_child_groups(sub_groups) if u["id"] not in exist_data]
                 return_data.extend(group_children)
                 exist_data.extend([u["id"] for u in group_children])
         return return_data
@@ -187,3 +173,14 @@ class KeyCloakClient:
                 role_info.update(role_type="group")
             roles.append(role_info)
         return roles
+
+    def create_permission(self, client_id, menu_ids, permission_name, policy_id):
+        permission = {
+            "resources": menu_ids,
+            "policies": [policy_id],
+            "name": f"{permission_name}-permission",
+            "description": "",
+            "decisionStrategy": "AFFIRMATIVE",
+            "resourceType": "",
+        }
+        self.realm_client.create_client_authz_resource_based_permission(client_id, permission, True)

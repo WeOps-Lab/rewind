@@ -15,19 +15,15 @@ class RoleManage(object):
 
     def get_role_list(self, client_id):
         """角色列表"""
-        policies = self.keycloak_client.realm_client.get_client_authz_policies(
-            client_id
-        )
+        policies = self.keycloak_client.realm_client.get_client_authz_policies(client_id)
         all_roles = self.keycloak_client.get_realm_roles()
         role_map = {i["id"]: i["name"] for i in all_roles}
         roles = [
             {
-                "id": i["id"],
+                "policy_id": i["id"],
                 "display_name": i["name"],
                 "role_id": json.loads(i["config"]["roles"])[0]["id"],
-                "role_name": role_map.get(
-                    json.loads(i["config"]["roles"])[0]["id"], ""
-                ),
+                "role_name": role_map.get(json.loads(i["config"]["roles"])[0]["id"], ""),
             }
             for i in policies
             if i["type"] == "role"
@@ -36,18 +32,57 @@ class RoleManage(object):
 
     def role_users(self, query, role_name):
         """获取角色关联的用户"""
-        result = self.keycloak_client.realm_client.get_realm_role_members(
-            role_name, query
-        )
+        result = self.keycloak_client.realm_client.get_realm_role_members(role_name, query)
         return result
 
     def get_all_menus(self, client_id):
-        client = SupplementApi(self.keycloak_client.realm_client.connection)
         all_menus = cache.get(f"all_menus_{client_id}")
         if not all_menus:
-            all_menus = client.get_all_menus(client_id)
+            menus = self.keycloak_client.realm_client.get_client_authz_resources(client_id)
+            all_menus = self.transform_data(menus)
             cache.set(f"all_menus_{client_id}", all_menus, 60 * 30)
         return all_menus
+
+    @staticmethod
+    def transform_data(data):
+        data = [
+            {
+                "name": i["name"],
+                "type": i["type"],
+                "display_name": i["displayName"],
+                "index": int(i["attributes"]["index"][0]),
+            }
+            for i in data
+            if i.get("attributes", {}).get("index") is not None
+        ]
+        data.sort(key=lambda i: i["index"])
+        transformed = defaultdict(lambda: defaultdict(lambda: {"display_name": "", "operation": []}))
+        for item in data:
+            type_ = item["type"]
+            name_operation = item["name"].split("-")
+            name = name_operation[0]
+            operation = name_operation[1] if len(name_operation) > 1 else ""
+            display_name = " ".join(item["display_name"].split("-")[:-1])
+
+            if transformed[type_][name]["display_name"] == "":
+                transformed[type_][name]["display_name"] = display_name
+
+            transformed[type_][name]["operation"].append(operation)
+
+        result = []
+        for type_, names in transformed.items():
+            children = []
+            for name, details in names.items():
+                children.append(
+                    {
+                        "name": name,
+                        "display_name": details["display_name"],
+                        "operation": details["operation"],
+                    }
+                )
+            result.append({"name": type_, "display_name": type_, "children": children})
+
+        return result
 
     def role_menus(self, client_id, policy_id):
         """获取角色权限"""
@@ -62,12 +97,12 @@ class RoleManage(object):
     def role_create(self, data):
         """创建角色，先创建角色再创建角色对应的策略"""
         role_name = data["name"]
-        client_id = data.pop("client_id")
+        client_name = data.pop("client_id")
+        client_id = data.pop("id")
         data.pop("superior_role", "")
-        self.keycloak_client.realm_client.create_realm_role(data, True)
-        role_info = self.keycloak_client.realm_client.get_realm_role(
-            role_name=role_name
-        )
+        role_params = {"name": f"{client_name}_{role_name}"}
+        self.keycloak_client.realm_client.create_realm_role(role_params, True)
+        role_info = self.keycloak_client.realm_client.get_realm_role(role_name=f"{client_name}_{role_name}")
         policy_data = {
             "type": "role",
             "logic": "POSITIVE",
@@ -75,13 +110,17 @@ class RoleManage(object):
             "name": role_name,
             "roles": [{"id": role_info["id"]}],
         }
-        self.keycloak_client.realm_client.create_client_authz_role_based_policy(
+        policy_obj = self.keycloak_client.realm_client.create_client_authz_role_based_policy(
             client_id, policy_data, True
         )
+        return {
+            "policy_id": policy_obj["id"],
+            "display_name": role_name,
+            "role_name": role_info["name"],
+            "role_id": role_info["id"],
+        }
 
-        return role_info
-
-    def role_delete(self, role_name):
+    def role_delete(self, client_id, policy_id, policy_name, role_name):
         """
         删除角色
         1.角色关联校验（校验角色是否被用户或者组织关联）
@@ -90,9 +129,9 @@ class RoleManage(object):
         """
 
         # 禁止删除内置角色
-        if role_name == "admin":
-            raise BaseAppException("内置角色禁止删除！")
 
+        if policy_name in ["admin", "normal"]:
+            raise BaseAppException("内置角色禁止删除！")
         # 角色关联校验（校验角色是否被用户或者组织关联）
         groups = self.keycloak_client.realm_client.get_realm_role_groups(role_name)
         if groups:
@@ -103,57 +142,29 @@ class RoleManage(object):
         if users:
             msg = "、".join([i["username"] for i in users])
             raise BaseAppException(f"角色已被下列用户使用：{msg}！")
-
         # 移除角色权限
-        client_id = self.keycloak_client.get_client_id()
-        policies = self.keycloak_client.realm_client.get_client_authz_policies(
-            client_id
-        )
-        policy_id = None
-        for policy in policies:
-            if policy["name"] == role_name:
-                policy_id = policy["id"]
-                break
-        permissions = SupplementApi(
-            self.keycloak_client.realm_client.connection
-        ).get_permission_by_policy_id(client_id, policy_id)
         supplement_api = SupplementApi(self.keycloak_client.realm_client.connection)
+        permissions = supplement_api.get_permission_by_policy_id(client_id, policy_id)
         for permission_info in permissions:
-            del permission_info["config"]
-            permission_policies = supplement_api.get_policies_by_permission_id(
-                client_id, permission_info["id"]
-            )
-            permission_policy_ids = [i["id"] for i in permission_policies]
-            permission_policy_ids.remove(policy_id)
-            permission_info.update(policies=permission_policy_ids, description="")
-            supplement_api.update_permission(
-                client_id, permission_info["id"], permission_info
-            )
-
+            supplement_api.delete_permission(client_id, permission_info["id"])
         # 删除角色
-        result = self.keycloak_client.realm_client.delete_realm_role(role_name)
+        self.keycloak_client.realm_client.delete_realm_role(role_name)
+        self.keycloak_client.realm_client.delete_client_authz_policy(client_id, policy_id)
 
-        return result
-
-    def role_update(self, description, role_name):
+    def role_update(self, client_id, policy_id, policy_name):
         """修改角色信息"""
-        self.keycloak_client.realm_client.update_realm_role(
-            role_name, dict(description=description, name=role_name)
-        )
+        supplement_api = SupplementApi(self.keycloak_client.realm_client.connection)
+        supplement_api.update_policy(client_id, policy_id, policy_name)
 
     def role_set_permissions(self, data, role_name):
         """设置角色权限"""
         if role_name == "admin":
             raise BaseAppException("超管角色拥有全部权限，无需设置！")
         client_id = self.keycloak_client.get_client_id()
-        all_resources = self.keycloak_client.realm_client.get_client_authz_resources(
-            client_id
-        )
+        all_resources = self.keycloak_client.realm_client.get_client_authz_resources(client_id)
         resource_mapping = {i["name"]: i["_id"] for i in all_resources}
         # 获取角色映射的policy_id（角色与policy一对一映射）
-        policies = self.keycloak_client.realm_client.get_client_authz_policies(
-            client_id
-        )
+        policies = self.keycloak_client.realm_client.get_client_authz_policies(client_id)
         policy_id = None
         for policy in policies:
             # 取角色的policy_id
@@ -162,12 +173,8 @@ class RoleManage(object):
                 break
         permission_name_set = set(data)
         # 判断是否需要初始化权限，若需要就进行资源与权限的初始化
-        all_permissions = (
-            self.keycloak_client.realm_client.get_client_authz_permissions(client_id)
-        )
-        need_init_permissions = permission_name_set - {
-            i["name"] for i in all_permissions
-        }
+        all_permissions = self.keycloak_client.realm_client.get_client_authz_permissions(client_id)
+        need_init_permissions = permission_name_set - {i["name"] for i in all_permissions}
         for permission_name in need_init_permissions:
             resource_id = resource_mapping.get(permission_name)
             if not resource_id:
@@ -180,10 +187,8 @@ class RoleManage(object):
                     "ownerManagedAccess": False,
                     "attributes": {},
                 }
-                resource_resp = (
-                    self.keycloak_client.realm_client.create_client_authz_resource(
-                        client_id, resource, True
-                    )
+                resource_resp = self.keycloak_client.realm_client.create_client_authz_resource(
+                    client_id, resource, True
                 )
                 resource_id = resource_resp["_id"]
             permission = {
@@ -194,19 +199,13 @@ class RoleManage(object):
                 "decisionStrategy": "AFFIRMATIVE",
                 "resourceType": "",
             }
-            self.keycloak_client.realm_client.create_client_authz_resource_based_permission(
-                client_id, permission, True
-            )
+            self.keycloak_client.realm_client.create_client_authz_resource_based_permission(client_id, permission, True)
 
         # 判断权限是否需要更新
-        all_permissions = (
-            self.keycloak_client.realm_client.get_client_authz_permissions(client_id)
-        )
+        all_permissions = self.keycloak_client.realm_client.get_client_authz_permissions(client_id)
         supplement_api = SupplementApi(self.keycloak_client.realm_client.connection)
         for permission_info in all_permissions:
-            permission_policies = supplement_api.get_policies_by_permission_id(
-                client_id, permission_info["id"]
-            )
+            permission_policies = supplement_api.get_policies_by_permission_id(client_id, permission_info["id"])
             permission_policy_ids = [i["id"] for i in permission_policies]
             # 需要绑定权限与角色的
             if permission_info["name"] in permission_name_set:
@@ -221,9 +220,7 @@ class RoleManage(object):
                 permission_policy_ids.remove(policy_id)
             # 执行权限更新
             permission_info.update(policies=permission_policy_ids)
-            supplement_api.update_permission(
-                client_id, permission_info["id"], permission_info
-            )
+            supplement_api.update_permission(client_id, permission_info["id"], permission_info)
 
     def role_add_user(self, role_id, user_ids):
         """为某个用户设置一个角色"""
@@ -231,10 +228,11 @@ class RoleManage(object):
         for user_id in user_ids:
             self.keycloak_client.realm_client.assign_realm_roles(user_id, role)
 
-    def role_remove_user(self, role_id, user_id):
+    def role_remove_user(self, role_id, user_ids):
         """移除角色下的某个用户"""
         role = self.keycloak_client.realm_client.get_realm_role_by_id(role_id)
-        self.keycloak_client.realm_client.delete_realm_roles_of_user(user_id, role)
+        for user_id in user_ids:
+            self.keycloak_client.realm_client.delete_realm_roles_of_user(user_id, role)
 
     def role_add_groups(self, data, role_id):
         """为一些组添加某个角色"""
@@ -254,6 +252,19 @@ class RoleManage(object):
         result = self.keycloak_client.realm_client.get_realm_role_groups(role_name)
         return result
 
+    def set_role_menus(self, policy_id, menus, policy_name, client_id):
+        supplement_api = SupplementApi(self.keycloak_client.realm_client.connection)
+        permissions = supplement_api.get_permission_by_policy_id(client_id, policy_id)
+        for permission_info in permissions:
+            supplement_api.delete_permission(client_id, permission_info["id"])
+        menu_ids = self.format_menus(menus, client_id)
+        self.keycloak_client.create_permission(client_id, menu_ids, policy_name, policy_id)
+
+    def format_menus(self, menus, client_id):
+        all_menus = self.keycloak_client.realm_client.get_client_authz_resources(client_id)
+        menu_ids = [i["_id"] for i in all_menus if i["name"] in menus]
+        return menu_ids
+
 
 class SupplementApi(object):
     def __init__(self, connection):
@@ -272,26 +283,40 @@ class SupplementApi(object):
 
     def update_permission(self, client_id, permission_id, permission):
         """设置权限"""
-        url = (
-            urls_patterns.URL_ADMIN_CLIENT_AUTHZ
-            + "/permission/resource/{permission_id}"
-        )
+        url = urls_patterns.URL_ADMIN_CLIENT_AUTHZ + "/permission/resource/{permission_id}"
         params_path = {
             "realm-name": self.connection.realm_name,
             "id": client_id,
             "permission_id": permission_id,
         }
-        data_raw = self.connection.raw_put(
-            url.format(**params_path), json.dumps(permission)
-        )
+        data_raw = self.connection.raw_put(url.format(**params_path), json.dumps(permission))
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
+    def update_policy(self, client_id, policy_id, policy_name):
+        url = urls_patterns.URL_ADMIN_CLIENT_AUTHZ + "/policy/role/{policy_id}"
+
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "id": client_id,
+            "policy_id": policy_id,
+        }
+        data_raw = self.connection.raw_put(url.format(**params_path), json.dumps({"name": policy_name}))
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
+    def delete_permission(self, client_id, permission_id):
+        """设置权限"""
+        url = urls_patterns.URL_ADMIN_CLIENT_AUTHZ + "/permission/resource/{permission_id}"
+        params_path = {
+            "realm-name": self.connection.realm_name,
+            "id": client_id,
+            "permission_id": permission_id,
+        }
+        data_raw = self.connection.raw_delete(url.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     def get_policies_by_permission_id(self, client_id, permission_id):
         """根据权限ID查询策略"""
-        url = (
-            urls_patterns.URL_ADMIN_CLIENT_AUTHZ
-            + "/policy/{permission_id}/associatedPolicies"
-        )
+        url = urls_patterns.URL_ADMIN_CLIENT_AUTHZ + "/policy/{permission_id}/associatedPolicies"
         params_path = {
             "realm-name": self.connection.realm_name,
             "id": client_id,
@@ -310,47 +335,3 @@ class SupplementApi(object):
         }
         data_raw = self.connection.raw_get(url.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
-
-    def get_all_menus(self, client_id):
-        url = urls_patterns.URL_ADMIN_CLIENT_AUTHZ + "/resource?first=0&max=10000"
-        params_path = {
-            "realm-name": self.connection.realm_name,
-            "id": client_id,
-        }
-        data_raw = self.connection.raw_get(url.format(**params_path))
-        menus = raise_error_from_response(data_raw, KeycloakGetError)
-        return self.transform_data(menus)
-
-    @staticmethod
-    def transform_data(data):
-        transformed = defaultdict(
-            lambda: defaultdict(lambda: {"display_name": "", "operation": []})
-        )
-        for item in data:
-            if item["uris"]:
-                continue
-            type_ = item["type"]
-            name_operation = item["name"].split("-")
-            name = name_operation[0]
-            operation = name_operation[1] if len(name_operation) > 1 else ""
-            display_name = " ".join(item["displayName"].split("-")[:-1])
-
-            if transformed[type_][name]["display_name"] == "":
-                transformed[type_][name]["display_name"] = display_name
-
-            transformed[type_][name]["operation"].append(operation)
-
-        result = []
-        for type_, names in transformed.items():
-            children = []
-            for name, details in names.items():
-                children.append(
-                    {
-                        "name": name,
-                        "display_name": details["display_name"],
-                        "operation": details["operation"],
-                    }
-                )
-            result.append({"name": type_, "children": children})
-
-        return result

@@ -21,27 +21,9 @@ class UserManage(object):
     def user_list(self, query_params, group_id=None):
         """用户列表"""
         if group_id:
-            users = self.keycloak_client.realm_client.get_group_members(
-                group_id, query_params
-            )
+            users = self.keycloak_client.realm_client.get_group_members(group_id, query_params)
         else:
             users = self.keycloak_client.realm_client.get_users(query_params)
-        for user_info in users:
-            # 用户补充角色信息
-            try:
-                roles = self.keycloak_client.get_realm_roles_of_user(user_info["id"])
-            except Exception:
-                roles = []
-            # 用户补充用户组信息
-            try:
-                groups = self.keycloak_client.realm_client.get_user_groups(
-                    user_info["id"]
-                )
-            except Exception:
-                groups = []
-            # 用户补充用户组信息
-            user_info.update(roles=roles)
-            user_info.update(groups=groups)
         return {"count": len(users), "users": users}
 
     def user_all(self):
@@ -52,6 +34,18 @@ class UserManage(object):
     def get_user_info(self, user_id):
         """获取用户信息"""
         user_info = self.keycloak_client.realm_client.get_user(user_id)
+        try:
+            roles = self.keycloak_client.get_realm_roles_of_user(user_id)
+        except Exception:
+            roles = []
+            # 用户补充用户组信息
+        try:
+            groups = self.keycloak_client.realm_client.get_user_groups(user_id)
+        except Exception:
+            groups = []
+            # 用户补充用户组信息
+        user_info.update(roles=roles)
+        user_info.update(groups=groups)
         return user_info
 
     def user_list_by_role(self, role_name):
@@ -84,9 +78,7 @@ class UserManage(object):
 
     def user_reset_password(self, data, user_id):
         """重置用户密码"""
-        self.keycloak_client.realm_client.set_user_password(
-            user_id, data["password"], False
-        )
+        self.keycloak_client.realm_client.set_user_password(user_id, data["password"], False)
 
     def user_add_groups(self, data, user_id):
         """为用户添加一些组"""
