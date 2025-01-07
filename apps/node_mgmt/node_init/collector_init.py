@@ -8,7 +8,7 @@ COLLECTORS = [
         "node_operating_system": "linux",
         "service_type": "svc",
         "executable_path": "/opt/fusion-collectors/bin/telegraf",
-        "execute_parameters": "-config /etc/telegraf/telegraf.conf",
+        "execute_parameters": "-config %s",
         "validation_parameters": "-test -config /etc/telegraf/telegraf.conf",
         "default_template": "",
         "introduction": "Telegraf 是一个插件驱动的服务器代理，用于收集和报告指标。"

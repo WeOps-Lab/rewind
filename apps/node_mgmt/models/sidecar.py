@@ -35,7 +35,7 @@ class Node(TimeInfo, MaintainerInfo):
 
         with transaction.atomic():
             super().save(*args, **kwargs)
-            if not self.pk:
+            if not self.id:
                 collector_obj = Collector.objects.filter(
                     name='telegraf', node_operating_system=self.operating_system).first()
                 configuration = CollectorConfiguration.objects.create(
