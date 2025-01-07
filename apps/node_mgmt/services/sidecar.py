@@ -6,7 +6,8 @@ from django.core.cache import cache
 from django.http import JsonResponse
 from django.utils.http import quote_etag
 
-from apps.node_mgmt.constants import L_INSTALL_DOWNLOAD_URL, L_SIDECAR_DOWNLOAD_URL, W_SIDECAR_DOWNLOAD_URL, LOCAL_HOST
+from apps.node_mgmt.constants import L_INSTALL_DOWNLOAD_URL, L_SIDECAR_DOWNLOAD_URL, W_SIDECAR_DOWNLOAD_URL, LOCAL_HOST, \
+    TELEGRAF_CONFIG
 from apps.node_mgmt.models.sidecar import Node, Collector, CollectorConfiguration, SidecarEnv
 
 logger = logging.getLogger("app")
@@ -79,8 +80,30 @@ class Sidecar:
 
         logger.debug(f"node data: {request_data}")
 
-        # 更新或创建Sidecar信息
-        Node.objects.update_or_create(id=node_id, defaults=request_data)
+        # 更新或创建 Sidecar 信息
+        node = Node.objects.filter(id=node_id).first()
+
+        if not node:
+            # 创建节点
+            node = Node.objects.create(**request_data)
+
+            # 创建默认配置
+            try:
+                collector_obj = Collector.objects.filter(
+                    name='telegraf', node_operating_system=node.operating_system
+                ).first()
+                configuration = CollectorConfiguration.objects.create(
+                    name='telegraf_config',
+                    collector=collector_obj,
+                    config_template=TELEGRAF_CONFIG,
+                )
+                configuration.nodes.add(node)
+            except Exception as e:
+                logger.error(f"create default configuration failed {e}")
+
+        else:
+            # 更新节点
+            Node.objects.filter(id=node_id).update(**request_data)
 
         # 预取相关数据，减少查询次数
         new_obj = Node.objects.prefetch_related('action_set', 'collectorconfiguration_set').get(id=node_id)
