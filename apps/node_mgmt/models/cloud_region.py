@@ -4,7 +4,7 @@ from apps.core.models.time_info import TimeInfo
 
 
 class CloudRegion(TimeInfo, MaintainerInfo):
-    name = models.CharField(max_length=100, verbose_name="云区域名称")
+    name = models.CharField(unique=True, max_length=100, verbose_name="云区域名称")
     introduction = models.TextField(blank=True, verbose_name="云区域介绍")
 
     class Meta:

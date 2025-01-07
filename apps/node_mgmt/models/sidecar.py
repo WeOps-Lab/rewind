@@ -1,10 +1,11 @@
 import uuid
 
-from django.db import models
+from django.db import models, transaction
 from django.db.models import JSONField
 
 from apps.core.models.maintainer_info import MaintainerInfo
 from apps.core.models.time_info import TimeInfo
+from apps.node_mgmt.constants import TELEGRAF_CONFIG
 from apps.node_mgmt.models.cloud_region import CloudRegion
 
 OS_TYPE = (
@@ -29,6 +30,20 @@ class Node(TimeInfo, MaintainerInfo):
         verbose_name = "节点信息"
         db_table = "node"
         verbose_name_plural = "节点信息"
+
+    def save(self, *args, **kwargs):
+
+        with transaction.atomic():
+            super().save(*args, **kwargs)
+            if not self.pk:
+                collector_obj = Collector.objects.filter(
+                    name='telegraf', node_operating_system=self.operating_system).first()
+                configuration = CollectorConfiguration.objects.create(
+                    name='telegraf_config',
+                    collector=collector_obj.id,
+                    config_template=TELEGRAF_CONFIG,
+                )
+                configuration.nodes.add(self)
 
 
 class NodeOrganization(TimeInfo, MaintainerInfo):
