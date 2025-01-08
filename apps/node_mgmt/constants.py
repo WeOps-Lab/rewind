@@ -22,7 +22,7 @@ L_INSTALL_DOWNLOAD_URL = f"{LOCAL_HOST}/openapi/sidecar/download_file/?file_name
 
 TELEGRAF_CONFIG = """
 [global_tags]
-    agent_id="${node.ip}"
+    agent_id="${node.ip}-${node.cloud_region}"
 
 [agent]
     interval = "10s"
@@ -46,5 +46,5 @@ TELEGRAF_CONFIG = """
     compression_codec=1
 
 [[inputs.internal]]
-    tags = { "instance_id"="${node.id}","instance_type"="internal","instance_name"="${node.name}" }
+    tags = { "instance_id"="${node.ip}-${node.cloud_region}","instance_type"="internal","instance_name"="${node.name}" }
 """

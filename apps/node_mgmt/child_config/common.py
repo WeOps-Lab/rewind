@@ -1,9 +1,11 @@
 from apps.node_mgmt.child_config.telegraf.host import HostConfig
+from apps.node_mgmt.child_config.telegraf.web import WebConfig
 from apps.node_mgmt.models.sidecar import CollectorConfiguration, ChildConfig
 
 
 OBJECT_TYPE_MAP = {
     "host": HostConfig.patch_set_node_config,
+    "web": WebConfig.patch_set_node_config,
 }
 
 

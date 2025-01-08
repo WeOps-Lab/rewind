@@ -1,24 +1,33 @@
 from apps.node_mgmt.models.sidecar import CollectorConfiguration, ChildConfig
 
 CONFIG_MAP = {
+
+    "cpu":"""[[inputs.cpu]]
+    percpu = true
+    totalcpu = true
+    collect_cpu_time = false
+    report_active = false
+    core_tags = false
+    tags = { "instance_id"="${node.id}","instance_type"="os" }""",
+
     "disk": """[[inputs.disk]]
     ignore_fs = ["tmpfs", "devtmpfs", "devfs", "iso9660", "overlay", "aufs", "squashfs"]
-    tags = { "instance_id"="${node.id}","instance_type"="os","instance_name"="${node.name}"  }""",
+    tags = { "instance_id"="${node.id}","instance_type"="os" }""",
 
     "diskio": """[[inputs.diskio]]
-    tags = { "instance_id"="${node.id}","instance_type"="os","instance_name"="${node.name}"  }""",
+    tags = { "instance_id"="${node.id}","instance_type"="os" }""",
 
     "mem": """[[inputs.mem]]
-    tags = { "instance_id"="${node.id}","instance_type"="os","instance_name"="${node.name}"  }""",
+    tags = { "instance_id"="${node.id}","instance_type"="os" }""",
 
     "net": """[[inputs.net]]
-    tags = { "instance_id"="${node.id}","instance_type"="os","instance_name"="${node.name}"  }""",
+    tags = { "instance_id"="${node.id}","instance_type"="os" }""",
 
     "processes": """[[inputs.processes]]
-    tags = { "instance_id"="${node.id}","instance_type"="os","instance_name"="${node.name}"  }""",
+    tags = { "instance_id"="${node.id}","instance_type"="os" }""",
 
     "system": """[[inputs.system]]
-    tags = { "instance_id"="${node.id}","instance_type"="os","instance_name"="${node.name}"  }""",
+    tags = { "instance_id"="${node.id}","instance_type"="os" }""",
 }
 
 class HostConfig:
