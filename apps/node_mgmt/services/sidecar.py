@@ -198,6 +198,7 @@ class Sidecar:
         variables = {obj.key: obj.value for obj in objs}
         node_dict = {
             "node__id": node_obj.id,
+            "node__cloud_region": node_obj.cloud_region,
             "node__name": node_obj.name,
             "node__ip": node_obj.ip,
             "node__operating_system": node_obj.operating_system,
