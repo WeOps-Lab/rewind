@@ -96,6 +96,7 @@ class Sidecar:
                     name='telegraf_config',
                     collector=collector_obj,
                     config_template=TELEGRAF_CONFIG,
+                    is_pre=True,
                 )
                 configuration.nodes.add(node)
             except Exception as e:
@@ -156,16 +157,27 @@ class Sidecar:
         if not node:
             return JsonResponse(status=404, data={}, manage="Node collector Configuration not found")
 
-        # 从数据库获取配置信息
-        configuration = CollectorConfiguration.objects.filter(id=configuration_id).first()
+        # 查询配置，并预取关联的子配置
+        configuration = CollectorConfiguration.objects.filter(id=configuration_id).prefetch_related(
+            'childconfig_set').first()
         if not configuration:
             return JsonResponse(status=404, data={}, manage="Configuration not found")
+
+        # 合并子配置内容到模板
+        merged_template = configuration.config_template
+        for child_config in configuration.childconfig_set.all():
+            # 假设子配置的 `content` 是纯文本格式，直接追加
+            merged_template += f"\n# {child_config.object_type} - {child_config.data_type}\n"
+            merged_template += child_config.content
+
         configuration = dict(
             id=configuration.id,
             collector_id=configuration.collector_id,
             name=configuration.name,
-            template=configuration.config_template,
+            template=merged_template,
         )
+        # TODO test merged_template
+
         # 生成新的 ETag
         _configuration = JsonResponse(configuration).content
         new_etag = Sidecar.generate_etag(_configuration.decode('utf-8'))

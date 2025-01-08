@@ -71,6 +71,7 @@ class CollectorConfiguration(TimeInfo, MaintainerInfo):
     collector = models.ForeignKey(Collector, on_delete=models.CASCADE, verbose_name="采集器")
     nodes = models.ManyToManyField(Node, blank=True, verbose_name="节点")
     cloud_region = models.ForeignKey(CloudRegion, default=1, on_delete=models.CASCADE, verbose_name="云区域")
+    is_pre = models.BooleanField(default=False, verbose_name="是否预定义")
 
     class Meta:
         verbose_name = "采集器配置信息"
@@ -82,6 +83,18 @@ class CollectorConfiguration(TimeInfo, MaintainerInfo):
         if not self.id:
             self.id = str(uuid.uuid4())
         super().save(*args, **kwargs)
+
+
+class ChildConfig(TimeInfo, MaintainerInfo):
+    object_type = models.CharField(max_length=50, verbose_name='对象类型')
+    data_type = models.CharField(max_length=50, verbose_name='数据类型')
+    content = models.TextField(verbose_name='内容')
+    collector_config = models.ForeignKey(CollectorConfiguration, on_delete=models.CASCADE, verbose_name='采集器配置')
+
+    class Meta:
+        verbose_name = "子配置"
+        db_table = "child_config"
+        verbose_name_plural = "子配置"
 
 
 class Action(TimeInfo, MaintainerInfo):
