@@ -3,13 +3,13 @@ from string import Template
 from apps.node_mgmt.models.sidecar import CollectorConfiguration, ChildConfig
 
 CONFIG_MAP = {
-    "http_response": """[[inputs.http_response]]
+    "ping": """[[inputs.ping]]
     urls = ["${url}"]
-    tags = { "instance_id"="${instance_id}","instance_type"="web"}""",
+    tags = { "instance_id"="${instance_id}","instance_type"="ping" }""",
 }
 
 
-class WebConfig:
+class PingConfig:
     @staticmethod
     def patch_set_node_config(nodes: list):
         """批量添加节点配置"""
@@ -28,7 +28,7 @@ class WebConfig:
                 template = Template(content)
                 content = template.safe_substitute(node_config)
                 node_objs.append(ChildConfig(
-                    object_type="web",
+                    object_type="ping",
                     data_type=node_config["type"],
                     content=content,
                     collector_config_id=base_config_id
