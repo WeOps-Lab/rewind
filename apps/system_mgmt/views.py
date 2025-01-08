@@ -3,6 +3,7 @@ from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_exempt
 
 from apps.core.utils.keycloak_client import KeyCloakClient
+from apps.system_mgmt.services.role_manage import RoleManage
 
 
 @csrf_exempt
@@ -36,9 +37,7 @@ def get_client_detail(request):
 def verify_token(request):
     user = request.user
     if not user:
-        return JsonResponse(
-            {"result": False, "message": _("Token verification failed")}
-        )
+        return JsonResponse({"result": False, "message": _("Token verification failed")})
     return JsonResponse(
         {
             "result": True,
@@ -55,4 +54,12 @@ def verify_token(request):
 
 
 def get_user_menus(request):
-    pass
+    client = RoleManage()
+    client_id = request.GET["id"]
+    policy_ids = client.get_policy_by_by_roles(client_id, request.user.roles)
+    menus = []
+    for i in policy_ids:
+        menus.extend(client.role_menus(client_id, i))
+    menus = list(set(menus))
+    user_menus = client.get_all_menus(client_id, user_menus=menus)
+    return JsonResponse({"result": True, "data": user_menus})

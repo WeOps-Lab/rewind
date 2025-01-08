@@ -35,13 +35,34 @@ class RoleManage(object):
         result = self.keycloak_client.realm_client.get_realm_role_members(role_name, query)
         return result
 
-    def get_all_menus(self, client_id):
-        all_menus = cache.get(f"all_menus_{client_id}")
+    def get_all_menus(self, client_id, user_menus=None):
+        cache_key = f"all_menus_{client_id}"
+        if user_menus:
+            user_menus.sort()
+            cache_key = f"all_menus_{client_id}_{'--'.join(user_menus)}"
+        all_menus = cache.get(cache_key)
         if not all_menus:
             menus = self.keycloak_client.realm_client.get_client_authz_resources(client_id)
+            if user_menus:
+                menus = [i for i in menus if i["name"] in user_menus]
             all_menus = self.transform_data(menus)
-            cache.set(f"all_menus_{client_id}", all_menus, 60 * 30)
+            cache.set(cache_key, all_menus, 60 * 30)
         return all_menus
+
+    def get_policy_by_by_roles(self, client_id, roles):
+        policies = self.keycloak_client.realm_client.get_client_authz_policies(client_id)
+        all_roles = self.keycloak_client.get_realm_roles()
+        role_map = {i["name"]: i["id"] for i in all_roles}
+        user_roles = [role_map.get(i) for i in roles]
+        user_policies = []
+        for i in policies:
+            role_obj = json.loads(i["config"]["roles"])
+            if not role_obj or i["type"] != "role":
+                continue
+            role_obj = role_obj[0]
+            if role_obj["id"] in user_roles:
+                user_policies.append(i["id"])
+        return user_policies
 
     @staticmethod
     def transform_data(data):
@@ -89,6 +110,7 @@ class RoleManage(object):
         client = SupplementApi(self.keycloak_client.realm_client.connection)
         select_menus = []
         permissions = client.get_permission_by_policy_id(client_id, policy_id)
+
         if permissions:
             resources = client.get_resources(client_id, permissions[0]["id"])
             select_menus = [i["name"] for i in resources]
@@ -131,17 +153,17 @@ class RoleManage(object):
         # 禁止删除内置角色
 
         if policy_name in ["admin", "normal"]:
-            raise BaseAppException("内置角色禁止删除！")
+            raise Exception("内置角色禁止删除！")
         # 角色关联校验（校验角色是否被用户或者组织关联）
         groups = self.keycloak_client.realm_client.get_realm_role_groups(role_name)
         if groups:
             msg = "、".join([i["name"] for i in groups])
-            raise BaseAppException(f"角色已被下列组织使用：{msg}！")
+            raise Exception(f"角色已被下列组织使用：{msg}！")
 
         users = self.keycloak_client.realm_client.get_realm_role_members(role_name)
         if users:
             msg = "、".join([i["username"] for i in users])
-            raise BaseAppException(f"角色已被下列用户使用：{msg}！")
+            raise Exception(f"角色已被下列用户使用：{msg}！")
         # 移除角色权限
         supplement_api = SupplementApi(self.keycloak_client.realm_client.connection)
         permissions = supplement_api.get_permission_by_policy_id(client_id, policy_id)

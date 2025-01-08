@@ -33,7 +33,7 @@ class RoleViewSet(viewsets.ViewSet):
     @action(detail=False, methods=["GET"])
     def get_role_menus(self, request):
         policy_id = request.GET.get("policy_id")
-        client_id = request.GET.get("client_id")
+        client_id = request.GET.get("id")
         data = RoleManage().role_menus(client_id, policy_id)
         return JsonResponse({"result": True, "data": data})
 
