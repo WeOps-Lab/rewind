@@ -81,7 +81,7 @@ MIDDLEWARE = (
 AUTHENTICATION_BACKENDS = (
     "apps.core.backends.KeycloakAuthBackend",  # this is default
     "apps.core.backends.APISecretAuthBackend",
-    # "django.contrib.auth.backends.ModelBackend",
+    "django.contrib.auth.backends.ModelBackend",
 )
 ROOT_URLCONF = "urls"
 
