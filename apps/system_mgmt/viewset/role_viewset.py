@@ -32,9 +32,9 @@ class RoleViewSet(viewsets.ViewSet):
 
     @action(detail=False, methods=["GET"])
     def get_role_menus(self, request):
-        role_id = request.GET.get("role_id")
+        policy_id = request.GET.get("policy_id")
         client_id = request.GET.get("client_id")
-        data = RoleManage().role_menus(client_id, role_id)
+        data = RoleManage().role_menus(client_id, policy_id)
         return JsonResponse({"result": True, "data": data})
 
     @action(detail=False, methods=["POST"])
@@ -57,9 +57,10 @@ class RoleViewSet(viewsets.ViewSet):
     @action(detail=False, methods=["POST"])
     def update_role(self, request):
         client_id = request.data.get("id")
+        role_id = request.data.get("role_id")
         policy_id = request.data.get("policy_id")
         policy_name = request.data.get("policy_name")
-        RoleManage().role_update(client_id, policy_id, policy_name)
+        RoleManage().role_update(client_id, policy_id, policy_name, role_id)
         return JsonResponse({"result": True})
 
     @action(detail=False, methods=["POST"])

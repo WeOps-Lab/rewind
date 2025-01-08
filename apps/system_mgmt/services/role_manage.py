@@ -151,10 +151,10 @@ class RoleManage(object):
         self.keycloak_client.realm_client.delete_realm_role(role_name)
         self.keycloak_client.realm_client.delete_client_authz_policy(client_id, policy_id)
 
-    def role_update(self, client_id, policy_id, policy_name):
+    def role_update(self, client_id, policy_id, policy_name, role_id):
         """修改角色信息"""
         supplement_api = SupplementApi(self.keycloak_client.realm_client.connection)
-        supplement_api.update_policy(client_id, policy_id, policy_name)
+        supplement_api.update_policy(client_id, policy_id, policy_name, role_id)
 
     def role_set_permissions(self, data, role_name):
         """设置角色权限"""
@@ -292,7 +292,7 @@ class SupplementApi(object):
         data_raw = self.connection.raw_put(url.format(**params_path), json.dumps(permission))
         return raise_error_from_response(data_raw, KeycloakGetError)
 
-    def update_policy(self, client_id, policy_id, policy_name):
+    def update_policy(self, client_id, policy_id, policy_name, role_id):
         url = urls_patterns.URL_ADMIN_CLIENT_AUTHZ + "/policy/role/{policy_id}"
 
         params_path = {
@@ -300,7 +300,14 @@ class SupplementApi(object):
             "id": client_id,
             "policy_id": policy_id,
         }
-        data_raw = self.connection.raw_put(url.format(**params_path), json.dumps({"name": policy_name}))
+        params = {
+            "type": "role",
+            "logic": "POSITIVE",
+            "decisionStrategy": "AFFIRMATIVE",
+            "name": policy_name,
+            "roles": [{"id": role_id}],
+        }
+        data_raw = self.connection.raw_put(url.format(**params_path), json.dumps(params))
         return raise_error_from_response(data_raw, KeycloakGetError)
 
     def delete_permission(self, client_id, permission_id):
