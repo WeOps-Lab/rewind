@@ -1,10 +1,12 @@
-# settings.py
 import os
 from datetime import timedelta
 from typing import List, Tuple
+from dotenv import load_dotenv
+
+load_dotenv()
 
 SECRET_KEY = os.getenv("SECRET_KEY", "")
-APP_CODE = os.getenv("APP_CODE", "munchkin")
+APP_CODE = os.getenv("APP_CODE", "rewind")
 
 # 使用时区
 USE_TZ = True
@@ -38,6 +40,11 @@ LOCALE_PATHS = (os.path.join(BASE_DIR, "locale"),)
 ALLOWED_HOSTS = ["*"]
 
 INSTALLED_APPS = (
+    "unfold",
+    "unfold.contrib.filters",
+    "unfold.contrib.forms",
+    "unfold.contrib.inlines",
+    "unfold.contrib.import_export",
     "apps.base",
     "django.contrib.admin",
     "django.contrib.auth",
@@ -62,6 +69,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 MIDDLEWARE = (
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     # "django.middleware.csrf.CsrfViewMiddleware",
@@ -76,10 +84,17 @@ MIDDLEWARE = (
     "apps.core.middlewares.api_middleware.APISecretMiddleware",
     "apps.core.middlewares.keycloak_auth_middleware.KeyCloakAuthMiddleware",
 )
+
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
+
 AUTHENTICATION_BACKENDS = (
     "apps.core.backends.KeycloakAuthBackend",  # this is default
     "apps.core.backends.APISecretAuthBackend",
-    # "django.contrib.auth.backends.ModelBackend",
+    "django.contrib.auth.backends.ModelBackend",
 )
 ROOT_URLCONF = "urls"
 
@@ -197,7 +212,7 @@ if os.path.exists(APPS_DIR):
     app_folders = [
         name
         for name in os.listdir(APPS_DIR)
-        if os.path.isdir(os.path.join(APPS_DIR, name)) and name not in  ["__pycache__", "base", "core"]
+        if os.path.isdir(os.path.join(APPS_DIR, name)) and name not in ["__pycache__", "base", "core"]
     ]
 else:
     app_folders = []
