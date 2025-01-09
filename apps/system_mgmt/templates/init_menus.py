@@ -2,6 +2,7 @@ MENUS = [
     {
         "client_id": "munchkin",
         "name": "OpsPilot",
+        "url": "/opspilot/studio",
         "description": "Create roles for the OpsPilot app to manage data permissions, menu permissions, and feature permissions.",  # noqa
         "menus": [
             {

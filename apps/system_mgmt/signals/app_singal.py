@@ -9,6 +9,7 @@ def init_apps(**kwargs):
             "clientId": app_obj["client_id"],
             "name": app_obj["name"],
             "description": app_obj["description"],
+            "baseUrl": app_obj["url"],
             "serviceAccountsEnabled": True,
             "directAccessGrantsEnabled": True,
             "authorizationServicesEnabled": True,
