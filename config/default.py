@@ -61,6 +61,7 @@ INSTALLED_APPS = (
     "import_export",
     "django_select2",
     "apps.core",
+    "nats_client",
 )
 IS_USE_CELERY = True
 
@@ -321,6 +322,10 @@ MINIO_CONSISTENCY_CHECK_ON_START = False
 MINIO_PRIVATE_BUCKETS = ["rewind-private"]
 MINIO_PUBLIC_BUCKETS = ["rewind-public"]
 MINIO_POLICY_HOOKS: List[Tuple[str, dict]] = []
+
+NATS_SERVERS = os.getenv("NATS_SERVERS", "")
+NATS_NAMESPACE = os.getenv("NATS_NAMESPACE", "")
+NATS_JETSTREAM_ENABLED = False
 
 from apps.config import *  # noqa
 
