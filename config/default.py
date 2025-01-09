@@ -5,6 +5,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+NATS_SERVERS = os.getenv("NATS_SERVERS", "")
+NATS_JETSTREAM_ENABLED = False
+NATS_NAMESPACE = "nats-demo"
+
 SECRET_KEY = os.getenv("SECRET_KEY", "")
 APP_CODE = os.getenv("APP_CODE", "rewind")
 
@@ -62,6 +66,7 @@ INSTALLED_APPS = (
     "django_select2",
     "apps.core",
     "nats_client",
+    "adrf",
 )
 IS_USE_CELERY = True
 
@@ -83,7 +88,7 @@ MIDDLEWARE = (
     "apps.core.middlewares.app_exception_middleware.AppExceptionMiddleware",
     "apps.core.middlewares.drf_middleware.DisableCSRFMiddleware",
     "apps.core.middlewares.api_middleware.APISecretMiddleware",
-    "apps.core.middlewares.keycloak_auth_middleware.KeyCloakAuthMiddleware",
+    # "apps.core.middlewares.keycloak_auth_middleware.KeyCloakAuthMiddleware",
 )
 
 STORAGES = {
@@ -322,8 +327,6 @@ MINIO_CONSISTENCY_CHECK_ON_START = False
 MINIO_PRIVATE_BUCKETS = ["rewind-private"]
 MINIO_PUBLIC_BUCKETS = ["rewind-public"]
 MINIO_POLICY_HOOKS: List[Tuple[str, dict]] = []
-
-NATS_SERVERS = os.getenv("NATS_SERVERS", "")
 
 from apps.config import *  # noqa
 
