@@ -324,6 +324,8 @@ MINIO_PUBLIC_BUCKETS = ["rewind-public"]
 MINIO_POLICY_HOOKS: List[Tuple[str, dict]] = []
 
 NATS_SERVERS = os.getenv("NATS_SERVERS", "")
+NATS_NAMESPACE = os.getenv("NATS_NAMESPACE", "")
+NATS_JETSTREAM_ENABLED = False
 
 from apps.config import *  # noqa
 
