@@ -35,6 +35,6 @@ class IpmiConfig:
                 ))
 
         # 删除已存在的配置
-        ChildConfig.objects.filter(collector_config_id__in=base_config_ids, object_type="web").delete()
+        ChildConfig.objects.filter(collector_config_id__in=base_config_ids, object_type="ipmi").delete()
         # 批量创建节点配置
         ChildConfig.objects.bulk_create(node_objs)

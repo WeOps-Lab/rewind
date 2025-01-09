@@ -3,13 +3,32 @@ from string import Template
 from apps.node_mgmt.models.sidecar import CollectorConfiguration, ChildConfig
 
 CONFIG_MAP = {
-    "ping": """[[inputs.ping]]
-    urls = ["${url}"]
-    tags = { "instance_id"="${instance_id}","instance_type"="ping" }""",
+    "snmp": """[[inputs.snmp]]
+    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}" }
+    ${snmp_config}
+
+    [[inputs.snmp.field]]
+        oid = "RFC1213-MIB::sysUpTime.0"
+        name = "uptime"
+
+    [[inputs.snmp.field]]
+        oid = "RFC1213-MIB::sysName.0"
+        name = "source"
+        is_tag = true
+
+    [[inputs.snmp.table]]
+        oid = "IF-MIB::ifTable"
+        name = "interface"
+        inherit_tags = ["source"]
+
+    [[inputs.snmp.table.field]]
+        oid = "IF-MIB::ifDescr"
+        name = "ifDescr"
+        is_tag = true""",
 }
 
 
-class PingConfig:
+class SnmpConfig:
     @staticmethod
     def patch_set_node_config(nodes: list):
         """批量添加节点配置"""
@@ -28,13 +47,13 @@ class PingConfig:
                 template = Template(content)
                 content = template.safe_substitute(node_config)
                 node_objs.append(ChildConfig(
-                    object_type="ping",
+                    object_type="snmp",
                     data_type=node_config["type"],
                     content=content,
                     collector_config_id=base_config_id
                 ))
 
         # 删除已存在的配置
-        ChildConfig.objects.filter(collector_config_id__in=base_config_ids, object_type="ping").delete()
+        ChildConfig.objects.filter(collector_config_id__in=base_config_ids, object_type="snmp").delete()
         # 批量创建节点配置
         ChildConfig.objects.bulk_create(node_objs)
