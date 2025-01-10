@@ -1,3 +1,5 @@
+import json
+
 from apps.core.utils.keycloak_client import KeyCloakClient
 
 
@@ -31,14 +33,10 @@ class UserManage(object):
         users = self.keycloak_client.realm_client.get_users()
         return users
 
-    def get_user_info(self, user_id):
+    def get_user_info(self, user_id, client_id):
         """获取用户信息"""
         user_info = self.keycloak_client.realm_client.get_user(user_id)
-        try:
-            roles = self.keycloak_client.get_realm_roles_of_user(user_id)
-        except Exception:
-            roles = []
-            # 用户补充用户组信息
+        roles = self.get_user_roles(client_id, user_id)
         try:
             groups = self.keycloak_client.realm_client.get_user_groups(user_id)
         except Exception:
@@ -47,6 +45,27 @@ class UserManage(object):
         user_info.update(roles=roles)
         user_info.update(groups=groups)
         return user_info
+
+    def get_user_roles(self, client_id, user_id):
+        roles = []
+        user_roles = self.keycloak_client.get_realm_roles_of_user(user_id)
+        policies = self.keycloak_client.realm_client.get_client_authz_policies(client_id)
+        role_map = {i["id"]: i["name"] for i in user_roles}
+        for i in policies:
+            role_obj = json.loads(i["config"]["roles"])
+            if not role_obj:
+                continue
+            role_obj = role_obj[0]
+            if role_obj["id"] in role_map:
+                roles.append(
+                    {
+                        "policy_id": i["id"],
+                        "display_name": i["name"],
+                        "role_id": role_obj["id"],
+                        "role_name": role_map.get(role_obj["id"], ""),
+                    }
+                )
+        return roles
 
     def user_list_by_role(self, role_name):
         """获取角色下用户"""

@@ -26,7 +26,8 @@ class UserViewSet(viewsets.ViewSet):
     @action(detail=False, methods=["GET"])
     def get_user_detail(self, request):
         pk = request.GET.get("user_id")
-        data = UserManage().get_user_info(pk)
+        client_id = request.GET.get("id")
+        data = UserManage().get_user_info(pk, client_id)
         return JsonResponse({"result": True, "data": data})
 
     # @action(detail=False, methods=["GET"])
@@ -52,8 +53,9 @@ class UserViewSet(viewsets.ViewSet):
 
     @action(detail=False, methods=["POST"])
     def update_user(self, request):
-        pk = request.data.get("user_id")
-        UserManage().user_update(request.data, pk)
+        params = request.data
+        pk = params.pop("user_id")
+        UserManage().user_update(params, pk)
         return JsonResponse({"result": True})
 
     @action(detail=False, methods=["POST"])
