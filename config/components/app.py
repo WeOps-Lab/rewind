@@ -1,6 +1,6 @@
 import os
 
-from config.components.base import DEBUG, BASE_DIR
+from config.components.base import BASE_DIR, DEBUG
 
 ROOT_URLCONF = "urls"
 
@@ -56,7 +56,7 @@ STORAGES = {
 AUTHENTICATION_BACKENDS = (
     "apps.core.backends.KeycloakAuthBackend",  # this is default
     "apps.core.backends.APISecretAuthBackend",
-    "django.contrib.auth.backends.ModelBackend",
+    # "django.contrib.auth.backends.ModelBackend",
 )
 
 AUTH_USER_MODEL = "base.User"
@@ -87,9 +87,9 @@ if DEBUG:
     )  # noqa
     # 该跨域中间件需要放在前面
     MIDDLEWARE = (
-                     "corsheaders.middleware.CorsMiddleware",
-                     "debug_toolbar.middleware.DebugToolbarMiddleware",
-                 ) + MIDDLEWARE  # noqa
+        "corsheaders.middleware.CorsMiddleware",
+        "debug_toolbar.middleware.DebugToolbarMiddleware",
+    ) + MIDDLEWARE  # noqa
     CORS_ORIGIN_ALLOW_ALL = True
     CORS_ALLOW_CREDENTIALS = True
     CORS_ALLOW_HEADERS = [
@@ -109,7 +109,7 @@ if os.path.exists(APPS_DIR):
     app_folders = [
         name
         for name in os.listdir(APPS_DIR)
-        if os.path.isdir(os.path.join(APPS_DIR, name)) and name not in ["__pycache__", "base", "core"]
+        if os.path.isdir(os.path.join(APPS_DIR, name)) and name not in ["__pycache__", "base", "core", "rpc"]
     ]
 else:
     app_folders = []
