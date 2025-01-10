@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.urls import re_path
+from django.urls import include, path, re_path
 from rest_framework import routers
 
 from apps.core.views import index_view
@@ -12,6 +12,7 @@ public_router.register(r"api/public/user_view", UserView, basename="user_view")
 
 urlpatterns = [
     re_path(r"api/login_info/", index_view.login_info),
+    path("select2/", include("django_select2.urls")),
 ]
 
 urlpatterns += public_router.urls

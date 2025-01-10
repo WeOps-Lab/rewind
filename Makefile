@@ -56,3 +56,6 @@ celery-inspect:
 
 celery-flower:
 	celery -A apps.core.celery flower
+
+start-nats:
+	python manage.py nats_listener
