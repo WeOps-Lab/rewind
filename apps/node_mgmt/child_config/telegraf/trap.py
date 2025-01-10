@@ -1,7 +1,11 @@
+from string import Template
+
 from apps.node_mgmt.models.sidecar import CollectorConfiguration, ChildConfig
 
 CONFIG_MAP = {
-    "snmp_trap": """[[inputs.snmp_trap]]""",
+    "snmp_trap": """[[inputs.snmp_trap]]
+    tags = { "instance_id"="${instance_id}", "instance_type"="${instance_type}" }""",
+
 }
 
 
@@ -19,15 +23,19 @@ class TrapConfig:
             base_config_id = base_config.id
             base_config_ids.append(base_config_id)
             for node_config in node_configs:
+
                 content = CONFIG_MAP[node_config["type"]]
+                template = Template(content)
+                content = template.safe_substitute(node_config)
+
                 node_objs.append(ChildConfig(
-                    object_type="trap",
-                    data_type=node_config["type"],
+                    collect_type="trap",
+                    config_type=node_config["type"],
                     content=content,
                     collector_config_id=base_config_id
                 ))
 
         # 删除已存在的配置
-        ChildConfig.objects.filter(collector_config_id__in=base_config_ids, object_type="trap").delete()
+        ChildConfig.objects.filter(collector_config_id__in=base_config_ids, collect_type="trap").delete()
         # 批量创建节点配置
         ChildConfig.objects.bulk_create(node_objs)

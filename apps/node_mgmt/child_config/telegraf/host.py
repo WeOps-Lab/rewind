@@ -1,3 +1,5 @@
+from string import Template
+
 from apps.node_mgmt.models.sidecar import CollectorConfiguration, ChildConfig
 
 CONFIG_MAP = {
@@ -8,26 +10,26 @@ CONFIG_MAP = {
     collect_cpu_time = false
     report_active = false
     core_tags = false
-    tags = { "instance_id"="${node.id}","instance_type"="os" }""",
+    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}" }""",
 
     "disk": """[[inputs.disk]]
     ignore_fs = ["tmpfs", "devtmpfs", "devfs", "iso9660", "overlay", "aufs", "squashfs"]
-    tags = { "instance_id"="${node.id}","instance_type"="os" }""",
+    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}" }""",
 
     "diskio": """[[inputs.diskio]]
-    tags = { "instance_id"="${node.id}","instance_type"="os" }""",
+    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}" }""",
 
     "mem": """[[inputs.mem]]
-    tags = { "instance_id"="${node.id}","instance_type"="os" }""",
+    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}" }""",
 
     "net": """[[inputs.net]]
-    tags = { "instance_id"="${node.id}","instance_type"="os" }""",
+    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}" }""",
 
     "processes": """[[inputs.processes]]
-    tags = { "instance_id"="${node.id}","instance_type"="os" }""",
+    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}" }""",
 
     "system": """[[inputs.system]]
-    tags = { "instance_id"="${node.id}","instance_type"="os" }""",
+    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}" }""",
 }
 
 class HostConfig:
@@ -43,15 +45,19 @@ class HostConfig:
             base_config_id = base_config.id
             base_config_ids.append(base_config_id)
             for node_config in node_configs:
-                content = CONFIG_MAP[node_config]
+
+                content = CONFIG_MAP[node_config["type"]]
+                template = Template(content)
+                content = template.safe_substitute(node_config)
+
                 node_objs.append(ChildConfig(
-                    object_type="host",
-                    data_type=node_config,
+                    collect_type="host",
+                    config_type=node_config,
                     content=content,
                     collector_config_id=base_config_id
                 ))
 
         # 删除已存在的配置
-        ChildConfig.objects.filter(collector_config_id__in=base_config_ids, object_type="host").delete()
+        ChildConfig.objects.filter(collector_config_id__in=base_config_ids, collect_type="host").delete()
         # 批量创建节点配置
         ChildConfig.objects.bulk_create(node_objs)

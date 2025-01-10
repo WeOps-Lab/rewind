@@ -3,8 +3,96 @@ from string import Template
 from apps.node_mgmt.models.sidecar import CollectorConfiguration, ChildConfig
 
 CONFIG_MAP = {
-    "snmp": """[[inputs.snmp]]
-    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}" }
+    "swtich": """[[inputs.snmp]]
+    tags = { "instance_id"="${instance_id}", "instance_type"="${instance_type}" }
+    ${snmp_config}
+
+    [[inputs.snmp.field]]
+        oid = "RFC1213-MIB::sysUpTime.0"
+        name = "uptime"
+
+    [[inputs.snmp.field]]
+        oid = "RFC1213-MIB::sysName.0"
+        name = "source"
+        is_tag = true
+
+    [[inputs.snmp.table]]
+        oid = "IF-MIB::ifTable"
+        name = "interface"
+        inherit_tags = ["source"]
+
+    [[inputs.snmp.table.field]]
+        oid = "IF-MIB::ifDescr"
+        name = "ifDescr"
+        is_tag = true""",
+    "rounter": """[[inputs.snmp]]
+    tags = { "instance_id"="${instance_id}", "instance_type"="${instance_type}" }
+    ${snmp_config}
+
+    [[inputs.snmp.field]]
+        oid = "RFC1213-MIB::sysUpTime.0"
+        name = "uptime"
+
+    [[inputs.snmp.field]]
+        oid = "RFC1213-MIB::sysName.0"
+        name = "source"
+        is_tag = true
+
+    [[inputs.snmp.table]]
+        oid = "IF-MIB::ifTable"
+        name = "interface"
+        inherit_tags = ["source"]
+
+    [[inputs.snmp.table.field]]
+        oid = "IF-MIB::ifDescr"
+        name = "ifDescr"
+        is_tag = true""",
+    "firewall": """[[inputs.snmp]]
+    tags = { "instance_id"="${instance_id}", "instance_type"="${instance_type}" }
+    ${snmp_config}
+
+    [[inputs.snmp.field]]
+        oid = "RFC1213-MIB::sysUpTime.0"
+        name = "uptime"
+
+    [[inputs.snmp.field]]
+        oid = "RFC1213-MIB::sysName.0"
+        name = "source"
+        is_tag = true
+
+    [[inputs.snmp.table]]
+        oid = "IF-MIB::ifTable"
+        name = "interface"
+        inherit_tags = ["source"]
+
+    [[inputs.snmp.table.field]]
+        oid = "IF-MIB::ifDescr"
+        name = "ifDescr"
+        is_tag = true""",
+    "loadbalance": """[[inputs.snmp]]
+    tags = { "instance_id"="${instance_id}", "instance_type"="${instance_type}" }
+    ${snmp_config}
+
+    [[inputs.snmp.field]]
+        oid = "RFC1213-MIB::sysUpTime.0"
+        name = "uptime"
+
+    [[inputs.snmp.field]]
+        oid = "RFC1213-MIB::sysName.0"
+        name = "source"
+        is_tag = true
+
+    [[inputs.snmp.table]]
+        oid = "IF-MIB::ifTable"
+        name = "interface"
+        inherit_tags = ["source"]
+
+    [[inputs.snmp.table.field]]
+        oid = "IF-MIB::ifDescr"
+        name = "ifDescr"
+        is_tag = true""",
+    "storage": """[[inputs.snmp]]
+    tags = { "instance_id"="${instance_id}", "instance_type"="${instance_type}" }
     ${snmp_config}
 
     [[inputs.snmp.field]]
@@ -46,14 +134,15 @@ class SnmpConfig:
                 content = CONFIG_MAP[node_config["type"]]
                 template = Template(content)
                 content = template.safe_substitute(node_config)
+
                 node_objs.append(ChildConfig(
-                    object_type="snmp",
-                    data_type=node_config["type"],
+                    collect_type="snmp",
+                    config_type=node_config["type"],
                     content=content,
                     collector_config_id=base_config_id
                 ))
 
         # 删除已存在的配置
-        ChildConfig.objects.filter(collector_config_id__in=base_config_ids, object_type="snmp").delete()
+        ChildConfig.objects.filter(collector_config_id__in=base_config_ids, collect_type="snmp").delete()
         # 批量创建节点配置
         ChildConfig.objects.bulk_create(node_objs)

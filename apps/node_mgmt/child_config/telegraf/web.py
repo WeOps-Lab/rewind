@@ -28,13 +28,13 @@ class WebConfig:
                 template = Template(content)
                 content = template.safe_substitute(node_config)
                 node_objs.append(ChildConfig(
-                    object_type="web",
-                    data_type=node_config["type"],
+                    collect_type="web",
+                    config_type=node_config["type"],
                     content=content,
                     collector_config_id=base_config_id
                 ))
 
         # 删除已存在的配置
-        ChildConfig.objects.filter(collector_config_id__in=base_config_ids, object_type="web").delete()
+        ChildConfig.objects.filter(collector_config_id__in=base_config_ids, collect_type="web").delete()
         # 批量创建节点配置
         ChildConfig.objects.bulk_create(node_objs)

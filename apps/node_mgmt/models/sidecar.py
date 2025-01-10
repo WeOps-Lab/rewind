@@ -86,8 +86,8 @@ class CollectorConfiguration(TimeInfo, MaintainerInfo):
 
 
 class ChildConfig(TimeInfo, MaintainerInfo):
-    object_type = models.CharField(max_length=50, verbose_name='对象类型')
-    data_type = models.CharField(max_length=50, verbose_name='数据类型')
+    collect_type = models.CharField(max_length=50, verbose_name='采集对象类型')
+    config_type = models.CharField(max_length=50, verbose_name='配置类型')
     content = models.TextField(verbose_name='内容')
     collector_config = models.ForeignKey(CollectorConfiguration, on_delete=models.CASCADE, verbose_name='采集器配置')
 
