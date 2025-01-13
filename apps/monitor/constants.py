@@ -12,7 +12,7 @@ MONITOR_OBJS = [
         "name": "Host",
         "default_metric": 'system_load1{instance_type="os"}',
         "instance_id_key": "instance_id",
-        "instance_name_key": "instance_name",
+        "instance_name_key": "host",
         "supplementary_indicators": ["cpu_summary.usage", "mem.pct_usable", "load5"],
     },
     {
