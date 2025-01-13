@@ -35,11 +35,11 @@ class RoleManage(object):
         result = self.keycloak_client.realm_client.get_realm_role_members(role_name, query)
         return result
 
-    def get_all_menus(self, client_id, user_menus=None):
+    def get_all_menus(self, client_id, user_menus=None, username=""):
         cache_key = f"all_menus_{client_id}"
         if user_menus:
             user_menus.sort()
-            cache_key = f"all_menus_{client_id}_{'--'.join(user_menus)}"
+            cache_key = f"all_menus_{client_id}_{username}"
         all_menus = cache.get(cache_key)
         if not all_menus:
             menus = self.keycloak_client.realm_client.get_client_authz_resources(client_id)
@@ -56,7 +56,7 @@ class RoleManage(object):
         user_roles = [role_map.get(i) for i in roles]
         user_policies = []
         for i in policies:
-            role_obj = json.loads(i["config"]["roles"])
+            role_obj = json.loads(i["config"].get("roles", "[]"))
             if not role_obj or i["type"] != "role":
                 continue
             role_obj = role_obj[0]

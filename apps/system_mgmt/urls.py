@@ -13,6 +13,5 @@ urlpatterns = router.urls
 urlpatterns += [
     path(r"api/get_client/", views.get_client, name="get_client"),
     path(r"api/get_client_detail/", views.get_client_detail, name="get_client_detail"),
-    path(r"api/verify_token/", views.verify_token, name="verify_token"),
     path(r"api/get_user_menus/", views.get_user_menus, name="get_user_menus"),
 ]

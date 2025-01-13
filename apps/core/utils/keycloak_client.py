@@ -1,32 +1,27 @@
 import logging
 
+from django.conf import settings
+from django.db import connection
 from keycloak import KeycloakAdmin, KeycloakOpenID
 from singleton_decorator import singleton
 
 from apps.core.constants import BUILT_IN_ROLES
 from apps.core.entities.user_token_entity import UserTokenEntity
-from config.default import (
-    KEYCLOAK_ADMIN_PASSWORD,
-    KEYCLOAK_ADMIN_USERNAME,
-    KEYCLOAK_CLIENT_ID,
-    KEYCLOAK_REALM,
-    KEYCLOAK_URL_API,
-)
 
 
 @singleton
 class KeyCloakClient:
     def __init__(self):
         self.admin_client = KeycloakAdmin(
-            server_url=KEYCLOAK_URL_API,
-            username=KEYCLOAK_ADMIN_USERNAME,
-            password=KEYCLOAK_ADMIN_PASSWORD,
+            server_url=settings.KEYCLOAK_URL_API,
+            username=settings.KEYCLOAK_ADMIN_USERNAME,
+            password=settings.KEYCLOAK_ADMIN_PASSWORD,
         )
         self.realm_client = KeycloakAdmin(
-            server_url=KEYCLOAK_URL_API,
-            username=KEYCLOAK_ADMIN_USERNAME,
-            password=KEYCLOAK_ADMIN_PASSWORD,
-            realm_name=KEYCLOAK_REALM,
+            server_url=settings.KEYCLOAK_URL_API,
+            username=settings.KEYCLOAK_ADMIN_USERNAME,
+            password=settings.KEYCLOAK_ADMIN_PASSWORD,
+            realm_name=settings.KEYCLOAK_REALM,
             client_id="admin-cli",
             user_realm_name="master",
         )
@@ -37,9 +32,9 @@ class KeyCloakClient:
     def get_openid_client(self):
         if self.openid_client is None:
             self.openid_client = KeycloakOpenID(
-                server_url=KEYCLOAK_URL_API,
-                client_id=KEYCLOAK_CLIENT_ID,
-                realm_name=KEYCLOAK_REALM,
+                server_url=settings.KEYCLOAK_URL_API,
+                client_id=settings.KEYCLOAK_CLIENT_ID,
+                realm_name=settings.KEYCLOAK_REALM,
                 client_secret_key=self.get_client_secret_key(),
             )
         return self.openid_client
@@ -49,7 +44,7 @@ class KeyCloakClient:
         client_secret_key, client_id = None, None
         clients = self.realm_client.get_clients()
         for client in clients:
-            if client["clientId"] == KEYCLOAK_CLIENT_ID:
+            if client["clientId"] == settings.KEYCLOAK_CLIENT_ID:
                 client_id = client["id"]
                 client_secret_key = client["secret"]
                 break
@@ -184,3 +179,36 @@ class KeyCloakClient:
             "resourceType": "",
         }
         self.realm_client.create_client_authz_resource_based_permission(client_id, permission, True)
+
+    def get_group_user_count(self, group_id, search):
+        sql = """SELECT COUNT
+    ( ugs.user_id )
+FROM
+    user_group_membership ugs
+    LEFT JOIN user_entity userobj ON userobj."id" = ugs.user_id
+WHERE
+    ugs.group_id = %(group_id)s
+and userobj.username like %(username)s"""
+        return_data = self.execute_sql(sql, {"group_id": group_id, "username": f"%{search}%"})
+        return return_data[0].get("count", 0) if return_data else 0
+
+    @staticmethod
+    def execute_sql(sql, args):
+        db_config = connection.get_connection_params()
+        db_config["dbname"] = "keycloak"
+        sql_connection = connection.get_new_connection(db_config)
+        cursor = sql_connection.cursor()
+        try:
+            if isinstance(args, str):
+                args = [args]
+            elif isinstance(args, int):
+                args = [str(args)]
+            cursor.execute(sql, args)
+            result = cursor.fetchall()
+            columns = [col[0] for col in cursor.description]
+            return_data = [dict(zip(columns, row)) for row in result]
+        except Exception:
+            return_data = []
+        cursor.close()
+        sql_connection.close()
+        return return_data

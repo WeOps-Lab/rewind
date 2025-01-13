@@ -39,7 +39,6 @@ class UserViewSet(viewsets.ViewSet):
     def create_user(self, request):
         try:
             data = UserManage().user_create(request.data)
-
             return JsonResponse({"result": True, "data": data})
         except Exception as e:
             logger.exception(e)
@@ -47,8 +46,8 @@ class UserViewSet(viewsets.ViewSet):
 
     @action(detail=False, methods=["POST"])
     def delete_user(self, request):
-        pk = request.data.get("user_id")
-        UserManage().user_delete(pk)
+        user_ids = request.data.get("user_ids")
+        UserManage().user_delete(user_ids)
         return JsonResponse({"result": True})
 
     @action(detail=False, methods=["POST"])
