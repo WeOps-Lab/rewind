@@ -47,7 +47,7 @@ class MonitorAlertVieSet(
 
         if request.GET.get("type") == "count":
             # 执行序列化
-            serializer = self.get_serializer(many=True)
+            serializer = self.get_serializer(queryset, many=True)
             # 返回成功响应
             return WebUtils.response_success(dict(count=queryset.count(), results=serializer.data))
 
