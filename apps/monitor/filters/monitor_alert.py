@@ -1,7 +1,5 @@
 from django_filters import FilterSet, CharFilter, IsoDateTimeFromToRangeFilter, BaseInFilter
 
-from apps.core.utils.group import get_group_and_subgroup_ids
-from apps.monitor.models import PolicyOrganization
 from apps.monitor.models.monitor_policy import MonitorAlert
 
 

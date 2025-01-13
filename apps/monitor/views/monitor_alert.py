@@ -39,6 +39,18 @@ class MonitorAlertVieSet(
             policy_ids = PolicyOrganization.objects.filter(organization__in=group_ids).values_list("policy_id", flat=True)
             queryset = queryset.filter(policy_id__in=list(policy_ids)).distinct()
 
+        if request.GET.get("monitor_objects"):
+            monitor_objects = request.GET.get("monitor_objects").split(",")
+            monitor_objects = [int(i) for i in monitor_objects]
+            policy_ids = MonitorPolicy.objects.filter(monitor_object_id__in=monitor_objects).values_list("id", flat=True)
+            queryset = queryset.filter(policy_id__in=list(policy_ids)).distinct()
+
+        if request.GET.get("type") == "count":
+            # 执行序列化
+            serializer = self.get_serializer(many=True)
+            # 返回成功响应
+            return WebUtils.response_success(dict(count=queryset.count(), results=serializer.data))
+
         # 获取分页参数
         page = int(request.GET.get('page', 1))  # 默认第1页
         page_size = int(request.GET.get('page_size', 10))  # 默认每页10条数据
