@@ -10,7 +10,7 @@ MONITOR_OBJS = [
     {
         "type": "OS",
         "name": "Host",
-        "default_metric": 'node_load1_gauge{instance_type="os"}',
+        "default_metric": 'system_load1{instance_type="os"}',
         "instance_id_key": "instance_id",
         "instance_name_key": "instance_name",
         "supplementary_indicators": ["cpu_summary.usage", "mem.pct_usable", "load5"],
