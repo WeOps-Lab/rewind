@@ -22,6 +22,10 @@ def json_dumps_decorator(func):
 @nats_client.register
 @json_dumps_decorator
 def verify_token(token):
+    return _verify_token(token)
+
+
+def _verify_token(token):
     if not token:
         return {"result": False, "message": _("Token is missing")}
     client = KeyCloakClient()
