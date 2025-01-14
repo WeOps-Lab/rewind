@@ -32,3 +32,17 @@ class SystemMgmt(object):
         """
         return_data = self.client.run("verify_token", token=token, client_id=client_id)
         return return_data
+
+    def get_group_users(self, group):
+        """
+        :param group: 当前组的ID
+        """
+        return_data = self.client.run("get_group_users", group=group)
+        return return_data
+
+    def get_all_users(self, group):
+        """
+        :param group: 当前组的ID
+        """
+        return_data = self.client.run("get_all_users")
+        return return_data
