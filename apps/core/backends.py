@@ -7,7 +7,7 @@ from django.db import IntegrityError
 from django.utils import translation
 
 from apps.base.models import User, UserAPISecret
-from apps.core.utils.keycloak_client import KeyCloakClient
+from apps.rpc.system_mgmt import SystemMgmt
 
 logger = logging.getLogger("app")
 cache = caches["db"]
@@ -30,29 +30,25 @@ class KeycloakAuthBackend(ModelBackend):
         # 判断是否传入验证所需的bk_token,没传入则返回None
         if not token:
             return None
-        client = KeyCloakClient()
-        is_active, user_info = client.token_is_valid(token)
+        client = SystemMgmt()
+        result = client.verify_token(token)
         # 判断token是否验证通过,不通过则返回None
-        if not is_active:
+        if not result["result"]:
             return None
+        user_info = result["data"]
         if user_info.get("locale"):
             translation.activate(user_info["locale"])
-        roles = user_info["realm_access"]["roles"]
-        groups = cache.get(f"group_{user_info['sub']}")
-        if not groups:
-            groups = client.get_user_groups(user_info["sub"], "admin" in roles)
-            cache.set(f"group_{user_info['sub']}", groups, 60 * 30)
-        return self.set_user_info(groups, roles, user_info)
+        return self.set_user_info(user_info)
 
     @staticmethod
-    def set_user_info(groups, roles, user_info):
+    def set_user_info(user_info):
         try:
             user, _ = User.objects.get_or_create(username=user_info["username"])
             user.email = user_info.get("email", "")
-            user.is_superuser = "admin" in roles
+            user.is_superuser = user_info["is_superuser"]
             user.is_staff = user.is_superuser
-            user.group_list = groups
-            user.roles = roles
+            user.group_list = user_info["group_list"]
+            user.roles = user_info["roles"]
             user.locale = user_info.get("locale", "en")
             user.save()
             return user
