@@ -54,6 +54,7 @@ class NodeMgmtView(ViewSet):
             },
             required=["object_type", "nodes"]
         ),
+        tags=['NodeMgmt']
     )
     @action(methods=['post'], detail=False, url_path='batch_setting_node_child_config')
     def batch_setting_node_child_config(self, request):
