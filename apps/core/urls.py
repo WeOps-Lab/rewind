@@ -4,7 +4,7 @@ from rest_framework import routers
 
 from apps.core.views import index_view
 
-admin.site.site_title = "Rewind Admin"
+admin.site.site_title = "Opspilot Admin"
 admin.site.site_header = admin.site.site_title
 public_router = routers.DefaultRouter()
 urlpatterns = [
