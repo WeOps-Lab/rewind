@@ -39,3 +39,25 @@ class ChildConfigCommon:
         if not method:
             raise ValueError(f"Unsupported object type: {self.object_type}")
         method(nodes)
+
+    def get_child_config_by_instance_id(self, collect_type, config_type, collect_instance_id):
+        """根据实例ID获取配置"""
+        qs = ChildConfig.objects.filter()
+        if collect_type:
+            qs = qs.filter(collect_type=collect_type)
+        if config_type:
+            qs = qs.filter(config_type=config_type)
+        if collect_instance_id:
+            qs = qs.filter(collect_instance_id=collect_instance_id)
+        result = [
+            {
+                "id": obj.id,
+                "collect_type": obj.collect_type,
+                "config_type": obj.config_type,
+                "collect_instance_id": obj.collect_instance_id,
+                "content": obj.content,
+                "collector_config_id": obj.collector_config_id,
+            }
+            for obj in qs
+        ]
+        return result

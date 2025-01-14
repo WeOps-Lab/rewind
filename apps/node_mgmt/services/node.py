@@ -74,3 +74,25 @@ class NodeService:
             action, created = Action.objects.get_or_create(node=node)
             action.action.append(action_data)
             action.save()
+
+    @staticmethod
+    def get_node_list(organization_ids, name, ip, os, page, page_size):
+        """获取节点列表"""
+        qs = Node.objects.all()
+        if organization_ids:
+            qs = qs.filter(nodeorganization__organization__in=organization_ids).distinct()
+        if name:
+            qs = qs.filter(name__icontains=name)
+        if ip:
+            qs = qs.filter(ip__icontains=ip)
+        if os:
+            qs = qs.filter(operating_system__icontains=os)
+        count = qs.count()
+        if page_size == -1:
+            nodes = qs
+        else:
+            start = (page - 1) * page_size
+            end = start + page_size
+            nodes = qs[start:end]
+        serializer = NodeSerializer(nodes, many=True)
+        return dict(count=count, nodes=serializer.data)

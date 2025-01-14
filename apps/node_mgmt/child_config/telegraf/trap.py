@@ -32,7 +32,8 @@ class TrapConfig:
                     collect_type="trap",
                     config_type=node_config["type"],
                     content=content,
-                    collector_config_id=base_config_id
+                    collector_config_id=base_config_id,
+                    collect_instance_id=node_config["instance_id"],
                 ))
 
         # 删除已存在的配置
