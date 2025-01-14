@@ -64,7 +64,7 @@ def get_client():
                 "url": i["baseUrl"],
             }
             for i in res
-            if i["clientId"] in ["munchkin", "system_mgmt"]
+            if i["clientId"] in ["opspilot", "system-manager"]
         ],
     }
 
