@@ -4,13 +4,13 @@ import uuid
 from celery.app import shared_task
 from datetime import datetime, timezone
 
+from django.conf.global_settings import DEFAULT_FROM_EMAIL
 from django.core.mail import send_mail
 
 from apps.core.utils.keycloak_client import KeyCloakClient
 from apps.monitor.constants import THRESHOLD_METHODS, LEVEL_WEIGHT, MONITOR_OBJS
 from apps.monitor.models import MonitorPolicy, MonitorInstanceOrganization, MonitorAlert, MonitorEvent, MonitorInstance
 from apps.monitor.utils.victoriametrics_api import VictoriaMetricsAPI
-from config.default import DEFAULT_FROM_EMAIL
 
 logger = logging.getLogger("app")
 
