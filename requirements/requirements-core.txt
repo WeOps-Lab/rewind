@@ -53,3 +53,8 @@ nanoid==2.0.0
 gunicorn==23.0.0
 uvicorn==0.32.0
 pika==1.3.2
+
+django-unfold==0.43.0
+
+django-nats-client==0.4.3
+adrf==0.1.9

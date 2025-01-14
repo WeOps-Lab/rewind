@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 校验提交信息是否包含规范的前缀
 """
@@ -7,15 +6,8 @@ from __future__ import absolute_import, print_function, unicode_literals
 import sys
 from io import open
 
-coding = None
-try:
-    # py2
-    reload(sys)
-    sys.setdefaultencoding("utf-8")
-except NameError:
-    # py3
-    coding = "utf-8"
-
+coding = "utf-8"
+py = 3
 
 ALLOWED_COMMIT_MSG_PREFIX = [
     ("feature", "新特性"),
