@@ -1,6 +1,3 @@
-import json
-from functools import wraps
-
 import nats_client
 from django.utils.translation import gettext_lazy as _
 
@@ -9,18 +6,7 @@ from apps.core.utils.keycloak_client import KeyCloakClient
 from apps.system_mgmt.services.role_manage import RoleManage
 
 
-def json_dumps_decorator(func):
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        # 调用被装饰的函数
-        result = func(*args, **kwargs)
-        return json.dumps(result)
-
-    return wrapper
-
-
 @nats_client.register
-@json_dumps_decorator
 def verify_token(token):
     return _verify_token(token)
 
@@ -51,7 +37,6 @@ def _verify_token(token):
 
 
 @nats_client.register
-@json_dumps_decorator
 def get_user_menus(client_id, roles, username):
     client = RoleManage()
     client_id = client_id
@@ -65,7 +50,6 @@ def get_user_menus(client_id, roles, username):
 
 
 @nats_client.register
-@json_dumps_decorator
 def get_client():
     client = KeyCloakClient()
     res = client.realm_client.get_clients()
@@ -86,7 +70,6 @@ def get_client():
 
 
 @nats_client.register
-@json_dumps_decorator
 def get_client_detail(client_id):
     client = KeyCloakClient()
     res = client.realm_client.get_client(client_id=client_id)

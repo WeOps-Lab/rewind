@@ -7,6 +7,7 @@ from django.db import IntegrityError
 from django.utils import translation
 
 from apps.base.models import User, UserAPISecret
+from apps.rpc.system_mgmt import SystemMgmt
 
 logger = logging.getLogger("app")
 cache = caches["db"]
@@ -29,11 +30,8 @@ class KeycloakAuthBackend(ModelBackend):
         # 判断是否传入验证所需的bk_token,没传入则返回None
         if not token:
             return None
-        # client = SystemMgmt()
-        # result = client.verify_token(token)
-        from apps.system_mgmt.nats_api import _verify_token
-
-        result = _verify_token(token)
+        client = SystemMgmt()
+        result = client.verify_token(token)
         # 判断token是否验证通过,不通过则返回None
         if not result["result"]:
             return None

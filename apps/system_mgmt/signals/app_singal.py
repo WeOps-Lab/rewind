@@ -32,7 +32,7 @@ def create_resource(client_id, menus, client):
                     "type": i["name"],
                     "name": f"{child['id']}-{operate}",
                     "displayName": f"{child['name']}-{operate}",
-                    "attributes": {"index": index, "url": child["url"], "title": child["title"]},
+                    "attributes": {"index": index, "url": child["url"], "icon": child["icon"], "title": child["title"]},
                 }
                 index += 1
                 client.realm_client.create_client_authz_resource(client_id, payload, True)
