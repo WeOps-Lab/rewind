@@ -1,6 +1,5 @@
 from django_filters import FilterSet, CharFilter
 
-from apps.core.utils.group import get_group_and_subgroup_ids
 from apps.monitor.models.monitor_policy import MonitorPolicy
 
 

@@ -7,7 +7,6 @@ from datetime import datetime, timezone
 from django.conf.global_settings import DEFAULT_FROM_EMAIL
 from django.core.mail import send_mail
 
-from apps.core.utils.keycloak_client import KeyCloakClient
 from apps.monitor.constants import THRESHOLD_METHODS, LEVEL_WEIGHT, MONITOR_OBJS
 from apps.monitor.models import MonitorPolicy, MonitorInstanceOrganization, MonitorAlert, MonitorEvent, MonitorInstance
 from apps.monitor.utils.victoriametrics_api import VictoriaMetricsAPI
@@ -247,8 +246,8 @@ class MonitorPolicyScan:
 
     def get_users_email(self, usernames):
         """获取用户邮箱"""
-        client = KeyCloakClient()
-        users = client.realm_client.get_users()
+        # TODO user list
+        users = []
         user_email_map = {user_info["username"]: user_info["email"] for user_info in users if user_info.get("email")}
 
         return {username: user_email_map.get(username) for username in usernames}

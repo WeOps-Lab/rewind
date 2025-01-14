@@ -2,11 +2,9 @@ import uuid
 
 from django.db.models import Prefetch
 
-from apps.core.utils.keycloak_client import KeyCloakClient
 from apps.monitor.constants import MONITOR_OBJS
 from apps.monitor.models.monitor_metrics import Metric
 from apps.monitor.models.monitor_object import MonitorInstance, MonitorObject
-from apps.core.utils.group import get_group_and_subgroup_ids
 from apps.monitor.utils.victoriametrics_api import VictoriaMetricsAPI
 from apps.monitor.tasks.grouping_rule import sync_instance_and_group
 
