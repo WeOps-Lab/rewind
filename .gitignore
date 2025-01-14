@@ -16,6 +16,6 @@ templates/index.prod.html
 output
 swagger.yml
 USERRES
-
+staticfiles/
 local_settings.py
 requirements.txt

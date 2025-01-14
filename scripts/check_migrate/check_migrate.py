@@ -15,16 +15,8 @@ from io import open
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-coding = None
-py = 2
-try:
-    # py2
-    reload(sys)
-    sys.setdefaultencoding("utf-8")
-except NameError:
-    # py3
-    coding = "utf-8"
-    py = 3
+coding = "utf-8"
+py = 3
 
 
 def read_csv():
