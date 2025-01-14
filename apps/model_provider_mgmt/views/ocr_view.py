@@ -1,8 +1,9 @@
-from apps.core.viewsets.guardian_model_viewset import GuardianModelViewSet
+from rest_framework import viewsets
+
 from apps.model_provider_mgmt.models import OCRProvider
 from apps.model_provider_mgmt.serializers.ocr_serializer import OCRProviderSerializer
 
 
-class OCRProviderViewSet(GuardianModelViewSet):
+class OCRProviderViewSet(viewsets.ModelViewSet):
     queryset = OCRProvider.objects.all()
     serializer_class = OCRProviderSerializer

@@ -3,3 +3,4 @@ httpx==0.27.2
 elasticsearch==8.13.2
 wechatpy==1.8.18
 kubernetes==29.0.0
+cython==3.0.10

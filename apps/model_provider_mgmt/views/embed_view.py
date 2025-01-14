@@ -2,13 +2,12 @@ from django.http import JsonResponse
 from rest_framework import viewsets
 from rest_framework.decorators import action
 
-from apps.core.viewsets.guardian_model_viewset import GuardianModelViewSet
 from apps.model_provider_mgmt.models import EmbedProvider
 from apps.model_provider_mgmt.serializers.embed_serializer import EmbedProviderSerializer
 from apps.model_provider_mgmt.services.remote_embeddings import RemoteEmbeddings
 
 
-class EmbedProviderViewSet(GuardianModelViewSet):
+class EmbedProviderViewSet(viewsets.ModelViewSet):
     serializer_class = EmbedProviderSerializer
     queryset = EmbedProvider.objects.all()
     search_fields = ["name"]

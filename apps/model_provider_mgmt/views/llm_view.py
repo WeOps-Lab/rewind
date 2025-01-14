@@ -2,14 +2,13 @@ from django.http import JsonResponse
 from django.utils.translation import gettext as _
 from django_filters import filters
 from django_filters.rest_framework import FilterSet
-from rest_framework import status
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from apps.base.quota_rule_mgmt.quota_utils import get_quota_client
 from apps.core.decorators.api_perminssion import HasRole
 from apps.core.utils.viewset_utils import AuthViewSet
-from apps.core.viewsets.guardian_model_viewset import GuardianModelViewSet
 from apps.knowledge_mgmt.models import KnowledgeBase
 from apps.model_provider_mgmt.models import LLMModel, LLMSkill
 from apps.model_provider_mgmt.serializers.llm_serializer import LLMModelSerializer, LLMSerializer
@@ -98,7 +97,7 @@ class LLMViewSet(AuthViewSet):
         return JsonResponse({"result": True, "data": return_data})
 
 
-class LLMModelViewSet(GuardianModelViewSet):
+class LLMModelViewSet(viewsets.ModelViewSet):
     serializer_class = LLMModelSerializer
     queryset = LLMModel.objects.all()
     search_fields = ["name"]
