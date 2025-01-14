@@ -8,7 +8,7 @@ from apps.base.models import QuotaRule
 from apps.base.quota_rule_mgmt.quota_utils import get_quota_client
 from apps.base.quota_rule_mgmt.serializers import QuotaRuleSerializer
 from apps.core.decorators.api_perminssion import HasRole
-from apps.core.utils.keycloak_client import KeyCloakClient
+from apps.rpc.system_mgmt import SystemMgmt
 
 
 class ObjFilter(FilterSet):
@@ -44,7 +44,7 @@ class QuotaRuleViewSet(viewsets.ModelViewSet):
         current_team = request.COOKIES.get("current_team")
         if not current_team:
             current_team = teams[0]
-        client = KeyCloakClient()
+        client = SystemMgmt()
         return_data = client.get_group_user(current_team)
         return JsonResponse({"result": True, "data": return_data})
 

@@ -7,7 +7,6 @@ from rest_framework.response import Response
 
 from apps.core.decorators.api_perminssion import HasRole
 from apps.core.utils.elasticsearch_utils import get_es_client
-from apps.core.utils.keycloak_client import KeyCloakClient
 from apps.core.utils.viewset_utils import AuthViewSet
 from apps.knowledge_mgmt.knowledge_base_mgmt.serializers import KnowledgeBaseSerializer
 from apps.knowledge_mgmt.models import KnowledgeBase, KnowledgeDocument
@@ -98,11 +97,5 @@ class KnowledgeBaseViewSet(AuthViewSet):
     @action(detail=False, methods=["GET"])
     @HasRole()
     def get_teams(self, request):
-        if not hasattr(request, "user"):
-            token = request.META.get("HTTP_AUTHORIZATION").split("Bearer ")[-1]
-            client = KeyCloakClient()
-            _, user_info = client.token_is_valid(token)
-            groups = client.get_user_groups(user_info["sub"], "admin" in user_info["realm_access"]["roles"])
-        else:
-            groups = request.user.group_list
+        groups = request.user.group_list
         return JsonResponse({"result": True, "data": groups})
