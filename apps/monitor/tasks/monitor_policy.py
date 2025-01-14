@@ -9,6 +9,7 @@ from django.core.mail import send_mail
 
 from apps.monitor.constants import THRESHOLD_METHODS, LEVEL_WEIGHT, MONITOR_OBJS
 from apps.monitor.models import MonitorPolicy, MonitorInstanceOrganization, MonitorAlert, MonitorEvent, MonitorInstance
+from apps.monitor.utils.system_mgmt_api import SystemMgmtUtils
 from apps.monitor.utils.victoriametrics_api import VictoriaMetricsAPI
 
 logger = logging.getLogger("app")
@@ -246,8 +247,7 @@ class MonitorPolicyScan:
 
     def get_users_email(self, usernames):
         """获取用户邮箱"""
-        # TODO user list
-        users = []
+        users = SystemMgmtUtils.get_user_all()
         user_email_map = {user_info["username"]: user_info["email"] for user_info in users if user_info.get("email")}
 
         return {username: user_email_map.get(username) for username in usernames}
