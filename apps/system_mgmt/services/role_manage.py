@@ -72,12 +72,16 @@ class RoleManage(object):
                 "type": i["type"],
                 "display_name": i["displayName"],
                 "index": int(i["attributes"]["index"][0]),
+                "title": i["attributes"]["title"],
+                "url": i["attributes"]["url"],
             }
             for i in data
             if i.get("attributes", {}).get("index") is not None
         ]
         data.sort(key=lambda i: i["index"])
-        transformed = defaultdict(lambda: defaultdict(lambda: {"display_name": "", "operation": []}))
+        transformed = defaultdict(
+            lambda: defaultdict(lambda: {"display_name": "", "operation": [], "title": "", "url": ""})
+        )
         for item in data:
             type_ = item["type"]
             name_operation = item["name"].split("-")
@@ -99,6 +103,8 @@ class RoleManage(object):
                         "name": name,
                         "display_name": details["display_name"],
                         "operation": details["operation"],
+                        "title": details["title"],
+                        "url": details["url"],
                     }
                 )
             result.append({"name": type_, "display_name": type_, "children": children})
