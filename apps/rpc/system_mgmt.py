@@ -40,9 +40,6 @@ class SystemMgmt(object):
         return_data = self.client.run("get_group_users", group=group)
         return return_data
 
-    def get_all_users(self, group):
-        """
-        :param group: 当前组的ID
-        """
+    def get_all_users(self):
         return_data = self.client.run("get_all_users")
         return return_data
