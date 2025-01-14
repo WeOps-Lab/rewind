@@ -9,6 +9,7 @@ class NodeMgmt(object):
         """
         :param query_data: 查询条件
         {
+            "cloud_region_id": 1,
             "organization_ids": ["1", "2"],
             "name": "node_name",
             "ip": "10.10.10.1",
@@ -42,11 +43,21 @@ class NodeMgmt(object):
         """
         :param query_data: 查询条件
         {
-            "object_type": "web",
-            "collect_type": "http_response",
-            "config_type": "http_response",
+            "collect_type": "http_response", // 非必填
+            "config_type": "http_response",  // 非必填
             "collect_instance_id": "https://wepaas.canway.net/"
         }
         """
         return_data = self.client.run('get_instance_child_config', query_data)
+        return return_data
+
+    def update_instance_child_config(self, data):
+        """
+        :param data: 更新实例子配置
+        {
+            "id": 1,
+            "content": ""
+        }
+        """
+        return_data = self.client.run('update_instance_child_config', data)
         return return_data
