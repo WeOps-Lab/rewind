@@ -72,9 +72,9 @@ class RoleManage(object):
                 "type": i["type"],
                 "display_name": i["displayName"],
                 "index": int(i["attributes"]["index"][0]),
-                "icon": i["attributes"]["icon"],
-                "title": i["attributes"]["title"],
-                "url": i["attributes"]["url"],
+                "icon": i["attributes"]["icon"][0],
+                "title": i["attributes"]["title"][0],
+                "url": i["attributes"]["url"][0],
             }
             for i in data
             if i.get("attributes", {}).get("index") is not None
@@ -94,6 +94,9 @@ class RoleManage(object):
                 transformed[type_][name]["display_name"] = display_name
 
             transformed[type_][name]["operation"].append(operation)
+            transformed[type_][name]["url"] = item["url"]
+            transformed[type_][name]["title"] = item["title"]
+            transformed[type_][name]["icon"] = item["icon"]
 
         result = []
         for type_, names in transformed.items():
