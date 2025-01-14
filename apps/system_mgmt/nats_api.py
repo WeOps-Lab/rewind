@@ -4,14 +4,11 @@ from django.utils.translation import gettext_lazy as _
 from apps.core.backends import cache
 from apps.core.utils.keycloak_client import KeyCloakClient
 from apps.system_mgmt.services.role_manage import RoleManage
+from apps.system_mgmt.services.user_manage import UserManage
 
 
 @nats_client.register
-def verify_token(token):
-    return _verify_token(token)
-
-
-def _verify_token(token):
+def verify_token(token, client_id):
     if not token:
         return {"result": False, "message": _("Token is missing")}
     client = KeyCloakClient()
@@ -28,7 +25,7 @@ def _verify_token(token):
         "data": {
             "username": user_info["username"],
             "email": user_info["email"],
-            "is_superuser": "admin" in roles,
+            "is_superuser": "admin" in roles or f"{client_id}_admin" in roles,
             "group_list": groups,
             "roles": roles,
             "locale": user_info.get("locale", "en"),
@@ -73,4 +70,19 @@ def get_client():
 def get_client_detail(client_id):
     client = KeyCloakClient()
     res = client.realm_client.get_client(client_id=client_id)
+    return {"result": True, "data": res}
+
+
+@nats_client.register
+def get_group_users(group):
+    client = KeyCloakClient()
+    users = client.realm_client.get_group_members(group)
+    return_data = [{"username": i["username"], "first_name": i["firstName"], "last_name": i["lastName"]} for i in users]
+    return {"result": True, "data": return_data}
+
+
+@nats_client.register
+def get_all_users():
+    client = UserManage()
+    res = client.user_all()
     return {"result": True, "data": res}
