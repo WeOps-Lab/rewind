@@ -2,6 +2,8 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from rest_framework.decorators import api_view
 
+from apps.rpc.system_mgmt import SystemMgmt
+
 
 def index(request):
     data = {"STATIC_URL": "static/", "RUN_MODE": "PROD"}
@@ -23,3 +25,26 @@ def login_info(request):
         }
     )
 
+
+def get_client(request):
+    client = SystemMgmt()
+    return_data = client.get_client()
+    return JsonResponse(return_data)
+
+
+def get_client_detail(request):
+    client = SystemMgmt()
+    return_data = client.get_client_detail(
+        client_id=request.GET["id"],
+    )
+    return JsonResponse(return_data)
+
+
+def get_user_menus(request):
+    client = SystemMgmt()
+    return_data = client.get_user_menus(
+        client_id=request.GET["id"],
+        roles=request.user.roles,
+        username=request.user.username,
+    )
+    return JsonResponse(return_data)
