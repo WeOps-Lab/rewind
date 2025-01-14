@@ -76,9 +76,11 @@ class NodeService:
             action.save()
 
     @staticmethod
-    def get_node_list(organization_ids, name, ip, os, page, page_size):
+    def get_node_list(organization_ids, cloud_region_id, name, ip, os, page, page_size):
         """获取节点列表"""
         qs = Node.objects.all()
+        if cloud_region_id:
+            qs = qs.filter(cloud_region_id=cloud_region_id)
         if organization_ids:
             qs = qs.filter(nodeorganization__organization__in=organization_ids).distinct()
         if name:
