@@ -43,11 +43,7 @@ class KnowledgeDocument(MaintainerInfo, TimeInfo):
     )
     enable_ocr_parse = models.BooleanField(default=False, verbose_name=_("enable OCR parse"))
     ocr_model = models.ForeignKey(
-        "model_provider_mgmt.OCRProvider",
-        blank=True,
-        null=True,
-        on_delete=models.CASCADE,
-        verbose_name=_("OCR model"),
+        "model_provider_mgmt.OCRProvider", blank=True, null=True, on_delete=models.CASCADE, verbose_name=_("OCR model")
     )
     enable_excel_parse = models.BooleanField(default=True, verbose_name=_("enable Excel parse"))
     excel_header_row_parse = models.BooleanField(default=False, verbose_name=_("Excel header row parse"))

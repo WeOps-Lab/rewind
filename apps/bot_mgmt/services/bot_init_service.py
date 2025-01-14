@@ -9,9 +9,7 @@ class BotInitService:
 
     def init(self):
         rasa_model, created = RasaModel.objects.update_or_create(
-            name="Core Model",
-            created_by=self.owner,
-            defaults={"description": _("Core Model")},
+            name="Core Model", created_by=self.owner, defaults={"description": _("Core Model")}
         )
         if created:
             with open("support-files/data/ops-pilot.tar.gz", "rb") as f:

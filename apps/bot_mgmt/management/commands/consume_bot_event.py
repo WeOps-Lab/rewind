@@ -109,9 +109,7 @@ def get_user_info(bot_id, input_channel, sender_id):
         fun = "update_or_create"
 
     user, _ = getattr(ChannelUser.objects, fun)(
-        user_id=sender_id,
-        channel_type=channel_type_map[input_channel],
-        defaults={"name": name},
+        user_id=sender_id, channel_type=channel_type_map[input_channel], defaults={"name": name}
     )
 
     return user
@@ -130,8 +128,7 @@ class Command(BaseCommand):
                         host=settings.CONVERSATION_MQ_HOST,
                         port=settings.CONVERSATION_MQ_PORT,
                         credentials=pika.PlainCredentials(
-                            settings.CONVERSATION_MQ_USER,
-                            settings.CONVERSATION_MQ_PASSWORD,
+                            settings.CONVERSATION_MQ_USER, settings.CONVERSATION_MQ_PASSWORD
                         ),
                     )
                 )

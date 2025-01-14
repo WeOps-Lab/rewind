@@ -12,12 +12,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="bot",
             name="api_token",
-            field=models.CharField(
-                blank=True,
-                default="",
-                max_length=64,
-                null=True,
-                verbose_name="API Token",
-            ),
+            field=models.CharField(blank=True, default="", max_length=64, null=True, verbose_name="API Token"),
         ),
     ]

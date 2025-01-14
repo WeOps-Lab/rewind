@@ -21,17 +21,10 @@ class Migration(migrations.Migration):
             name="EmbedProvider",
             fields=[
                 ("id", models.AutoField(primary_key=True, serialize=False)),
-                (
-                    "name",
-                    models.CharField(max_length=255, unique=True, verbose_name="名称"),
-                ),
+                ("name", models.CharField(max_length=255, unique=True, verbose_name="名称")),
                 (
                     "embed_model_type",
-                    models.CharField(
-                        choices=[("lang-serve", "LangServe")],
-                        max_length=255,
-                        verbose_name="嵌入模型",
-                    ),
+                    models.CharField(choices=[("lang-serve", "LangServe")], max_length=255, verbose_name="嵌入模型"),
                 ),
                 (
                     "embed_config",
@@ -55,16 +48,11 @@ class Migration(migrations.Migration):
             name="LLMModel",
             fields=[
                 ("id", models.AutoField(primary_key=True, serialize=False)),
-                (
-                    "name",
-                    models.CharField(max_length=255, unique=True, verbose_name="名称"),
-                ),
+                ("name", models.CharField(max_length=255, unique=True, verbose_name="名称")),
                 (
                     "llm_model_type",
                     models.CharField(
-                        choices=[("chat-gpt", "ChatGPT"), ("zhipu", "智谱AI")],
-                        max_length=255,
-                        verbose_name="LLM模型类型",
+                        choices=[("chat-gpt", "ChatGPT"), ("zhipu", "智谱AI")], max_length=255, verbose_name="LLM模型类型"
                     ),
                 ),
                 (
@@ -89,14 +77,8 @@ class Migration(migrations.Migration):
             name="OCRProvider",
             fields=[
                 ("id", models.AutoField(primary_key=True, serialize=False)),
-                (
-                    "name",
-                    models.CharField(max_length=255, unique=True, verbose_name="名称"),
-                ),
-                (
-                    "ocr_config",
-                    models.JSONField(blank=True, default=dict, null=True, verbose_name="OCR配置"),
-                ),
+                ("name", models.CharField(max_length=255, unique=True, verbose_name="名称")),
+                ("ocr_config", models.JSONField(blank=True, default=dict, null=True, verbose_name="OCR配置")),
                 ("enabled", models.BooleanField(default=True, verbose_name="是否启用")),
             ],
             options={
@@ -108,17 +90,10 @@ class Migration(migrations.Migration):
             name="RerankProvider",
             fields=[
                 ("id", models.AutoField(primary_key=True, serialize=False)),
-                (
-                    "name",
-                    models.CharField(max_length=255, unique=True, verbose_name="名称"),
-                ),
+                ("name", models.CharField(max_length=255, unique=True, verbose_name="名称")),
                 (
                     "rerank_model_type",
-                    models.CharField(
-                        choices=[("langserve", "LangServe")],
-                        max_length=255,
-                        verbose_name="模型类型",
-                    ),
+                    models.CharField(choices=[("langserve", "LangServe")], max_length=255, verbose_name="模型类型"),
                 ),
                 (
                     "rerank_config",
@@ -141,57 +116,23 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="LLMSkill",
             fields=[
-                (
-                    "created_by",
-                    models.CharField(default="", max_length=32, verbose_name="Creator"),
-                ),
-                (
-                    "updated_by",
-                    models.CharField(default="", max_length=32, verbose_name="Updater"),
-                ),
+                ("created_by", models.CharField(default="", max_length=32, verbose_name="Creator")),
+                ("updated_by", models.CharField(default="", max_length=32, verbose_name="Updater")),
                 ("id", models.AutoField(primary_key=True, serialize=False)),
                 ("name", models.CharField(max_length=255, verbose_name="名称")),
-                (
-                    "skill_id",
-                    models.CharField(blank=True, max_length=255, null=True, verbose_name="技能ID"),
-                ),
-                (
-                    "skill_prompt",
-                    models.TextField(blank=True, null=True, verbose_name="技能提示词"),
-                ),
-                (
-                    "enable_conversation_history",
-                    models.BooleanField(default=False, verbose_name="启用对话历史"),
-                ),
-                (
-                    "conversation_window_size",
-                    models.IntegerField(default=10, verbose_name="对话窗口大小"),
-                ),
-                (
-                    "enable_rag",
-                    models.BooleanField(default=False, verbose_name="启用RAG"),
-                ),
-                (
-                    "enable_rag_knowledge_source",
-                    models.BooleanField(default=False, verbose_name="显示RAG知识来源"),
-                ),
-                (
-                    "rag_score_threshold_map",
-                    models.JSONField(default=dict, verbose_name="知识库RAG分数阈值映射"),
-                ),
-                (
-                    "introduction",
-                    models.TextField(blank=True, default="", null=True, verbose_name="介绍"),
-                ),
+                ("skill_id", models.CharField(blank=True, max_length=255, null=True, verbose_name="技能ID")),
+                ("skill_prompt", models.TextField(blank=True, null=True, verbose_name="技能提示词")),
+                ("enable_conversation_history", models.BooleanField(default=False, verbose_name="启用对话历史")),
+                ("conversation_window_size", models.IntegerField(default=10, verbose_name="对话窗口大小")),
+                ("enable_rag", models.BooleanField(default=False, verbose_name="启用RAG")),
+                ("enable_rag_knowledge_source", models.BooleanField(default=False, verbose_name="显示RAG知识来源")),
+                ("rag_score_threshold_map", models.JSONField(default=dict, verbose_name="知识库RAG分数阈值映射")),
+                ("introduction", models.TextField(blank=True, default="", null=True, verbose_name="介绍")),
                 ("team", models.JSONField(default=list, verbose_name="分组")),
                 ("temperature", models.FloatField(default=0.7, verbose_name="温度")),
                 (
                     "knowledge_base",
-                    models.ManyToManyField(
-                        blank=True,
-                        to="knowledge_mgmt.knowledgebase",
-                        verbose_name="知识库",
-                    ),
+                    models.ManyToManyField(blank=True, to="knowledge_mgmt.knowledgebase", verbose_name="知识库"),
                 ),
                 (
                     "llm_model",

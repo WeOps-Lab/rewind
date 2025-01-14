@@ -22,21 +22,11 @@ class HistoryViewSet(viewsets.ModelViewSet):
 
     @action(methods=["GET"], detail=False)
     def search_log(self, request):
-        (
-            bot_id,
-            channel_type,
-            end_time,
-            page,
-            page_size,
-            search,
-            start_time,
-        ) = self.set_log_params(request)
+        bot_id, channel_type, end_time, page, page_size, search, start_time = self.set_log_params(request)
 
         earliest_conversation_subquery = (
             BotConversationHistory.objects.filter(
-                bot=OuterRef("bot"),
-                channel_user=OuterRef("channel_user"),
-                created_at__date=OuterRef("day"),
+                bot=OuterRef("bot"), channel_user=OuterRef("channel_user"), created_at__date=OuterRef("day")
             )
             .order_by("created_at")
             .values("conversation")[:1]
@@ -49,12 +39,7 @@ class HistoryViewSet(viewsets.ModelViewSet):
                 channel_user__name__icontains=search,
             )
             .annotate(day=TruncDay("created_at"))
-            .values(
-                "day",
-                "channel_user__user_id",
-                "channel_user__name",
-                "channel_user__channel_type",
-            )
+            .values("day", "channel_user__user_id", "channel_user__name", "channel_user__channel_type")
             .annotate(
                 count=Count("id"),
                 ids=ArrayAgg("id"),
@@ -83,8 +68,7 @@ class HistoryViewSet(viewsets.ModelViewSet):
                     "sender_id": entry["channel_user__user_id"],
                     "username": entry["channel_user__name"],
                     "channel_type": dict(ChannelChoices.choices).get(
-                        entry["channel_user__channel_type"],
-                        entry["channel_user__channel_type"],
+                        entry["channel_user__channel_type"], entry["channel_user__channel_type"]
                     ),
                     "count": entry["count"],
                     "ids": entry["ids"],

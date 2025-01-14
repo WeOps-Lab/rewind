@@ -13,20 +13,9 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="ChannelUser",
             fields=[
-                (
-                    "id",
-                    models.BigAutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="ID",
-                    ),
-                ),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
                 ("user_id", models.CharField(max_length=100, verbose_name="用户ID")),
-                (
-                    "name",
-                    models.CharField(blank=True, max_length=100, null=True, verbose_name="名称"),
-                ),
+                ("name", models.CharField(blank=True, max_length=100, null=True, verbose_name="名称")),
                 (
                     "channel_type",
                     models.CharField(

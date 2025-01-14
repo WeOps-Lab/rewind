@@ -11,11 +11,7 @@ class BotConversationHistory(MaintainerInfo):
     conversation = models.TextField(verbose_name="对话内容")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
     channel_user = models.ForeignKey(
-        "bot_mgmt.ChannelUser",
-        on_delete=models.CASCADE,
-        verbose_name="通道用户",
-        blank=True,
-        null=True,
+        "bot_mgmt.ChannelUser", on_delete=models.CASCADE, verbose_name="通道用户", blank=True, null=True
     )
     citing_knowledge = models.JSONField(verbose_name="引用知识", default=list, blank=True, null=True)
 
@@ -30,11 +26,7 @@ class BotConversationHistory(MaintainerInfo):
 class ConversationTag(models.Model):
     question = models.TextField(verbose_name="问题")
     answer = models.ForeignKey(
-        "bot_mgmt.BotConversationHistory",
-        null=True,
-        blank=True,
-        on_delete=models.CASCADE,
-        verbose_name="回答",
+        "bot_mgmt.BotConversationHistory", null=True, blank=True, on_delete=models.CASCADE, verbose_name="回答"
     )
     content = models.TextField(verbose_name="内容")
     knowledge_base_id = models.IntegerField(verbose_name="知识库ID")

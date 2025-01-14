@@ -15,23 +15,9 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="Channel",
             fields=[
-                (
-                    "id",
-                    models.BigAutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="ID",
-                    ),
-                ),
-                (
-                    "created_by",
-                    models.CharField(default="", max_length=32, verbose_name="Creator"),
-                ),
-                (
-                    "updated_by",
-                    models.CharField(default="", max_length=32, verbose_name="Updater"),
-                ),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("created_by", models.CharField(default="", max_length=32, verbose_name="Creator")),
+                ("updated_by", models.CharField(default="", max_length=32, verbose_name="Updater")),
                 ("name", models.CharField(max_length=100, verbose_name="name")),
                 (
                     "channel_type",

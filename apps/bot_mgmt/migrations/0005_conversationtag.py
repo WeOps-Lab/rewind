@@ -13,15 +13,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="ConversationTag",
             fields=[
-                (
-                    "id",
-                    models.BigAutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="ID",
-                    ),
-                ),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
                 ("question", models.TextField(verbose_name="问题")),
                 ("content", models.TextField(verbose_name="内容")),
                 ("knowledge_base_id", models.IntegerField(verbose_name="知识库ID")),

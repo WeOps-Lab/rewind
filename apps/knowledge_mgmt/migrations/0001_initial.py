@@ -15,15 +15,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="FileKnowledge",
             fields=[
-                (
-                    "id",
-                    models.BigAutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="ID",
-                    ),
-                ),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
                 (
                     "file",
                     models.FileField(
@@ -57,66 +49,22 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="KnowledgeBase",
             fields=[
-                (
-                    "id",
-                    models.BigAutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="ID",
-                    ),
-                ),
-                (
-                    "created_at",
-                    models.DateTimeField(auto_now_add=True, db_index=True, verbose_name="Created Time"),
-                ),
-                (
-                    "updated_at",
-                    models.DateTimeField(auto_now=True, verbose_name="Updated Time"),
-                ),
-                (
-                    "created_by",
-                    models.CharField(default="", max_length=32, verbose_name="Creator"),
-                ),
-                (
-                    "updated_by",
-                    models.CharField(default="", max_length=32, verbose_name="Updater"),
-                ),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("created_at", models.DateTimeField(auto_now_add=True, db_index=True, verbose_name="Created Time")),
+                ("updated_at", models.DateTimeField(auto_now=True, verbose_name="Updated Time")),
+                ("created_by", models.CharField(default="", max_length=32, verbose_name="Creator")),
+                ("updated_by", models.CharField(default="", max_length=32, verbose_name="Updater")),
                 ("name", models.CharField(db_index=True, max_length=100)),
                 ("introduction", models.TextField(blank=True, null=True)),
                 ("team", models.JSONField(default=list)),
-                (
-                    "enable_vector_search",
-                    models.BooleanField(default=True, verbose_name="Enable Vector Search"),
-                ),
-                (
-                    "vector_search_weight",
-                    models.FloatField(default=0.1, verbose_name="Vector Search weight"),
-                ),
-                (
-                    "enable_text_search",
-                    models.BooleanField(default=True, verbose_name="Enable Text Search"),
-                ),
-                (
-                    "text_search_weight",
-                    models.FloatField(default=0.9, verbose_name="Text Search Weight"),
-                ),
-                (
-                    "enable_rerank",
-                    models.BooleanField(default=True, verbose_name="Enable Rerank"),
-                ),
-                (
-                    "rag_k",
-                    models.IntegerField(default=50, verbose_name="Number of Results"),
-                ),
-                (
-                    "rag_num_candidates",
-                    models.IntegerField(default=1000, verbose_name="Number of Candidates"),
-                ),
-                (
-                    "text_search_mode",
-                    models.CharField(default="match", max_length=20, verbose_name="Text search mode"),
-                ),
+                ("enable_vector_search", models.BooleanField(default=True, verbose_name="Enable Vector Search")),
+                ("vector_search_weight", models.FloatField(default=0.1, verbose_name="Vector Search weight")),
+                ("enable_text_search", models.BooleanField(default=True, verbose_name="Enable Text Search")),
+                ("text_search_weight", models.FloatField(default=0.9, verbose_name="Text Search Weight")),
+                ("enable_rerank", models.BooleanField(default=True, verbose_name="Enable Rerank")),
+                ("rag_k", models.IntegerField(default=50, verbose_name="Number of Results")),
+                ("rag_num_candidates", models.IntegerField(default=1000, verbose_name="Number of Candidates")),
+                ("text_search_mode", models.CharField(default="match", max_length=20, verbose_name="Text search mode")),
             ],
             options={
                 "verbose_name": "Maintainer Fields",
@@ -126,65 +74,24 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="KnowledgeDocument",
             fields=[
-                (
-                    "id",
-                    models.BigAutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="ID",
-                    ),
-                ),
-                (
-                    "created_at",
-                    models.DateTimeField(auto_now_add=True, db_index=True, verbose_name="Created Time"),
-                ),
-                (
-                    "updated_at",
-                    models.DateTimeField(auto_now=True, verbose_name="Updated Time"),
-                ),
-                (
-                    "created_by",
-                    models.CharField(default="", max_length=32, verbose_name="Creator"),
-                ),
-                (
-                    "updated_by",
-                    models.CharField(default="", max_length=32, verbose_name="Updater"),
-                ),
-                (
-                    "name",
-                    models.CharField(db_index=True, max_length=255, verbose_name="name"),
-                ),
-                (
-                    "chunk_size",
-                    models.IntegerField(default=0, verbose_name="chunk size"),
-                ),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("created_at", models.DateTimeField(auto_now_add=True, db_index=True, verbose_name="Created Time")),
+                ("updated_at", models.DateTimeField(auto_now=True, verbose_name="Updated Time")),
+                ("created_by", models.CharField(default="", max_length=32, verbose_name="Creator")),
+                ("updated_by", models.CharField(default="", max_length=32, verbose_name="Updater")),
+                ("name", models.CharField(db_index=True, max_length=255, verbose_name="name")),
+                ("chunk_size", models.IntegerField(default=0, verbose_name="chunk size")),
                 (
                     "train_status",
                     models.IntegerField(
-                        choices=[
-                            (0, "Training"),
-                            (1, "Ready"),
-                            (2, "Error"),
-                            (3, "Pending"),
-                            (4, "Chunking"),
-                        ],
+                        choices=[(0, "Training"), (1, "Ready"), (2, "Error"), (3, "Pending"), (4, "Chunking")],
                         default=0,
                         verbose_name="train status",
                     ),
                 ),
-                (
-                    "train_progress",
-                    models.FloatField(default=0, verbose_name="train progress"),
-                ),
-                (
-                    "enable_general_parse",
-                    models.BooleanField(default=True, verbose_name="enable general parse"),
-                ),
-                (
-                    "general_parse_chunk_size",
-                    models.IntegerField(default=256, verbose_name="general parse chunk size"),
-                ),
+                ("train_progress", models.FloatField(default=0, verbose_name="train progress")),
+                ("enable_general_parse", models.BooleanField(default=True, verbose_name="enable general parse")),
+                ("general_parse_chunk_size", models.IntegerField(default=256, verbose_name="general parse chunk size")),
                 (
                     "general_parse_chunk_overlap",
                     models.IntegerField(default=32, verbose_name="general parse chunk overlap"),
@@ -193,32 +100,17 @@ class Migration(migrations.Migration):
                     "enable_semantic_chunk_parse",
                     models.BooleanField(default=False, verbose_name="enable semantic chunk parse"),
                 ),
-                (
-                    "enable_ocr_parse",
-                    models.BooleanField(default=False, verbose_name="enable OCR parse"),
-                ),
-                (
-                    "enable_excel_parse",
-                    models.BooleanField(default=True, verbose_name="enable Excel parse"),
-                ),
-                (
-                    "excel_header_row_parse",
-                    models.BooleanField(default=False, verbose_name="Excel header row parse"),
-                ),
+                ("enable_ocr_parse", models.BooleanField(default=False, verbose_name="enable OCR parse")),
+                ("enable_excel_parse", models.BooleanField(default=True, verbose_name="enable Excel parse")),
+                ("excel_header_row_parse", models.BooleanField(default=False, verbose_name="Excel header row parse")),
                 (
                     "excel_full_content_parse",
                     models.BooleanField(default=True, verbose_name="Excel full content parse"),
                 ),
-                (
-                    "knowledge_source_type",
-                    models.CharField(default="file", max_length=20, verbose_name="source type"),
-                ),
+                ("knowledge_source_type", models.CharField(default="file", max_length=20, verbose_name="source type")),
                 (
                     "knowledge_base",
-                    models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE,
-                        to="knowledge_mgmt.knowledgebase",
-                    ),
+                    models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="knowledge_mgmt.knowledgebase"),
                 ),
             ],
             options={
@@ -229,15 +121,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="WebPageKnowledge",
             fields=[
-                (
-                    "id",
-                    models.BigAutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="ID",
-                    ),
-                ),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
                 ("url", models.URLField(verbose_name="URL")),
                 ("max_depth", models.IntegerField(default=1, verbose_name="max depth")),
                 (
@@ -259,15 +143,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="ManualKnowledge",
             fields=[
-                (
-                    "id",
-                    models.BigAutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="ID",
-                    ),
-                ),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
                 ("content", models.TextField(verbose_name="content")),
                 (
                     "knowledge_document",

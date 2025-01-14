@@ -5,18 +5,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django_minio_backend import MinioBackend, iso_date_prefix
 
-KNOWLEDGE_TYPES = [
-    "md",
-    "docx",
-    "xlsx",
-    "csv",
-    "pptx",
-    "pdf",
-    "txt",
-    "png",
-    "jpg",
-    "jpeg",
-]
+KNOWLEDGE_TYPES = ["md", "docx", "xlsx", "csv", "pptx", "pdf", "txt", "png", "jpg", "jpeg"]
 
 
 class FileKnowledge(models.Model):

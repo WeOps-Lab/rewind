@@ -13,44 +13,17 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="SkillRule",
             fields=[
-                (
-                    "id",
-                    models.BigAutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="ID",
-                    ),
-                ),
-                (
-                    "created_at",
-                    models.DateTimeField(auto_now_add=True, db_index=True, verbose_name="Created Time"),
-                ),
-                (
-                    "updated_at",
-                    models.DateTimeField(auto_now=True, verbose_name="Updated Time"),
-                ),
-                (
-                    "created_by",
-                    models.CharField(default="", max_length=32, verbose_name="Creator"),
-                ),
-                (
-                    "updated_by",
-                    models.CharField(default="", max_length=32, verbose_name="Updater"),
-                ),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("created_at", models.DateTimeField(auto_now_add=True, db_index=True, verbose_name="Created Time")),
+                ("updated_at", models.DateTimeField(auto_now=True, verbose_name="Updated Time")),
+                ("created_by", models.CharField(default="", max_length=32, verbose_name="Creator")),
+                ("updated_by", models.CharField(default="", max_length=32, verbose_name="Updater")),
                 ("name", models.CharField(max_length=255, verbose_name="规则名称")),
-                (
-                    "description",
-                    models.TextField(blank=True, null=True, verbose_name="描述"),
-                ),
+                ("description", models.TextField(blank=True, null=True, verbose_name="描述")),
                 ("condition", models.JSONField(default=dict, verbose_name="条件")),
                 (
                     "action",
-                    models.IntegerField(
-                        choices=[(0, "Use specified knowledge base")],
-                        default=0,
-                        verbose_name="动作",
-                    ),
+                    models.IntegerField(choices=[(0, "Use specified knowledge base")], default=0, verbose_name="动作"),
                 ),
                 ("action_set", models.JSONField(default=dict, verbose_name="动作设置")),
                 ("is_enabled", models.BooleanField(default=True, verbose_name="是否启用")),

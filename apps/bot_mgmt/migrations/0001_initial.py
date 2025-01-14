@@ -17,58 +17,22 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="Bot",
             fields=[
-                (
-                    "id",
-                    models.BigAutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="ID",
-                    ),
-                ),
-                (
-                    "created_by",
-                    models.CharField(default="", max_length=32, verbose_name="Creator"),
-                ),
-                (
-                    "updated_by",
-                    models.CharField(default="", max_length=32, verbose_name="Updater"),
-                ),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("created_by", models.CharField(default="", max_length=32, verbose_name="Creator")),
+                ("updated_by", models.CharField(default="", max_length=32, verbose_name="Updater")),
                 ("name", models.CharField(max_length=255, verbose_name="名称")),
-                (
-                    "introduction",
-                    models.TextField(blank=True, null=True, verbose_name="描述"),
-                ),
+                ("introduction", models.TextField(blank=True, null=True, verbose_name="描述")),
                 ("team", models.JSONField(default=list)),
-                (
-                    "enable_bot_domain",
-                    models.BooleanField(default=False, verbose_name="启用域名"),
-                ),
-                (
-                    "bot_domain",
-                    models.CharField(blank=True, max_length=255, null=True, verbose_name="域名"),
-                ),
-                (
-                    "enable_ssl",
-                    models.BooleanField(default=False, verbose_name="启用SSL"),
-                ),
-                (
-                    "enable_node_port",
-                    models.BooleanField(default=False, verbose_name="启用端口映射"),
-                ),
+                ("enable_bot_domain", models.BooleanField(default=False, verbose_name="启用域名")),
+                ("bot_domain", models.CharField(blank=True, max_length=255, null=True, verbose_name="域名")),
+                ("enable_ssl", models.BooleanField(default=False, verbose_name="启用SSL")),
+                ("enable_node_port", models.BooleanField(default=False, verbose_name="启用端口映射")),
                 ("node_port", models.IntegerField(default=5005, verbose_name="端口映射")),
                 ("online", models.BooleanField(default=False, verbose_name="是否上线")),
-                (
-                    "channels",
-                    models.ManyToManyField(blank=True, to="channel_mgmt.channel", verbose_name="通道"),
-                ),
+                ("channels", models.ManyToManyField(blank=True, to="channel_mgmt.channel", verbose_name="通道")),
                 (
                     "llm_skills",
-                    models.ManyToManyField(
-                        blank=True,
-                        to="model_provider_mgmt.llmskill",
-                        verbose_name="LLM技能",
-                    ),
+                    models.ManyToManyField(blank=True, to="model_provider_mgmt.llmskill", verbose_name="LLM技能"),
                 ),
             ],
             options={
@@ -79,28 +43,11 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="RasaModel",
             fields=[
-                (
-                    "id",
-                    models.BigAutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="ID",
-                    ),
-                ),
-                (
-                    "created_by",
-                    models.CharField(default="", max_length=32, verbose_name="Creator"),
-                ),
-                (
-                    "updated_by",
-                    models.CharField(default="", max_length=32, verbose_name="Updater"),
-                ),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("created_by", models.CharField(default="", max_length=32, verbose_name="Creator")),
+                ("updated_by", models.CharField(default="", max_length=32, verbose_name="Updater")),
                 ("name", models.CharField(max_length=255, verbose_name="模型名称")),
-                (
-                    "description",
-                    models.TextField(blank=True, null=True, verbose_name="描述"),
-                ),
+                ("description", models.TextField(blank=True, null=True, verbose_name="描述")),
                 (
                     "model_file",
                     models.FileField(
@@ -120,43 +67,20 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="BotConversationHistory",
             fields=[
-                (
-                    "id",
-                    models.BigAutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="ID",
-                    ),
-                ),
-                (
-                    "created_by",
-                    models.CharField(default="", max_length=32, verbose_name="Creator"),
-                ),
-                (
-                    "updated_by",
-                    models.CharField(default="", max_length=32, verbose_name="Updater"),
-                ),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("created_by", models.CharField(default="", max_length=32, verbose_name="Creator")),
+                ("updated_by", models.CharField(default="", max_length=32, verbose_name="Updater")),
                 ("user_info", models.JSONField(default=dict, verbose_name="用户信息")),
                 (
                     "conversation_role",
-                    models.CharField(
-                        choices=[("user", "用户"), ("bot", "机器人")],
-                        max_length=255,
-                        verbose_name="对话角色",
-                    ),
+                    models.CharField(choices=[("user", "用户"), ("bot", "机器人")], max_length=255, verbose_name="对话角色"),
                 ),
                 ("conversation", models.TextField(verbose_name="对话内容")),
-                (
-                    "created_at",
-                    models.DateTimeField(auto_now_add=True, verbose_name="创建时间"),
-                ),
+                ("created_at", models.DateTimeField(auto_now_add=True, verbose_name="创建时间")),
                 (
                     "bot",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE,
-                        to="bot_mgmt.bot",
-                        verbose_name="机器人",
+                        on_delete=django.db.models.deletion.CASCADE, to="bot_mgmt.bot", verbose_name="机器人"
                     ),
                 ),
             ],

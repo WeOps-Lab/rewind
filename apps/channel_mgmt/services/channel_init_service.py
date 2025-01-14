@@ -72,7 +72,7 @@ class ChannelInitService:
         )
 
         logger.info("初始化微信公众号通道")
-        Channel.objects.get_or_create(
+        Channel.objects.update_or_create(
             name=ChannelChoices.WECHAT_OFFICIAL_ACCOUNT.value,
             channel_type=ChannelChoices.WECHAT_OFFICIAL_ACCOUNT,
             created_by=self.owner,

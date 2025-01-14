@@ -37,12 +37,7 @@ class KnowledgeBaseViewSet(AuthViewSet):
         if "embed_model" not in params:
             params["embed_model"] = EmbedProvider.objects.get(name="FastEmbed(BAAI/bge-small-zh-v1.5)").id
         if KnowledgeBase.objects.filter(name=params["name"]).exists():
-            return JsonResponse(
-                {
-                    "result": False,
-                    "message": _("The knowledge base name already exists."),
-                }
-            )
+            return JsonResponse({"result": False, "message": _("The knowledge base name already exists.")})
         params["created_by"] = request.user.username
         params["rerank_model"] = rerank_model.id
         params["enable_rerank"] = False
@@ -64,10 +59,7 @@ class KnowledgeBaseViewSet(AuthViewSet):
         if instance.embed_model_id != params["embed_model"]:
             if instance.knowledgedocument_set.filter(train_status=DocumentStatus.TRAINING).exists():
                 return JsonResponse(
-                    {
-                        "result": False,
-                        "message": _("The knowledge base is training and cannot be modified."),
-                    }
+                    {"result": False, "message": _("The knowledge base is training and cannot be modified.")}
                 )
             retrain_all.delay(instance.id)
         return super().update(request, *args, **kwargs)
@@ -79,12 +71,7 @@ class KnowledgeBaseViewSet(AuthViewSet):
         kwargs = request.data
         if kwargs.get("name"):
             if KnowledgeBase.objects.filter(name=kwargs["name"]).exclude(id=instance.id).exists():
-                return JsonResponse(
-                    {
-                        "result": False,
-                        "message": _("The knowledge base name already exists."),
-                    }
-                )
+                return JsonResponse({"result": False, "message": _("The knowledge base name already exists.")})
             instance.name = kwargs["name"]
         if kwargs.get("introduction"):
             instance.introduction = kwargs["introduction"]
@@ -104,10 +91,7 @@ class KnowledgeBaseViewSet(AuthViewSet):
     def destroy(self, request, *args, **kwargs):
         if KnowledgeDocument.objects.filter(knowledge_base_id=kwargs["pk"]).exists():
             return JsonResponse(
-                {
-                    "result": False,
-                    "message": _("This knowledge base contains documents and cannot be deleted."),
-                }
+                {"result": False, "message": _("This knowledge base contains documents and cannot be deleted.")}
             )
         return super().destroy(request, *args, **kwargs)
 

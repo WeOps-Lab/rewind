@@ -17,11 +17,7 @@ class Bot(MaintainerInfo):
     team = models.JSONField(default=list)
     channels = models.JSONField(default=list)
     rasa_model = models.ForeignKey(
-        "bot_mgmt.RasaModel",
-        on_delete=models.CASCADE,
-        verbose_name="模型",
-        blank=True,
-        null=True,
+        "bot_mgmt.RasaModel", on_delete=models.CASCADE, verbose_name="模型", blank=True, null=True
     )
     llm_skills = models.ManyToManyField("model_provider_mgmt.LLMSkill", verbose_name="LLM技能", blank=True)
     enable_bot_domain = models.BooleanField(verbose_name="启用域名", default=False)
@@ -57,15 +53,11 @@ class BotChannel(models.Model, EncryptMixin):
             super(BotChannel, self).save()
         if self.channel_type == ChannelChoices.GITLAB:
             self.encrypt_field(
-                "secret_token",
-                self.channel_config["channels.gitlab_review_channel.GitlabReviewChannel"],
+                "secret_token", self.channel_config["channels.gitlab_review_channel.GitlabReviewChannel"]
             )
 
         elif self.channel_type == ChannelChoices.DING_TALK:
-            self.encrypt_field(
-                "client_secret",
-                self.channel_config["channels.dingtalk_channel.DingTalkChannel"],
-            )
+            self.encrypt_field("client_secret", self.channel_config["channels.dingtalk_channel.DingTalkChannel"])
 
         elif self.channel_type == ChannelChoices.ENTERPRISE_WECHAT:
             key = "channels.enterprise_wechat_channel.EnterpriseWechatChannel"
@@ -90,16 +82,10 @@ class BotChannel(models.Model, EncryptMixin):
     def decrypted_channel_config(self):
         decrypted_config = self.channel_config.copy()
         if self.channel_type == ChannelChoices.GITLAB:
-            self.decrypt_field(
-                "secret_token",
-                decrypted_config["channels.gitlab_review_channel.GitlabReviewChannel"],
-            )
+            self.decrypt_field("secret_token", decrypted_config["channels.gitlab_review_channel.GitlabReviewChannel"])
 
         if self.channel_type == ChannelChoices.DING_TALK:
-            self.decrypt_field(
-                "client_secret",
-                decrypted_config["channels.dingtalk_channel.DingTalkChannel"],
-            )
+            self.decrypt_field("client_secret", decrypted_config["channels.dingtalk_channel.DingTalkChannel"])
 
         elif self.channel_type == ChannelChoices.ENTERPRISE_WECHAT:
             key = "channels.enterprise_wechat_channel.EnterpriseWechatChannel"
@@ -111,8 +97,7 @@ class BotChannel(models.Model, EncryptMixin):
 
         elif self.channel_type == ChannelChoices.ENTERPRISE_WECHAT_BOT:
             self.decrypt_field(
-                "secret_token",
-                decrypted_config["channels.enterprise_wechat_bot_channel.EnterpriseWechatBotChannel"],
+                "secret_token", decrypted_config["channels.enterprise_wechat_bot_channel.EnterpriseWechatBotChannel"]
             )
         elif self.channel_type == ChannelChoices.WECHAT_OFFICIAL_ACCOUNT:
             key = "channels.wechat_official_account_channel.WechatOfficialAccountChannel"

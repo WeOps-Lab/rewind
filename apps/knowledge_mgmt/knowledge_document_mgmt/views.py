@@ -46,12 +46,7 @@ class KnowledgeDocumentViewSet(AuthViewSet):
             if KnowledgeDocument.objects.filter(
                 id__in=knowledge_document_ids, train_status=DocumentStatus.TRAINING
             ).exists():
-                return JsonResponse(
-                    {
-                        "result": False,
-                        "message": _("training document can not be retrained"),
-                    }
-                )
+                return JsonResponse({"result": False, "message": _("training document can not be retrained")})
             kwargs["train_status"] = DocumentStatus.TRAINING
         KnowledgeDocument.objects.filter(id__in=knowledge_document_ids).update(**kwargs)
         if not is_save_only:
@@ -192,11 +187,7 @@ class KnowledgeDocumentViewSet(AuthViewSet):
     @action(methods=["GET"], detail=True)
     def get_document_detail(self, request, *args, **kwargs):
         obj: KnowledgeDocument = self.get_object()
-        result = {
-            "document_id": obj.id,
-            "name": obj.name,
-            "knowledge_source_type": obj.knowledge_source_type,
-        }
+        result = {"document_id": obj.id, "name": obj.name, "knowledge_source_type": obj.knowledge_source_type}
         knowledge_model_map = {
             "web_page": WebPageKnowledge,
             "manual": ManualKnowledge,

@@ -140,9 +140,7 @@ def get_conversations_line_data(request):
     end_time, start_time = set_time_range(end_time_str, start_time_str)
     queryset = (
         BotConversationHistory.objects.filter(
-            created_at__range=[start_time, end_time],
-            bot_id=request.GET.get("bot_id"),
-            conversation_role="bot",
+            created_at__range=[start_time, end_time], bot_id=request.GET.get("bot_id"), conversation_role="bot"
         )
         .annotate(date=TruncDate("created_at"))
         .values("channel_user__channel_type", "date")
@@ -160,9 +158,7 @@ def get_active_users_line_data(request):
     end_time, start_time = set_time_range(end_time_str, start_time_str)
     queryset = (
         BotConversationHistory.objects.filter(
-            created_at__range=[start_time, end_time],
-            bot_id=request.GET.get("bot_id"),
-            conversation_role="user",
+            created_at__range=[start_time, end_time], bot_id=request.GET.get("bot_id"), conversation_role="user"
         )
         .annotate(date=TruncDate("created_at"))
         .values("channel_user__channel_type", "date")
