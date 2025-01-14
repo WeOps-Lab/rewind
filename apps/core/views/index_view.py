@@ -11,7 +11,7 @@ def index(request):
     return response
 
 
-@api_view(['GET'])
+@api_view(["GET"])
 def login_info(request):
     return JsonResponse(
         {
