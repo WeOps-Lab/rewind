@@ -183,7 +183,7 @@
     {
       "metric_group": "Traffic",
       "name": "iftotalInOctets",
-      "query": "sum(rate(interface_ifInOctets{_$labels_}[5m]) / 1024 / 1024)by (instance_id)",
+      "query": "sum(rate(interface_ifInOctets{__$labels__}[5m]) / 1024 / 1024)by (instance_id)",
       "display_name": "Device Total Incoming Traffic (per second)",
       "data_type": "Number",
       "unit": "MBs",
@@ -193,7 +193,7 @@
     {
       "metric_group": "Traffic",
       "name": "iftotalOutOctets",
-      "query": "sum(rate(interface_ifInOctets{_$labels_}[5m]) / 1024 / 1024) by (instance_id)",
+      "query": "sum(rate(interface_ifInOctets{__$labels__}[5m]) / 1024 / 1024) by (instance_id)",
       "display_name": "Device Total Outgoing Traffic (per second)",
       "data_type": "Number",
       "unit": "MBs",

@@ -138,7 +138,7 @@
     {
       "metric_group": "Packet",
       "name": "ifOutUcastPkts",
-      "query": "rate(interface_ifOutUcastPkts{_$labels_}[5m])",
+      "query": "rate(interface_ifOutUcastPkts{__$labels__}[5m])",
       "display_name": "Outgoing Unicast Packets Rate (per second)",
       "data_type": "Number",
       "unit": "pps",
@@ -153,7 +153,7 @@
     {
       "metric_group": "Traffic",
       "name": "ifInOctets",
-      "query": "rate(interface_ifInOctets{_$labels_}[5m]) / 1024/1024",
+      "query": "rate(interface_ifInOctets{__$labels__}[5m]) / 1024/1024",
       "display_name": "Interface Incoming Traffic Rate (per second)",
       "data_type": "Number",
       "unit": "MBs",
@@ -168,7 +168,7 @@
     {
       "metric_group": "Traffic",
       "name": "ifOutOctets",
-      "query": "rate(interface_ifInOctets{_$labels_}[5m]) / 1024/1024",
+      "query": "rate(interface_ifInOctets{__$labels__}[5m]) / 1024/1024",
       "display_name": "Interface Outgoing Traffic Rate (per second)",
       "data_type": "Number",
       "unit": "MBs",
@@ -183,7 +183,7 @@
     {
       "metric_group": "Traffic",
       "name": "iftotalInOctets",
-      "query": "sum(rate(interface_ifInOctets{_$labels_}[5m]) / 1024 / 1024)by (instance_id)",
+      "query": "sum(rate(interface_ifInOctets{__$labels__}[5m]) / 1024 / 1024)by (instance_id)",
       "display_name": "Device Total Incoming Traffic (per second)",
       "data_type": "Number",
       "unit": "MBs",
@@ -193,7 +193,7 @@
     {
       "metric_group": "Traffic",
       "name": "iftotalOutOctets",
-      "query": "sum(rate(interface_ifInOctets{_$labels_}[5m]) / 1024 / 1024) by (instance_id)",
+      "query": "sum(rate(interface_ifInOctets{__$labels__}[5m]) / 1024 / 1024) by (instance_id)",
       "display_name": "Device Total Outgoing Traffic (per second)",
       "data_type": "Number",
       "unit": "MBs",
