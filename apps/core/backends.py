@@ -1,4 +1,5 @@
 import logging
+import os
 import traceback
 
 from django.contrib.auth.backends import ModelBackend
@@ -31,7 +32,7 @@ class KeycloakAuthBackend(ModelBackend):
         if not token:
             return None
         client = SystemMgmt()
-        result = client.verify_token(token)
+        result = client.verify_token(token, os.getenv("CLIENT_ID", ""))
         # 判断token是否验证通过,不通过则返回None
         if not result["result"]:
             return None
