@@ -8,7 +8,7 @@
     {
       "metric_group": "Base",
       "name": "sysUpTime",
-      "query": "sum(snmp_uptime{_$labels_}) by (instance_id) / 60 / 60 / 24",
+      "query": "sum(snmp_uptime{__$labels__}) by (instance_id) / 60 / 60 / 24",
       "display_name": "System Uptime",
       "data_type": "Number",
       "unit": "d",
@@ -18,7 +18,7 @@
     {
       "metric_group": "Status",
       "name": "ifAdminStatus",
-      "query": "interface_ifAdminStatus{_$labels_}",
+      "query": "interface_ifAdminStatus{__$labels__}",
       "display_name": "Interface Admin Status",
       "data_type": "Enum",
       "unit": "[{\"name\":\"up\",\"id\":1},{\"name\":\"down\",\"id\":2},{\"name\":\"testing\",\"id\":3}]",
@@ -33,7 +33,7 @@
     {
       "metric_group": "Status",
       "name": "ifOperStatus",
-      "query": "interface_ifOperStatus{_$labels_}",
+      "query": "interface_ifOperStatus{__$labels__}",
       "display_name": "Interface Oper Status",
       "data_type": "Enum",
       "unit": "[{\"name\":\"up\",\"id\":1},{\"name\":\"down\",\"id\":2},{\"name\":\"testing\",\"id\":3}]",
@@ -48,7 +48,7 @@
     {
       "metric_group": "Bandwidth",
       "name": "ifHighSpeed",
-      "query": "interface_ifSpeed{_$labels_}",
+      "query": "interface_ifSpeed{__$labels__}",
       "display_name": "Interface Bandwidth",
       "data_type": "Number",
       "unit": "Mbits",
@@ -63,7 +63,7 @@
     {
       "metric_group": "Packet Error",
       "name": "ifInErrors",
-      "query": "rate(interface_ifInErrors{_$labels_}[5m])",
+      "query": "rate(interface_ifInErrors{__$labels__}[5m])",
       "display_name": "Incoming Errors Rate (per second)",
       "data_type": "Number",
       "unit": "pps",
