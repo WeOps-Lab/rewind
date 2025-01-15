@@ -1,5 +1,5 @@
 {
-  "plugin": "K8S General",
+  "plugin": "K8S",
   "plugin_desc": "The K8S monitoring plugin is used to monitor the status and health of Kubernetes clusters, including the performance metrics of nodes, containers, and pods.",
   "is_compound_object": true,
   "objects": [
@@ -17,7 +17,7 @@
           "unit": "short",
           "dimensions": [],
           "description": "It is used to count the total number of Pods currently present in the Kubernetes cluster. This metric returns the count of Pods running in the cluster, including those across all namespaces.",
-          "query": "count(prometheus_remote_write_kube_pod_info{__$labels__})by (instance_id)"
+          "query": "round(count(prometheus_remote_write_kube_pod_info{__$labels__}) by (instance_id))"
         },
         {
           "metric_group": "Counts",
@@ -27,7 +27,7 @@
           "unit": "short",
           "dimensions": [],
           "description": "It is used to count the total number of nodes currently available in the Kubernetes cluster. This metric returns the number of nodes in the cluster, helping users understand the scale and resources of the cluster.",
-          "query": "count(prometheus_remote_write_kube_node_info{__$labels__})by (instance_id)"
+          "query": "round(count(prometheus_remote_write_kube_node_info{__$labels__})by (instance_id))"
         },
         {
           "metric_group": "Utilization",
@@ -37,7 +37,7 @@
           "unit": "percent",
           "dimensions": [],
           "description": "Represents the current CPU utilization of the cluster, typically expressed as a percentage.",
-          "query": "100 * (1 - sum(rate(prometheus_remote_write_node_cpu_seconds_total{instance_type=\"k8s\", mode=\"idle\",__$labels__}[5m])) / sum(rate(prometheus_remote_write_node_cpu_seconds_total{instance_type=\"k8s\",__$labels__}[5m])))"
+          "query": "sum(rate(prometheus_remote_write_container_cpu_usage_seconds_total{instance_type=\"k8s\", __$labels__}[5m])) / sum(prometheus_remote_write_machine_cpu_cores{instance_type=\"k8s\",__$labels__})*100"
         },
         {
           "metric_group": "Utilization",
@@ -47,7 +47,7 @@
           "unit": "percent",
           "dimensions": [],
           "description": "Shows the current memory utilization of the cluster, expressed as a percentage.",
-          "query": "100 * (sum(prometheus_remote_write_node_memory_MemAvailable_bytes{instance_type=\"k8s\",__$labels__}) by (instance_id) / sum(prometheus_remote_write_node_memory_MemTotal_bytes{instance_type=\"k8s\",__$labels__ }) by (instance_id))"
+          "query": "(sum(prometheus_remote_write_container_memory_usage_bytes{instance_type=\"k8s\", __$labels__}) - sum(prometheus_remote_write_container_memory_cache{instance_type=\"k8s\", __$labels__})) / sum(prometheus_remote_write_machine_memory_bytes{instance_type=\"k8s\", __$labels__})*100"
         }
       ]
     },
@@ -148,7 +148,7 @@
         {
           "metric_group": "Status",
           "name": "node_status_condition",
-          "query": "sum(prometheus_remote_write_kube_node_status_condition{condition=\"Ready\",status=\"true\",__$labels__}) by (node)",
+          "query": "sum(prometheus_remote_write_kube_node_status_condition{condition=\"Ready\",status=\"true\",__$labels__})by (node)",
           "display_name": "Node Status",
           "data_type": "Enum",
           "unit": "[{\"name\":\"ready\",\"id\":1},{\"name\":\"not ready\",\"id\":0}]",
@@ -158,7 +158,7 @@
         {
           "metric_group": "CPU",
           "name": "node_cpu_utilization",
-          "query": "100 * (1 - sum(rate(prometheus_remote_write_node_cpu_seconds_total{instance_type=\"k8s\", mode=\"idle\",__$labels__}[5m])) by (node) / sum(rate(prometheus_remote_write_node_cpu_seconds_total{instance_type=\"k8s\", mode=\"idle\",__$labels__}[5m])) by (node))",
+          "query": "100 - avg(cpu_usage_idle{cpu=\"cpu-total\", instance_type=\"k8s\", __$labels__}) by (instance_id)",
           "display_name": "CPU Utilization",
           "data_type": "Number",
           "unit": "percent",
@@ -168,17 +168,17 @@
         {
           "metric_group": "Memory",
           "name": "node_memory_usage",
-          "query": "((prometheus_remote_write_node_memory_MemTotal_bytes{instance_type=\"k8s\", __$labels__} - prometheus_remote_write_node_memory_MemAvailable_bytes{instance_type=\"k8s\", __$labels__}) / 1024 / 1024 / 1024)",
+          "query": "avg(mem_used{instance_type=\"k8s\", __$labels__})/ 1024 / 1024 / 1024",
           "display_name": "Application Memory Usage",
           "data_type": "Number",
-          "unit": "tebibytes",
+          "unit": "tbytes",
           "dimensions": [],
           "description": "Application Memory Usage represents the total amount of memory utilized by applications running on the node. This metric helps understand the memory demands of applications and their impact on system performance."
         },
         {
           "metric_group": "Memory",
           "name": "node_memory_utilization",
-          "query": "100 * (sum(prometheus_remote_write_node_memory_MemAvailable_bytes{instance_type=\"k8s\", __$labels__}) by (node) / sum(prometheus_remote_write_node_memory_MemTotal_bytes{instance_type=\"k8s\", __$labels__}) by (node))",
+          "query": "avg(mem_used_percent{instance_type=\"k8s\", __$labels__})",
           "display_name": "Application Memory Utilization Rate",
           "data_type": "Number",
           "unit": "percent",
@@ -186,36 +186,16 @@
           "description": "Application Memory Utilization Rate is the ratio of memory used by the application to its configured memory limits. By monitoring this metric, users can determine if adjustments to memory limits are needed."
         },
         {
-          "metric_group": "Memory",
-          "name": "node_physical_memory_usage",
-          "query": "((prometheus_remote_write_node_memory_MemTotal_bytes{instance_type=\"k8s\", __$labels__} - prometheus_remote_write_node_memory_MemAvailable_bytes{instance_type=\"k8s\", __$labels__}) / 1024 / 1024 / 1024)",
-          "display_name": "Physical Memory Usage",
-          "data_type": "Number",
-          "unit": "tebibytes",
-          "dimensions": [],
-          "description": "Physical Memory Usage refers to the total amount of physical memory actually used by the node. Understanding this metric helps administrators identify if there is a need to expand physical memory to support higher loads."
-        },
-        {
-          "metric_group": "Memory",
-          "name": "node_physical_memory_utilization",
-          "query": "(((prometheus_remote_write_node_memory_MemTotal_bytes{instance_type=\"k8s\", __$labels__} - prometheus_remote_write_node_memory_MemAvailable_bytes{instance_type=\"k8s\", __$labels__}) / prometheus_remote_write_node_memory_MemTotal_bytes{instance_type=\"k8s\", __$labels__}) * 100)",
-          "display_name": "Physical Memory Utilization Rate",
-          "data_type": "Number",
-          "unit": "percent",
-          "dimensions": [],
-          "description": "Physical Memory Utilization Rate represents the percentage of physical memory used compared to the total available physical memory. This metric helps assess the memory pressure and health status of the node."
-        },
-        {
           "metric_group": "Disk",
           "name": "node_io_read",
-          "query": "rate(prometheus_remote_write_node_disk_written_bytes_total{instance_type=\"k8s\", __$labels__}[5m])/1024",
+          "query": "rate(diskio_write_bytes{instance_type=\"k8s\", __$labels__}[5m])",
           "display_name": "Disk Write Rate",
           "data_type": "Number",
           "unit": "KB/s",
           "dimensions": [
             {
-              "name": "device",
-              "description": "device"
+              "name": "name",
+              "description": "name"
             }
           ],
           "description": "Disk Write Rate indicates the rate of write operations performed by the node over a specified period. This metric is crucial for monitoring the disk write performance of applications."
@@ -223,44 +203,44 @@
         {
           "metric_group": "Disk",
           "name": "node_io_write",
-          "query": "rate(prometheus_remote_write_node_disk_reads_completed_total{instance_type=\"k8s\", __$labels__}[5m])/1024",
+          "query": "rate(diskio_read_bytes{instance_type=\"k8s\", __$labels__}[5m])",
           "display_name": "Disk Read Rate",
           "data_type": "Number",
           "unit": "KB/s",
           "dimensions": [
             {
-              "name": "device",
-              "description": "device"
+              "name": "name",
+              "description": "name"
             }
           ],
           "description": "Disk Read Rate indicates the rate of read operations performed by the node over a specified period. This metric helps assess the data reading performance of applications and storage load."
         },
         {
-          "metric_group": "Network",
+          "metric_group": "Net",
           "name": "node_network_receive",
-          "query": "rate(prometheus_remote_write_node_network_receive_bytes_total{instance_type=\"k8s\", __$labels__}[5m]) / 1024 / 1024",
+          "query": "rate(net_bytes_recv{instance_type=\"k8s\", __$labels__}[5m])/1024/1024",
           "display_name": "Incoming Bytes on NIC",
           "data_type": "Number",
           "unit": "MBs",
           "dimensions": [
             {
-              "name": "device",
-              "description": "device"
+              "name": "name",
+              "description": "name"
             }
           ],
           "description": "Network In refers to the volume of data traffic received through the network interface. Monitoring this metric helps analyze if network bandwidth is sufficient and the overall network performance."
         },
         {
-          "metric_group": "Network",
+          "metric_group": "Net",
           "name": "node_network_transmit",
-          "query": "rate(prometheus_remote_write_node_network_transmit_bytes_total{instance_type=\"k8s\", __$labels__}[5m]) / 1024 / 1024",
+          "query": "rate(net_bytes_sent{instance_type=\"k8s\", __$labels__}[5m])/1024/1024",
           "display_name": "Outgoing Bytes on NIC",
           "data_type": "Number",
           "unit": "MBs",
           "dimensions": [
             {
-              "name": "device",
-              "description": "device"
+              "name": "name",
+              "description": "name"
             }
           ],
           "description": "Network Out refers to the volume of data traffic sent through the network interface. This metric helps understand the node's network egress demands and potential bottlenecks."
@@ -268,7 +248,7 @@
         {
           "metric_group": "Load",
           "name": "node_cpu_load1",
-          "query": "prometheus_remote_write_node_load1{instance_type=\"k8s\", __$labels__}",
+          "query": "system_load1{instance_type=\"k8s\", __$labels__}",
           "display_name": "1 Minute Average Load",
           "data_type": "Number",
           "unit": "short",
@@ -278,7 +258,7 @@
         {
           "metric_group": "Load",
           "name": "node_cpu_load5",
-          "query": "prometheus_remote_write_node_load5{instance_type=\"k8s\", __$labels__}",
+          "query": "system_load5{instance_type=\"k8s\", __$labels__}",
           "display_name": "5 Minute Average Load",
           "data_type": "Number",
           "unit": "short",
@@ -288,7 +268,7 @@
         {
           "metric_group": "Load",
           "name": "node_cpu_load15",
-          "query": "prometheus_remote_write_node_load15{instance_type=\"k8s\", __$labels__}",
+          "query": "system_load15{instance_type=\"k8s\", __$labels__}",
           "display_name": "15 Minute Average Load",
           "data_type": "Number",
           "unit": "short",

@@ -1,5 +1,5 @@
 {
-  "plugin": "Host General",
+  "plugin": "Host",
   "plugin_desc": "The host monitoring plugin is used to collect and analyze performance data of hosts, including CPU, memory, disk, and network usage.",
   "name": "Host",
   "type": "OS",
@@ -94,10 +94,10 @@
       "unit": "short",
       "dimensions": [
         {
-        "name": "name",
-        "description": "name"
+          "name": "name",
+          "description": "name"
         }
-         ],
+      ],
       "description": "Displays the number of bytes written to disk per unit of time, used to evaluate disk write performance. This metric is crucial for monitoring the read/write speed of a disk."
     },
     {
@@ -109,10 +109,10 @@
       "unit": "short",
       "dimensions": [
         {
-        "name": "name",
-        "description": "name"
+          "name": "name",
+          "description": "name"
         }
-         ],
+      ],
       "description": "Displays the number of bytes read from disk per unit of time, used to evaluate disk read performance. This metric is crucial for monitoring the read/write speed of a disk."
     },
     {
@@ -274,10 +274,10 @@
       "unit": "short",
       "dimensions": [
         {
-        "name": "interface",
-        "description": "interface"
+          "name": "interface",
+          "description": "interface"
         }
-         ],
+      ],
       "description": "Displays the number of data packets received by the network interface per unit of time, used to evaluate network reception performance. This metric is crucial for monitoring network traffic."
     },
     {
@@ -289,10 +289,10 @@
       "unit": "short",
       "dimensions": [
         {
-        "name": "interface",
-        "description": "interface"
+          "name": "interface",
+          "description": "interface"
         }
-         ],
+      ],
       "description": "Displays the number of data packets sent by the network interface per unit of time, used to evaluate network transmission performance. This metric is crucial for monitoring network traffic."
     },
     {
@@ -304,10 +304,10 @@
       "unit": "MBs",
       "dimensions": [
         {
-        "name": "interface",
-        "description": "interface"
+          "name": "interface",
+          "description": "interface"
         }
-         ],
+      ],
       "description": "Displays the number of bytes received by the network interface per unit of time (in MB), used to evaluate network bandwidth utilization. This metric is important for monitoring network bandwidth."
     },
     {
@@ -319,10 +319,10 @@
       "unit": "MBs",
       "dimensions": [
         {
-        "name": "interface",
-        "description": "interface"
+          "name": "interface",
+          "description": "interface"
         }
-         ],
+      ],
       "description": "Displays the number of bytes sent by the network interface per unit of time (in MB), used to evaluate network bandwidth utilization. This metric is crucial for monitoring network bandwidth."
     },
     {
@@ -334,10 +334,10 @@
       "unit": "short",
       "dimensions": [
         {
-        "name": "interface",
-        "description": "interface"
+          "name": "interface",
+          "description": "interface"
         }
-         ],
+      ],
       "description": "Displays the number of error packets received by the network interface, used to detect network issues. This metric is helpful for identifying network faults and abnormal traffic."
     },
     {
@@ -349,10 +349,10 @@
       "unit": "short",
       "dimensions": [
         {
-        "name": "interface",
-        "description": "interface"
+          "name": "interface",
+          "description": "interface"
         }
-         ],
+      ],
       "description": "Displays the number of error packets sent by the network interface, helping understand network transmission errors. This metric is helpful for identifying network faults and abnormal traffic."
     },
     {
@@ -364,10 +364,10 @@
       "unit": "short",
       "dimensions": [
         {
-        "name": "interface",
-        "description": "interface"
+          "name": "interface",
+          "description": "interface"
         }
-         ],
+      ],
       "description": "Displays the number of dropped packets received by the network interface, indicating network congestion. This metric is crucial for monitoring network reliability."
     },
     {
@@ -378,11 +378,11 @@
       "data_type": "Number",
       "unit": "short",
       "dimensions": [
-       {
-       "name": "interface",
-       "description": "interface"
-       }
-        ],
+        {
+          "name": "interface",
+          "description": "interface"
+        }
+      ],
       "description": "Displays the number of dropped packets sent by the network interface, indicating network transmission congestion. This metric is crucial for monitoring network reliability."
     }
   ]
