@@ -2,7 +2,7 @@ FROM python:3.10
 WORKDIR /apps
 
 RUN apt-get update -y
-RUN apt-get install -y vim
+RUN apt-get install -y vim supervisor
 
 ADD ./support-files/supervisor/app.conf  /etc/supervisor/conf.d/app.conf
 ADD ./support-files/supervisor/celery.conf  /etc/supervisor/conf.d/celery.conf
