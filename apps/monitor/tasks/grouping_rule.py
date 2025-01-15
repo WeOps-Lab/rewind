@@ -39,7 +39,6 @@ class SyncInstance:
             if monitor_info["name"] not in self.monitor_map:
                 continue
             instance_id_key = monitor_info["instance_id_key"]
-            instance_name_key = monitor_info["instance_name_key"]
             query = monitor_info["default_metric"]
             metrics = VictoriaMetricsAPI().query(query)
             for metric_info in metrics.get("data", {}).get("result", []):
@@ -48,7 +47,7 @@ class SyncInstance:
                     continue
                 instances_map[instance_id] = {
                     "id": instance_id,
-                    "name": metric_info["metric"].get(instance_name_key),
+                    "name": instance_id,
                     "agent_id": metric_info["metric"].get("agent_id", ""),
                     "monitor_object_id": self.monitor_map[monitor_info["name"]],
                     "auto": True,
