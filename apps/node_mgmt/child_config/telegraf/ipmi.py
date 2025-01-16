@@ -3,7 +3,10 @@ from string import Template
 from apps.node_mgmt.models.sidecar import CollectorConfiguration, ChildConfig
 
 CONFIG_MAP = {
-    "ipmi_sensor": """[[inputs.ipmi_sensor]]
+    "storage": """[[inputs.ipmi_sensor]]
+    servers = ["${server}"]
+    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}" }""",
+    "hardware_server": """[[inputs.ipmi_sensor]]
     servers = ["${server}"]
     tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}" }""",
 }
@@ -39,4 +42,4 @@ class IpmiConfig:
         # 删除已存在的配置
         ChildConfig.objects.filter(collector_config_id__in=base_config_ids, collect_type="ipmi").delete()
         # 批量创建节点配置
-        ChildConfig.objects.bulk_create(node_objs)
+        ChildConfig.objects.bulk_create(node_objs, batch_size=100)

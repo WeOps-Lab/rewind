@@ -39,4 +39,4 @@ class TrapConfig:
         # 删除已存在的配置
         ChildConfig.objects.filter(collector_config_id__in=base_config_ids, collect_type="trap").delete()
         # 批量创建节点配置
-        ChildConfig.objects.bulk_create(node_objs)
+        ChildConfig.objects.bulk_create(node_objs, batch_size=100)
