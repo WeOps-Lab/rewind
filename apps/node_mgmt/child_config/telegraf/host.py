@@ -52,7 +52,7 @@ class HostConfig:
 
                 node_objs.append(ChildConfig(
                     collect_type="host",
-                    config_type=node_config,
+                    config_type=node_config["type"],
                     content=content,
                     collector_config_id=base_config_id,
                     collect_instance_id=node_config["instance_id"],
@@ -61,4 +61,4 @@ class HostConfig:
         # 删除已存在的配置
         ChildConfig.objects.filter(collector_config_id__in=base_config_ids, collect_type="host").delete()
         # 批量创建节点配置
-        ChildConfig.objects.bulk_create(node_objs)
+        ChildConfig.objects.bulk_create(node_objs, batch_size=100)
