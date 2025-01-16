@@ -8,21 +8,17 @@
     {
       "metric_group": "HTTP",
       "name": "http_success.rate",
-      "query": "http_response_result_type{__$labels__}",
-      "display_name": "Probe Status",
+      "query": "count(http_response_result_type{result=\"success\",__$labels__}) by (instance_id) / count(http_response_result_type{__$labels__}) by (instance_name)",
+      "display_name": "Success Rate",
       "data_type": "Number",
-      "unit": "short",
+      "unit": "percent",
       "dimensions": [
-        {
-          "name": "result",
-          "description": "result"
-        },
         {
           "name": "agent_id",
           "description": "agent_id"
         }
       ],
-      "description": "This metric indicates the success status of the probe operation. A successful status is represented by 1, while a failure is represented by 0. Monitoring this metric is crucial for ensuring the availability of the system, as it provides a quick indication of the health status of the monitored target. If the value is 0, further investigation is needed to determine the cause of the failure."
+      "description": "Measures the success rate of multiple nodes probing targets (the percentage of successful responses out of the total number of requests)."
     },
     {
       "metric_group": "HTTP",
