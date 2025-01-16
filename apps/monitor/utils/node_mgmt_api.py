@@ -1,4 +1,4 @@
-from apps.monitor.models import MonitorInstance
+from apps.monitor.models import MonitorInstance, MonitorInstanceOrganization
 from apps.rpc.node_mgmt import NodeMgmt
 
 
@@ -13,7 +13,6 @@ class FormatChildConfig:
             return FormatChildConfig.format_host(configs, instances)
         elif object_type == "ping":
             return FormatChildConfig.format_ping(instances, configs)
-
 
     @staticmethod
     def format_host(configs, instances):
@@ -103,6 +102,37 @@ class NodeUtils:
 
     @staticmethod
     def batch_setting_node_child_config(data: dict):
+        # 实例更新
+        instance_map = {
+            instance["instance_id"]: {
+                "id": instance["instance_id"],
+                "name": instance["instance_name"],
+                "agent_id": instance["agent_id"],
+                "monitor_object_id": data["monitor_object_id"],
+                "auto": instance["auto"],
+                "group_ids": instance["group_ids"],
+            }
+            for instance in data["instances"]
+        }
+
+        old_instance_ids = set(MonitorInstance.objects.filter(agent_id=data["agent_id"]).values_list("id", flat=True))
+        creates, assos = [], []
+        for instance_id, instance_info in instance_map.items():
+            group_ids = instance_info.pop("group_ids")
+            for group_id in group_ids:
+                assos.append((instance_id, group_id))
+            if instance_id not in old_instance_ids:
+                creates.append(MonitorInstance(**instance_info))
+        MonitorInstance.objects.bulk_create(creates, batch_size=200)
+        # 实例组织关联
+        old_asso_objs = MonitorInstanceOrganization.objects.filter(instance_id__in=old_instance_ids)
+        old_asso_set = {(asso.monitor_instance_id, asso.organization) for asso in old_asso_objs}
+        new_asso_set = set(assos) - old_asso_set
+        MonitorInstanceOrganization.objects.bulk_create(
+            [MonitorInstanceOrganization(instance_id=asso[0], organization=asso[1]) for asso in new_asso_set],
+            batch_size=200
+        )
+        # 实例配置关联（node）
         return NodeMgmt().batch_setting_node_child_config(data)
 
     @staticmethod

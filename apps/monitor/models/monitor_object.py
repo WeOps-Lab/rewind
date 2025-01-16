@@ -22,7 +22,6 @@ class MonitorInstance(TimeInfo, MaintainerInfo):
     id = models.CharField(primary_key=True, max_length=200, verbose_name='监控对象实例ID')
     name = models.CharField(db_index=True, max_length=200, default="", verbose_name='监控对象实例名称')
     interval = models.IntegerField(default=10, verbose_name='监控实例采集间隔(s)')
-    agent_id = models.CharField(max_length=100, default="", verbose_name='Agent ID')
     monitor_object = models.ForeignKey(MonitorObject, on_delete=models.CASCADE, verbose_name='监控对象')
     auto = models.BooleanField(default=False, verbose_name='是否自动发现')
 

@@ -40,19 +40,33 @@ class NodeMgmtView(ViewSet):
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             properties={
-                "object_type": openapi.Schema(type=openapi.TYPE_STRING, description="对象类型"),
-                "nodes": openapi.Schema(
+                "monitor_object_id": openapi.Schema(type=openapi.TYPE_STRING, description="监控对象id"),
+                "collect_type": openapi.Schema(type=openapi.TYPE_STRING, description="采集类型"),
+                "configs": openapi.Schema(
                     type=openapi.TYPE_ARRAY,
                     items=openapi.Schema(
                         type=openapi.TYPE_OBJECT,
                         properties={
-                            "id": openapi.Schema(type=openapi.TYPE_STRING, description="节点ID"),
-                            "configs": openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Schema(type=openapi.TYPE_OBJECT))
+                            "type": openapi.Schema(type=openapi.TYPE_STRING, description="配置类型"),
+                            "...": openapi.Schema(type=openapi.TYPE_STRING, description="配置内容"),
+                        }
+                    )),
+                "instances": openapi.Schema(
+                    type=openapi.TYPE_ARRAY,
+                    items=openapi.Schema(
+                        type=openapi.TYPE_OBJECT,
+                        properties={
+                            "instance_id": openapi.Schema(type=openapi.TYPE_STRING, description="实例id"),
+                            "instance_type": openapi.Schema(type=openapi.TYPE_STRING, description="实例类型"),
+                            "instance_name": openapi.Schema(type=openapi.TYPE_STRING, description="实例类型"),
+                            "group_ids": openapi.Schema(type=openapi.TYPE_ARRAY,items=openapi.Schema(type=openapi.TYPE_INTEGER), description="组织id列表"),
+                            "node_ids": openapi.Schema(type=openapi.TYPE_ARRAY,items=openapi.Schema(type=openapi.TYPE_INTEGER), description="节点id列表"),
+                            "...": openapi.Schema(type=openapi.TYPE_OBJECT, description="其他信息"),
                         }
                     )
                 )
             },
-            required=["object_type", "nodes"]
+            required=["monitor_object_id", "collect_type", "configs", "instances"]
         ),
         tags=['NodeMgmt']
     )

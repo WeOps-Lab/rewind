@@ -11,17 +11,21 @@ class MonitorPolicy(TimeInfo, MaintainerInfo):
     NOTICE_TYPE_CHOICES = [('email', 'Email'), ('wechat', 'Wechat'), ('sms', 'SMS')]
 
     monitor_object = models.ForeignKey(MonitorObject, on_delete=models.CASCADE, verbose_name='监控对象')
-    metric = models.ForeignKey(Metric, on_delete=models.CASCADE, verbose_name='监控指标')
-    filter = models.JSONField(default=list, verbose_name='过滤条件')
     name = models.CharField(max_length=100, verbose_name='监控策略名称')
     organizations = models.JSONField(default=list, verbose_name='所属组织')
+
+    metric = models.ForeignKey(Metric, on_delete=models.CASCADE, verbose_name='监控指标')
+    filter = models.JSONField(default=list, verbose_name='过滤条件')
     source = models.JSONField(default=dict, verbose_name="策略适用的资源")
+
     schedule = models.JSONField(default=dict, verbose_name="策略执行周期, eg: 1h执行一次, 5m执行一次")
     period = models.JSONField(default=dict, verbose_name="每次监控检测的数据周期,eg: 1h内, 5m内")
+
     algorithm = models.CharField(max_length=10, choices=ALGORITHM_CHOICES, verbose_name="聚合算法")
     group_by = models.JSONField(default=list, verbose_name="分组字段")
     threshold = models.JSONField(default=list, verbose_name="阈值")
     recovery_condition = models.SmallIntegerField(default=1, verbose_name="多少周期不满足阈值自动恢复")
+
 
     no_data_alert = models.SmallIntegerField(default=1, verbose_name="连续多少周期无数据, 生成告警")
     no_data_level = models.CharField(max_length=20, default="", verbose_name="无数据告警级别")
