@@ -5,7 +5,7 @@ from apps.node_mgmt.models.sidecar import Node
 class NodeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Node
-        fields = ['id', 'name', 'ip', 'operating_system', 'status']
+        fields = ['id', 'name', 'ip', 'operating_system', 'status', 'cloud_region']
 
 
 class BatchBindingNodeConfigurationSerializer(serializers.Serializer):
