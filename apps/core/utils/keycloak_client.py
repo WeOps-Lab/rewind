@@ -1,12 +1,12 @@
 import logging
 
 from django.conf import settings
-from django.db import connection
 from keycloak import KeycloakAdmin, KeycloakOpenID
 from singleton_decorator import singleton
 
 from apps.core.constants import BUILT_IN_ROLES
 from apps.core.entities.user_token_entity import UserTokenEntity
+from apps.core.utils.db_utils import SQLExecute
 
 
 @singleton
@@ -189,26 +189,5 @@ FROM
 WHERE
     ugs.group_id = %(group_id)s
 and userobj.username like %(username)s"""
-        return_data = self.execute_sql(sql, {"group_id": group_id, "username": f"%{search}%"})
+        return_data = SQLExecute.execute_sql(sql, {"group_id": group_id, "username": f"%{search}%"})
         return return_data[0].get("count", 0) if return_data else 0
-
-    @staticmethod
-    def execute_sql(sql, args):
-        db_config = connection.get_connection_params()
-        db_config["dbname"] = "keycloak"
-        sql_connection = connection.get_new_connection(db_config)
-        cursor = sql_connection.cursor()
-        try:
-            if isinstance(args, str):
-                args = [args]
-            elif isinstance(args, int):
-                args = [str(args)]
-            cursor.execute(sql, args)
-            result = cursor.fetchall()
-            columns = [col[0] for col in cursor.description]
-            return_data = [dict(zip(columns, row)) for row in result]
-        except Exception:
-            return_data = []
-        cursor.close()
-        sql_connection.close()
-        return return_data

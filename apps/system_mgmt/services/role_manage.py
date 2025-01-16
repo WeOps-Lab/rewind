@@ -6,6 +6,7 @@ from keycloak.exceptions import raise_error_from_response
 
 from apps.core.backends import cache
 from apps.core.exceptions.base_app_exception import BaseAppException
+from apps.core.utils.db_utils import SQLExecute
 from apps.core.utils.keycloak_client import KeyCloakClient
 
 
@@ -292,6 +293,15 @@ class RoleManage(object):
             supplement_api.delete_permission(client_id, permission_info["id"])
         menu_ids = self.format_menus(menus, client_id)
         self.keycloak_client.create_permission(client_id, menu_ids, policy_name, policy_id)
+        cache_key = f"all_menus_{client_id}"
+        keys = self.get_cache_keys(cache_key)
+        cache.delete_many(keys)
+
+    @staticmethod
+    def get_cache_keys(cache_key):
+        sql = "select * from django_cache where cache_key like %(key)s"
+        data = SQLExecute.execute_sql(sql, {"key": f"%{cache_key}%"}, db_name="system_mgmt")
+        return [i["cache_key"].split(":", 3)[-1] for i in data]
 
     def format_menus(self, menus, client_id):
         all_menus = self.keycloak_client.realm_client.get_client_authz_resources(client_id)
