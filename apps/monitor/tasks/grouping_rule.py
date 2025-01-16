@@ -48,7 +48,6 @@ class SyncInstance:
                 instances_map[instance_id] = {
                     "id": instance_id,
                     "name": instance_id,
-                    "agent_id": metric_info["metric"].get("agent_id", ""),
                     "monitor_object_id": self.monitor_map[monitor_info["name"]],
                     "auto": True,
                 }
