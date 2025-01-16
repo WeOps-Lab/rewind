@@ -3,7 +3,10 @@ from string import Template
 from apps.node_mgmt.models.sidecar import CollectorConfiguration, ChildConfig
 
 CONFIG_MAP = {
-    "ipmi_sensor": """[[inputs.ipmi_sensor]]
+    "storage": """[[inputs.ipmi_sensor]]
+    servers = ["${server}"]
+    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}" }""",
+    "hardware_server": """[[inputs.ipmi_sensor]]
     servers = ["${server}"]
     tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}" }""",
 }

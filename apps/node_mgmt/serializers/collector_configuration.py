@@ -5,13 +5,14 @@ from apps.node_mgmt.models.sidecar import CollectorConfiguration, Node, Collecto
 
 
 class CollectorConfigurationSerializer(serializers.ModelSerializer):
-    collector = serializers.PrimaryKeyRelatedField(queryset=Collector.objects.all())
+    collector = serializers.CharField(source='collector.id')
+    collector_name = serializers.CharField(source='collector.name')
     nodes = serializers.PrimaryKeyRelatedField(queryset=Node.objects.all(), many=True)
     operating_system = serializers.CharField(source='collector.node_operating_system')
 
     class Meta:
         model = CollectorConfiguration
-        fields = ['id', 'name', 'config_template', 'operating_system', 'collector', 'nodes']
+        fields = ['id', 'name', 'config_template', 'operating_system', 'collector', "collector_name", 'nodes']
 
 
 class CollectorConfigurationCreateSerializer(serializers.ModelSerializer):
