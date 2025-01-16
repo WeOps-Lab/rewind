@@ -12,7 +12,7 @@ MONITOR_OBJS = [
         "name": "Host",
         "default_metric": 'any({instance_type="os"}) by (instance_id)',
         "instance_id_key": "instance_id",
-        "supplementary_indicators": ["cpu_summary.usage", "mem.pct_usable", "load5"],
+        "supplementary_indicators": ["cpu_summary.usage", "mem.pct_used", "load5"],
     },
     {
         "type": "Web",
