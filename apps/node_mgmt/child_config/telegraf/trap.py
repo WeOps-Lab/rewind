@@ -36,7 +36,20 @@ class TrapConfig:
                     collect_instance_id=node_config["instance_id"],
                 ))
 
-        # 删除已存在的配置
-        ChildConfig.objects.filter(collector_config_id__in=base_config_ids, collect_type="trap").delete()
-        # 批量创建节点配置
-        ChildConfig.objects.bulk_create(node_objs, batch_size=100)
+        old_child_configs = ChildConfig.objects.filter(collector_config_id__in=base_config_ids, collect_type="trap")
+        old_child_map = {(i.collect_type, i.config_type, i.collect_instance_id): i for i in old_child_configs}
+        creates, updates = [], []
+        for node_obj in node_objs:
+            if (node_obj.collect_type, node_obj.config_type, node_obj.collect_instance_id) in old_child_map:
+                old_child_map[(
+                node_obj.collect_type, node_obj.config_type, node_obj.collect_instance_id)].content = node_obj.content
+                updates.append(
+                    old_child_map[(node_obj.collect_type, node_obj.config_type, node_obj.collect_instance_id)])
+            else:
+                creates.append(node_obj)
+
+        if creates:
+            ChildConfig.objects.bulk_create(creates, batch_size=100)
+
+        if updates:
+            ChildConfig.objects.bulk_update(updates, ["content"])
