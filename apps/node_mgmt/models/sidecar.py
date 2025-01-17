@@ -66,7 +66,7 @@ class Collector(TimeInfo, MaintainerInfo):
 
 class CollectorConfiguration(TimeInfo, MaintainerInfo):
     id = models.CharField(primary_key=True, max_length=100, verbose_name="配置ID")
-    name = models.CharField(max_length=100, verbose_name="配置名称")
+    name = models.CharField(unique=True, max_length=100, verbose_name="配置名称")
     config_template = models.TextField(blank=True, verbose_name="配置模板")
     collector = models.ForeignKey(Collector, on_delete=models.CASCADE, verbose_name="采集器")
     nodes = models.ManyToManyField(Node, blank=True, verbose_name="节点")

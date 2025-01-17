@@ -18,20 +18,8 @@ OBJECT_TYPE_MAP = {
 
 
 class ChildConfigCommon:
-    def __init__(self, object_type, base_config_name="telegraf_config"):
+    def __init__(self, object_type):
         self.object_type = object_type
-        self.base_config_name = base_config_name
-
-    def get_child_config(self, node_id, data_type):
-        """获取节点配置"""
-        base_config = CollectorConfiguration.objects.filter(nodes__id=node_id, name=self.base_config_name, is_pre=True).first()
-        obj = ChildConfig.objects.filter(collector_config_id=base_config.id, object_type=self.object_type, data_type=data_type).first()
-        return obj.content if obj else None
-
-    def update_child_config(self, node_id, data_type, content):
-        """更新节点配置"""
-        base_config = CollectorConfiguration.objects.filter(nodes__id=node_id, name=self.base_config_name, is_pre=True).first()
-        ChildConfig.objects.filter(collector_config_id=base_config.id, object_type=self.object_type, data_type=data_type).update(content=content)
 
     def batch_setting_node_config(self, nodes):
         """批量设置节点配置"""

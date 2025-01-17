@@ -18,7 +18,7 @@ class TrapConfig:
         for node in nodes:
             node_id = node["id"]
             node_configs = node["configs"]
-            base_config = CollectorConfiguration.objects.filter(nodes__id=node_id, name="telegraf_config",
+            base_config = CollectorConfiguration.objects.filter(nodes__id=node_id, name=f'telegraf-{node_id}',
                                                                 is_pre=True).first()
             base_config_id = base_config.id
             base_config_ids.append(base_config_id)

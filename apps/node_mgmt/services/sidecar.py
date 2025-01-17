@@ -93,7 +93,7 @@ class Sidecar:
                     name='telegraf', node_operating_system=node.operating_system
                 ).first()
                 configuration = CollectorConfiguration.objects.create(
-                    name='telegraf_config',
+                    name=f'telegraf-{node.id}',
                     collector=collector_obj,
                     config_template=TELEGRAF_CONFIG,
                     is_pre=True,
