@@ -61,7 +61,14 @@ pipeline {
             steps {
                 script {
                     sh """
-                        echo "finish"
+                        docker pull ${IMAGE_NAME}:${IMAGE_TAG}
+                        docker stop opspilot || true
+                        docker rm opspilot|| true
+                        docker run -itd --name opspilot --restart always \
+                            -v /root/codes/conf/opspilot/.env:/apps/.env \
+                            --add-host=kube-service.lite:${env.CLOUD_SERVER}  \
+                            --network lite \
+                            etherfurnace/opspilot
                     """
                 }
             }
