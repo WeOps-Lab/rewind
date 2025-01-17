@@ -15,6 +15,7 @@ class KeyCloakAuthMiddleware(MiddlewareMixin):
         self.logger = logging.getLogger(__name__)
 
     def process_view(self, request, view, args, kwargs):
+        return None
         if any([
             getattr(view, "api_exempt", False),
             getattr(request, "api_pass", False),

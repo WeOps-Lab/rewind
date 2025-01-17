@@ -88,7 +88,7 @@ MIDDLEWARE = (
     "apps.core.middlewares.app_exception_middleware.AppExceptionMiddleware",
     "apps.core.middlewares.drf_middleware.DisableCSRFMiddleware",
     "apps.core.middlewares.api_middleware.APISecretMiddleware",
-    # "apps.core.middlewares.keycloak_auth_middleware.KeyCloakAuthMiddleware",
+    "apps.core.middlewares.keycloak_auth_middleware.KeyCloakAuthMiddleware",
 )
 
 STORAGES = {
@@ -100,7 +100,6 @@ STORAGES = {
 AUTHENTICATION_BACKENDS = (
     "apps.core.backends.KeycloakAuthBackend",  # this is default
     "apps.core.backends.APISecretAuthBackend",
-    "django.contrib.auth.backends.ModelBackend",
 )
 ROOT_URLCONF = "urls"
 
@@ -226,7 +225,7 @@ INSTALLED_APPS += tuple(f"apps.{app}" for app in app_folders)
 # DRF 配置
 
 REST_FRAMEWORK = {
-    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.AllowAny",),
     "DEFAULT_PAGINATION_CLASS": "config.drf.pagination.CustomPageNumberPagination",
     "PAGE_SIZE": 10,
     "TEST_REQUEST_DEFAULT_FORMAT": "json",
@@ -241,7 +240,7 @@ REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": ("config.drf.renderers.CustomRenderer",),
     "DEFAULT_SCHEMA_CLASS": "rest_framework.schemas.coreapi.AutoSchema",
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework.authentication.SessionAuthentication",
+        # "rest_framework.authentication.SessionAuthentication",
         # "rest_framework.authentication.BasicAuthentication",
     ],
     "DEFAULT_PARSER_CLASSES": [
