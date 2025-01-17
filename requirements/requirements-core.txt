@@ -56,5 +56,7 @@ pika==1.3.2
 
 django-unfold==0.43.0
 
-django-nats-client==0.4.3
+jsonpickle==4.0.1
+nats-py==2.9.0
+
 adrf==0.1.9
