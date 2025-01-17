@@ -218,7 +218,6 @@ class NodeUtils:
         )
         # 实例配置关联（node）
         result = FormatChildConfig.collector(data)
-        print(result)
         return NodeMgmt().batch_setting_node_child_config(result)
 
     @staticmethod

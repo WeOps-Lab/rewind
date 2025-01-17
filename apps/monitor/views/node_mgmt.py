@@ -1,3 +1,5 @@
+import logging
+
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.decorators import action
@@ -5,6 +7,8 @@ from rest_framework.viewsets import ViewSet
 
 from apps.core.utils.web_utils import WebUtils
 from apps.monitor.utils.node_mgmt_api import NodeUtils
+
+logger = logging.getLogger(__name__)
 
 
 class NodeMgmtView(ViewSet):
@@ -72,6 +76,7 @@ class NodeMgmtView(ViewSet):
     )
     @action(methods=['post'], detail=False, url_path='batch_setting_node_child_config')
     def batch_setting_node_child_config(self, request):
+        logger.info(f"batch_setting_node_child_config: {request.data}")
         data = NodeUtils.batch_setting_node_child_config(request.data)
         return WebUtils.response_success(data)
 
