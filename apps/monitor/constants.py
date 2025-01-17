@@ -31,7 +31,7 @@ MONITOR_OBJS = [
     {
         "type": "Network Device",
         "name": "Switch",
-        "default_metric": 'any({instance_type="swtich"}) by (instance_id)',
+        "default_metric": 'any({instance_type="switch"}) by (instance_id)',
         "instance_id_key": "instance_id",
         "supplementary_indicators": ["sysUpTime", "iftotalInOctets", "iftotalOutOctets"],
     },
