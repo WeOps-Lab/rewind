@@ -46,7 +46,7 @@ class QuotaRuleViewSet(viewsets.ModelViewSet):
             current_team = teams[0]
         client = SystemMgmt()
         return_data = client.get_group_users(current_team)
-        return JsonResponse({"result": True, "data": return_data})
+        return JsonResponse(return_data)
 
     @action(detail=False, methods=["GET"])
     def my_quota(self, request):

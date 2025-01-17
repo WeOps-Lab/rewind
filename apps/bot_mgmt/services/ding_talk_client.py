@@ -37,3 +37,13 @@ class DingTalkClient(object):
         for i in data["result"].get("parent_list", []):
             return_data.extend(i.get("parent_dept_id_list", []))
         return list(set(return_data))
+
+    def get_department_name(self, dept_id):
+        url = "https://oapi.dingtalk.com/topapi/v2/department/get"
+        params = {"access_token": self.get_access_token()}
+        kwargs = {"dept_id": dept_id}
+        response = requests.post(url, params=params, json=kwargs)
+        data = response.json()
+        if data.get("errcode") != 0:
+            raise Exception(f"获取部门信息失败: {data.get('errmsg')}")
+        return data["result"]["name"]

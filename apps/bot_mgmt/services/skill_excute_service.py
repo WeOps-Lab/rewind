@@ -1,4 +1,4 @@
-from apps.bot_mgmt.models import ChannelUser
+from apps.bot_mgmt.utils import get_user_info
 from apps.core.logger import logger
 from apps.model_provider_mgmt.models import LLMSkill, SkillRule
 from apps.model_provider_mgmt.services.llm_service import llm_service
@@ -9,7 +9,7 @@ class SkillExecuteService:
     def execute_skill(cls, bot, action_name, user_message, chat_history, sender_id, channel):
         logger.info(f"执行[{bot.id}]的[{action_name}]动作,发送者ID:[{sender_id}],消息: {user_message}")
         llm_skill: LLMSkill = bot.llm_skills.first()
-        user = ChannelUser.objects.filter(user_id=sender_id, channel_type=channel).first()
+        user = get_user_info(bot.id, channel, sender_id)
 
         skill_prompt, rag_score_threshold = cls.get_rule_result(channel, llm_skill, user)
 

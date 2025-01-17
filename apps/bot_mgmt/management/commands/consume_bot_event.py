@@ -6,13 +6,10 @@ import pika
 from django.conf import settings
 from django.core.management import BaseCommand
 from django.db import close_old_connections
-from wechatpy import WeChatClient as WeChatAccountClient
-from wechatpy.enterprise import WeChatClient
 
 from apps.bot_mgmt.models import Bot, BotConversationHistory
-from apps.bot_mgmt.models.bot import BotChannel
 from apps.bot_mgmt.models.channel_user import ChannelUser
-from apps.bot_mgmt.services.ding_talk_client import DingTalkClient
+from apps.bot_mgmt.utils import get_user_info
 from apps.channel_mgmt.models import ChannelChoices
 from apps.core.logger import logger
 
@@ -54,65 +51,6 @@ def on_message(channel, method_frame, header_frame, body):
     else:
         logger.info("消息处理完成")
         channel.basic_ack(delivery_tag=method_frame.delivery_tag)
-
-
-def get_user_info(bot_id, input_channel, sender_id):
-    channel_type_map = {
-        "socketio": ChannelChoices.WEB,
-        "enterprise_wechat": ChannelChoices.ENTERPRISE_WECHAT,
-        "dingtalk": ChannelChoices.DING_TALK,
-        "wechat_official_account": ChannelChoices.WECHAT_OFFICIAL_ACCOUNT,
-    }
-    if input_channel == "enterprise_wechat":
-        channel_obj = BotChannel.objects.get(bot_id=bot_id, channel_type=ChannelChoices.ENTERPRISE_WECHAT)
-        conf = channel_obj.decrypted_channel_config
-        wechat_client = WeChatClient(
-            conf["channels.enterprise_wechat_channel.EnterpriseWechatChannel"]["corp_id"],
-            conf["channels.enterprise_wechat_channel.EnterpriseWechatChannel"]["secret"],
-        )
-        try:
-            name = wechat_client.user.get(sender_id)["name"]
-        except Exception as e:
-            logger.error(f"获取企业微信用户信息失败: {e}")
-            name = sender_id
-    elif input_channel == "dingtalk":
-        channel_obj = BotChannel.objects.get(bot_id=bot_id, channel_type=ChannelChoices.DING_TALK)
-        conf = channel_obj.decrypted_channel_config
-        client = DingTalkClient(
-            conf["channels.dingtalk_channel.DingTalkChannel"]["client_id"],
-            conf["channels.dingtalk_channel.DingTalkChannel"]["client_secret"],
-        )
-        try:
-            name = client.get_user_info(sender_id)["name"]
-        except Exception as e:
-            logger.error(f"获取钉钉用户信息失败: {e}")
-            name = sender_id
-    elif input_channel == "wechat_official_account":
-        channel_obj = BotChannel.objects.get(bot_id=bot_id, channel_type=ChannelChoices.WECHAT_OFFICIAL_ACCOUNT)
-        conf = channel_obj.decrypted_channel_config
-        client = WeChatAccountClient(
-            conf["channels.wechat_official_account_channel.WechatOfficialAccountChannel"]["appid"],
-            conf["channels.wechat_official_account_channel.WechatOfficialAccountChannel"]["secret"],
-        )
-        try:
-            user = client.user.get(sender_id)
-            name = user["nickname"] or user["remark"] or sender_id
-        except Exception as e:
-            logger.error(f"获取微信用户信息失败: {e}")
-            name = sender_id
-    else:
-        name = sender_id
-
-    if name == sender_id:
-        fun = "get_or_create"
-    else:
-        fun = "update_or_create"
-
-    user, _ = getattr(ChannelUser.objects, fun)(
-        user_id=sender_id, channel_type=channel_type_map[input_channel], defaults={"name": name}
-    )
-
-    return user
 
 
 class Command(BaseCommand):

@@ -20,3 +20,14 @@ class ChannelUser(models.Model):
             "channel_type": self.channel_type,
             "channel_type_display": self.get_channel_type_display(),
         }
+
+
+class ChannelGroup(models.Model):
+    name = models.CharField(max_length=100)
+    group_id = models.CharField(max_length=100)
+    channel_type = models.CharField(max_length=100, choices=ChannelChoices.choices, verbose_name=_("channel type"))
+
+
+class UserGroup(models.Model):
+    user = models.ForeignKey(ChannelUser, on_delete=models.CASCADE)
+    group = models.ForeignKey(ChannelGroup, on_delete=models.CASCADE)
