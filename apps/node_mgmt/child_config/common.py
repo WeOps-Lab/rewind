@@ -1,10 +1,11 @@
+
 from apps.node_mgmt.child_config.telegraf.host import HostConfig
 from apps.node_mgmt.child_config.telegraf.ipmi import IpmiConfig
 from apps.node_mgmt.child_config.telegraf.ping import PingConfig
 from apps.node_mgmt.child_config.telegraf.snmp import SnmpConfig
 from apps.node_mgmt.child_config.telegraf.trap import TrapConfig
 from apps.node_mgmt.child_config.telegraf.web import WebConfig
-from apps.node_mgmt.models.sidecar import CollectorConfiguration, ChildConfig
+from apps.node_mgmt.models.sidecar import ChildConfig
 
 
 OBJECT_TYPE_MAP = {

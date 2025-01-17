@@ -1,7 +1,11 @@
+import logging
+
 import nats_client
 
 from apps.node_mgmt.child_config.common import ChildConfigCommon
 from apps.node_mgmt.services.node import NodeService
+
+logger = logging.getLogger("app")
 
 
 @nats_client.register
@@ -25,6 +29,7 @@ def collector_list(query_data: dict):
 @nats_client.register
 def batch_setting_node_child_config(data: dict):
     """批量对节点设置子配置"""
+    logger.info(f"batch_setting_node_child_config: {data}")
     object_type = data.get('object_type')
     nodes = data.get('nodes')
     ChildConfigCommon(object_type).batch_setting_node_config(nodes)
