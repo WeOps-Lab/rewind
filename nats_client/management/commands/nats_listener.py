@@ -121,6 +121,8 @@ class Command(BaseCommand):
                 asyncio.ensure_future(fetch(psub))
             else:
                 full_name = f'{data["namespace"]}.{data["name"]}'
+
+                # 默认使用消息组模式,支持负载均衡，以后可以考虑根据注册参数来决定是否使用消息组模式
                 await self.nats.subscribe(full_name, full_name, cb=callback)
             print(f'     - {full_name}' + (' (JetStream)' if data['js'] else ''))
 
