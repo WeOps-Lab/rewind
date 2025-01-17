@@ -8,7 +8,7 @@ from rest_framework.viewsets import ViewSet
 from apps.core.utils.web_utils import WebUtils
 from apps.monitor.utils.node_mgmt_api import NodeUtils
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("app")
 
 
 class NodeMgmtView(ViewSet):
