@@ -87,9 +87,9 @@
     },
     {
       "metric_group": "Disk IO",
-      "name": "io.w_s",
-      "query": "rate(diskio_write_bytes{instance_type=\"os\", __$labels__}[5m])",
-      "display_name": "Disk Write Rate",
+      "name": "diskio_writes",
+      "query": "rate(diskio_writes{instance_type=\"os\", __$labels__}[5m])",
+      "display_name": "Disk I/O Write Rate",
       "data_type": "Number",
       "unit": "short",
       "dimensions": [
@@ -98,13 +98,43 @@
           "description": "name"
         }
       ],
-      "description": "Displays the number of bytes written to disk per unit of time, used to evaluate disk write performance. This metric is crucial for monitoring the read/write speed of a disk."
+      "description": "Counts the number of data write operations to the disk in the specified time interval."
     },
     {
       "metric_group": "Disk IO",
-      "name": "io.rkb_s",
-      "query": "rate(diskio_read_bytes{instance_type=\"os\", __$labels__}[5m])",
-      "display_name": "Disk Read Rate",
+      "name": "diskio_write_bytes",
+      "query": "rate(diskio_write_bytes{instance_type=\"os\", __$labels__}[5m])/1024/1024",
+      "display_name": "Disk I/O Write Bytes Rate",
+      "data_type": "Number",
+      "unit": "mebibytes",
+      "dimensions": [
+        {
+          "name": "name",
+          "description": "name"
+        }
+      ],
+      "description": "Counts the number of bytes written to the disk in the specified time interval, represented in megabytes (MB)."
+    },
+    {
+      "metric_group": "Disk IO",
+      "name": "diskio_write_time",
+      "query": "rate(diskio_write_time{instance_type=\"os\", __$labels__}[5m])/1000",
+      "display_name": "Disk I/O Write Time Rate",
+      "data_type": "Number",
+      "unit": "s",
+      "dimensions": [
+        {
+          "name": "name",
+          "description": "name"
+        }
+      ],
+      "description": "Counts the time taken to write data to the disk in the specified time interval, represented in seconds (s)."
+    },
+    {
+      "metric_group": "Disk IO",
+      "name": "diskio_reads",
+      "query": "rate(diskio_reads{instance_type=\"os\", __$labels__}[5m])",
+      "display_name": "Disk I/O Read Rate",
       "data_type": "Number",
       "unit": "short",
       "dimensions": [
@@ -113,7 +143,37 @@
           "description": "name"
         }
       ],
-      "description": "Displays the number of bytes read from disk per unit of time, used to evaluate disk read performance. This metric is crucial for monitoring the read/write speed of a disk."
+      "description": "Counts the number of data read operations from the disk in the specified time interval."
+    },
+    {
+      "metric_group": "Disk IO",
+      "name": "diskio_read_bytes",
+      "query": "rate(diskio_read_bytes{instance_type=\"os\", __$labels__}[5m])/1024/1024",
+      "display_name": "Disk I/O Read Bytes Rate",
+      "data_type": "Number",
+      "unit": "mebibytes",
+      "dimensions": [
+        {
+          "name": "name",
+          "description": "name"
+        }
+      ],
+      "description": "Counts the number of bytes read from the disk in the specified time interval, represented in megabytes (MB)."
+    },
+    {
+      "metric_group": "Disk IO",
+      "name": "diskio_read_time",
+      "query": "rate(diskio_read_time{instance_type=\"os\", __$labels__}[5m])/1000",
+      "display_name": "Disk I/O Read Time Rate",
+      "data_type": "Number",
+      "unit": "s",
+      "dimensions": [
+        {
+          "name": "name",
+          "description": "name"
+        }
+      ],
+      "description": "Counts the time taken to read data from the disk in the specified time interval, represented in seconds (s)."
     },
     {
       "metric_group": "Disk",
