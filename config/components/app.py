@@ -56,7 +56,7 @@ STORAGES = {
 AUTHENTICATION_BACKENDS = (
     "apps.core.backends.KeycloakAuthBackend",  # this is default
     "apps.core.backends.APISecretAuthBackend",
-    # "django.contrib.auth.backends.ModelBackend",
+    "django.contrib.auth.backends.ModelBackend",
 )
 
 AUTH_USER_MODEL = "base.User"
@@ -87,9 +87,9 @@ if DEBUG:
     )  # noqa
     # 该跨域中间件需要放在前面
     MIDDLEWARE = (
-        "corsheaders.middleware.CorsMiddleware",
-        "debug_toolbar.middleware.DebugToolbarMiddleware",
-    ) + MIDDLEWARE  # noqa
+                     "corsheaders.middleware.CorsMiddleware",
+                     "debug_toolbar.middleware.DebugToolbarMiddleware",
+                 ) + MIDDLEWARE  # noqa
     CORS_ORIGIN_ALLOW_ALL = True
     CORS_ALLOW_CREDENTIALS = True
     CORS_ALLOW_HEADERS = [
