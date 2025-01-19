@@ -33,9 +33,6 @@ i18n:
 collect-static:
 	python manage.py collectstatic --noinput
 
-
-
-
 dev:
 	daphne -b 0.0.0.0 -p 8001 core.asgi:application
 

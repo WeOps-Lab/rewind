@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
 db_engine = os.getenv('DB_ENGINE', 'postgresql').lower()
 
 if db_engine == 'postgresql':
