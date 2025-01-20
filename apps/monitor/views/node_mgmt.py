@@ -6,6 +6,7 @@ from rest_framework.decorators import action
 from rest_framework.viewsets import ViewSet
 
 from apps.core.utils.web_utils import WebUtils
+from apps.monitor.services.node_mgmt import InstanceConfigService
 from apps.monitor.utils.node_mgmt_api import NodeUtils
 
 logger = logging.getLogger("app")
@@ -85,23 +86,16 @@ class NodeMgmtView(ViewSet):
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             properties={
-                "object_type": openapi.Schema(type=openapi.TYPE_STRING, description="对象类型"),
-                "collect_type": openapi.Schema(type=openapi.TYPE_STRING, description="采集类型"),
-                "config_type": openapi.Schema(type=openapi.TYPE_STRING, description="配置类型"),
-                "collect_instance_id": openapi.Schema(type=openapi.TYPE_STRING, description="采集实例ID"),
+                "instance_type": openapi.Schema(type=openapi.TYPE_STRING, description="采集实例类型"),
+                "instance_id": openapi.Schema(type=openapi.TYPE_STRING, description="采集实例ID"),
             },
-            required=["object_type", "collect_instance_id"]
+            required=["instance_type", "instance_id"]
         ),
         tags=['NodeMgmt']
     )
     @action(methods=['post'], detail=False, url_path='get_instance_child_config')
     def get_instance_child_config(self, request):
-        data = NodeUtils.get_instance_child_config(dict(
-            object_type=request.data.get("object_type"),
-            collect_type=request.data.get("collect_type"),
-            config_type=request.data.get("config_type"),
-            collect_instance_id=request.data.get("collect_instance_id"),
-        ))
+        data = InstanceConfigService.get_instance_configs(request.data["instance_id"], request.data["instance_type"])
         return WebUtils.response_success(data)
 
     @swagger_auto_schema(
