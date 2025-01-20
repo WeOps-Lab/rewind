@@ -10,26 +10,26 @@ CONFIG_MAP = {
     collect_cpu_time = false
     report_active = false
     core_tags = false
-    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="host" }""",
+    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="host","config_type"="cpu" }""",
 
     "disk": """[[inputs.disk]]
     ignore_fs = ["tmpfs", "devtmpfs", "devfs", "iso9660", "overlay", "aufs", "squashfs"]
-    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="host" }""",
+    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="host","config_type"="disk" }""",
 
     "diskio": """[[inputs.diskio]]
-    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="host" }""",
+    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="host","config_type"="diskio" }""",
 
     "mem": """[[inputs.mem]]
-    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="host" }""",
+    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="host","config_type"="mem" }""",
 
     "net": """[[inputs.net]]
-    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="host" }""",
+    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="host","config_type"="net" }""",
 
     "processes": """[[inputs.processes]]
-    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="host" }""",
+    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="host","config_type"="processes" }""",
 
     "system": """[[inputs.system]]
-    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="host" }""",
+    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="host","config_type"="system" }""",
 }
 
 class HostConfig:
