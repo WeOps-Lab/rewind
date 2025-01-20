@@ -5,7 +5,7 @@ from apps.node_mgmt.models.sidecar import CollectorConfiguration, ChildConfig
 CONFIG_MAP = {
     "http_response": """[[inputs.http_response]]
     urls = ["${url}"]
-    tags = { "instance_id"="${instance_id}","instance_type"="web"}""",
+    tags = { "instance_id"="${instance_id}","instance_type"="web","collect_type"="web" }""",
 }
 
 

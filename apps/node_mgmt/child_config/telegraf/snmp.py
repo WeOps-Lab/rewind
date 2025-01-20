@@ -4,7 +4,7 @@ from apps.node_mgmt.models.sidecar import CollectorConfiguration, ChildConfig
 
 CONFIG_MAP = {
     "switch": """[[inputs.snmp]]
-    tags = { "instance_id"="${instance_id}", "instance_type"="${instance_type}" }
+    tags = { "instance_id"="${instance_id}", "instance_type"="${instance_type}", "collect_type"="snmp" }
     ${snmp_config}
 
     [[inputs.snmp.field]]
@@ -26,7 +26,7 @@ CONFIG_MAP = {
         name = "ifDescr"
         is_tag = true""",
     "router": """[[inputs.snmp]]
-    tags = { "instance_id"="${instance_id}", "instance_type"="${instance_type}" }
+    tags = { "instance_id"="${instance_id}", "instance_type"="${instance_type}", "collect_type"="snmp" }
     ${snmp_config}
 
     [[inputs.snmp.field]]
@@ -48,7 +48,7 @@ CONFIG_MAP = {
         name = "ifDescr"
         is_tag = true""",
     "firewall": """[[inputs.snmp]]
-    tags = { "instance_id"="${instance_id}", "instance_type"="${instance_type}" }
+    tags = { "instance_id"="${instance_id}", "instance_type"="${instance_type}", "collect_type"="snmp" }
     ${snmp_config}
 
     [[inputs.snmp.field]]
@@ -70,7 +70,7 @@ CONFIG_MAP = {
         name = "ifDescr"
         is_tag = true""",
     "loadbalance": """[[inputs.snmp]]
-    tags = { "instance_id"="${instance_id}", "instance_type"="${instance_type}" }
+    tags = { "instance_id"="${instance_id}", "instance_type"="${instance_type}", "collect_type"="snmp" }
     ${snmp_config}
 
     [[inputs.snmp.field]]
@@ -92,7 +92,7 @@ CONFIG_MAP = {
         name = "ifDescr"
         is_tag = true""",
     "detection_device": """[[inputs.snmp]]
-    tags = { "instance_id"="${instance_id}", "instance_type"="${instance_type}" }
+    tags = { "instance_id"="${instance_id}", "instance_type"="${instance_type}", "collect_type"="snmp" }
     ${snmp_config}
 
     [[inputs.snmp.field]]
@@ -114,7 +114,7 @@ CONFIG_MAP = {
         name = "ifDescr"
         is_tag = true""",
     "scanning_device": """[[inputs.snmp]]
-    tags = { "instance_id"="${instance_id}", "instance_type"="${instance_type}" }
+    tags = { "instance_id"="${instance_id}", "instance_type"="${instance_type}", "collect_type"="snmp" }
     ${snmp_config}
 
     [[inputs.snmp.field]]
@@ -136,7 +136,7 @@ CONFIG_MAP = {
         name = "ifDescr"
         is_tag = true""",
     "bastion_host": """[[inputs.snmp]]
-    tags = { "instance_id"="${instance_id}", "instance_type"="${instance_type}" }
+    tags = { "instance_id"="${instance_id}", "instance_type"="${instance_type}", "collect_type"="snmp" }
     ${snmp_config}
 
     [[inputs.snmp.field]]
@@ -158,7 +158,7 @@ CONFIG_MAP = {
         name = "ifDescr"
         is_tag = true""",
     "storage": """[[inputs.snmp]]
-    tags = { "instance_id"="${instance_id}", "instance_type"="${instance_type}" }
+    tags = { "instance_id"="${instance_id}", "instance_type"="${instance_type}", "collect_type"="snmp" }
     ${snmp_config}
 
     [[inputs.snmp.field]]
@@ -180,7 +180,7 @@ CONFIG_MAP = {
         name = "ifDescr"
         is_tag = true""",
     "hardware_server": """[[inputs.snmp]]
-    tags = { "instance_id"="${instance_id}", "instance_type"="${instance_type}" }
+    tags = { "instance_id"="${instance_id}", "instance_type"="${instance_type}", "collect_type"="snmp" }
     ${snmp_config}
 
     [[inputs.snmp.field]]

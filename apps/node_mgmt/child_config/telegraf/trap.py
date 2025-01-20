@@ -4,7 +4,7 @@ from apps.node_mgmt.models.sidecar import CollectorConfiguration, ChildConfig
 
 CONFIG_MAP = {
     "snmp_trap": """[[inputs.snmp_trap]]
-    tags = { "instance_id"="${instance_id}", "instance_type"="${instance_type}" }""",
+    tags = { "instance_id"="${instance_id}", "instance_type"="${instance_type}", "collect_type"="trap" }""",
 
 }
 

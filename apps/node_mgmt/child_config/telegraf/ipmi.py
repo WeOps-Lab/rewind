@@ -8,7 +8,7 @@ CONFIG_MAP = {
     tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}" }""",
     "hardware_server": """[[inputs.ipmi_sensor]]
     servers = ["${server}"]
-    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}" }""",
+    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="ipmi" }""",
 }
 
 
