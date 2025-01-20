@@ -1,6 +1,4 @@
-# 日志配置
 import os
-
 from config.components.base import DEBUG, APP_CODE, BASE_DIR
 
 if DEBUG:

@@ -16,23 +16,22 @@ install:
 win-install:
 	.\.venv\Scripts\pip-compile.exe ./requirements/requirements-core.txt ./requirements/requirements-dev.txt ./requirements/requirements-ops.txt  ./requirements/requirements-extra.txt -v --output-file ./requirements.txt
 	.\.venv\Scripts\pip-sync.exe -v	
-	
+
+migrate:
+	python manage.py makemigrations
+	python manage.py migrate
+	python manage.py createcachetable django_cache
+
+setup-dev-user:
+	DJANGO_SUPERUSER_USERNAME=admin DJANGO_SUPERUSER_EMAIL=admin@example.com DJANGO_SUPERUSER_PASSWORD=password python manage.py createsuperuser --noinput
+
 i18n:
 	python manage.py makemessages -l zh_Hans
 	python manage.py makemessages -l en
 	python manage.py compilemessages
 
-migrate:
-	python manage.py makemigrations
-	python manage.py migrate
-	python manage.py createcachetable
-
 collect-static:
 	python manage.py collectstatic --noinput
-
-setup-dev-user:
-	DJANGO_SUPERUSER_USERNAME=admin DJANGO_SUPERUSER_EMAIL=admin@example.com DJANGO_SUPERUSER_PASSWORD=password python manage.py createsuperuser --noinput
-
 
 dev:
 	daphne -b 0.0.0.0 -p 8001 core.asgi:application
