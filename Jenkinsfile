@@ -22,7 +22,7 @@ pipeline {
             steps {
                 script {
                     sh """
-                    docker run \
+                    sudo docker run \
                         --rm \
                         -e SONAR_HOST_URL="http://${env.SONARQUBE_URL}"  \
                         -e SONAR_TOKEN="${env.SONARQUBE_TOKEN}" \
