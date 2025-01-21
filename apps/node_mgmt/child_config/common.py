@@ -5,8 +5,7 @@ from apps.node_mgmt.child_config.telegraf.ping import PingConfig
 from apps.node_mgmt.child_config.telegraf.snmp import SnmpConfig
 from apps.node_mgmt.child_config.telegraf.trap import TrapConfig
 from apps.node_mgmt.child_config.telegraf.web import WebConfig
-from apps.node_mgmt.models.sidecar import ChildConfig, Node, CollectorConfiguration
-from apps.node_mgmt.nats.node import node_list
+from apps.node_mgmt.models.sidecar import ChildConfig
 
 OBJECT_TYPE_MAP = {
     "host": HostConfig.patch_set_node_config,
