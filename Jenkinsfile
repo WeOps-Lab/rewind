@@ -24,7 +24,7 @@ pipeline {
                     sh """
                     sudo docker run \
                         --rm \
-                        -e SONAR_HOST_URL="http://${env.SONARQUBE_URL}"  \
+                        -e SONAR_HOST_URL="${env.SONARQUBE_URL}"  \
                         -e SONAR_TOKEN="${env.SONARQUBE_TOKEN}" \
                         -v "${WORKSPACE}:/usr/src" \
                         sonarsource/sonar-scanner-cli
