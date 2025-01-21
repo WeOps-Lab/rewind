@@ -37,10 +37,10 @@ TELEGRAF_CONFIG = """
     omit_hostname = false
 
 [[outputs.kafka]]
-    brokers = ["10.11.25.48:9092"]
-    topic = "telegraf"
-    sasl_username = "admin"
-    sasl_password = "ahsae9daeK9o"
+    brokers = ["${DEFAULT_ZONE_VAR_KAFKA_BROKER}"]
+    topic = "${DEFAULT_ZONE_VAR_KAFKA_TOPIC}"
+    sasl_username = "${DEFAULT_ZONE_VAR_KAFKA_USERNAME}"
+    sasl_password = "${DEFAULT_ZONE_VAR_KAFKA_KAFKA_PASSWORD}"
     sasl_mechanism = "PLAIN"
     max_message_bytes = 10000000
     compression_codec=1
@@ -48,3 +48,9 @@ TELEGRAF_CONFIG = """
 [[inputs.internal]]
     tags = { "instance_id"="${node.ip}-${node.cloud_region}","instance_type"="internal","instance_name"="${node.name}" }
 """
+
+# kafka
+DEFAULT_ZONE_VAR_KAFKA_BROKER=os.getenv("DEFAULT_ZONE_VAR_KAFKA_BROKER")
+DEFAULT_ZONE_VAR_KAFKA_TOPIC=os.getenv("DEFAULT_ZONE_VAR_KAFKA_TOPIC")
+DEFAULT_ZONE_VAR_KAFKA_USERNAME=os.getenv("DEFAULT_ZONE_VAR_KAFKA_USERNAME")
+DEFAULT_ZONE_VAR_KAFKA_KAFKA_PASSWORD=os.getenv("DEFAULT_ZONE_VAR_KAFKA_KAFKA_PASSWORD")

@@ -7,7 +7,8 @@ from django.http import JsonResponse
 from django.utils.http import quote_etag
 
 from apps.node_mgmt.constants import L_INSTALL_DOWNLOAD_URL, L_SIDECAR_DOWNLOAD_URL, W_SIDECAR_DOWNLOAD_URL, LOCAL_HOST, \
-    TELEGRAF_CONFIG
+    TELEGRAF_CONFIG, DEFAULT_ZONE_VAR_KAFKA_BROKER, DEFAULT_ZONE_VAR_KAFKA_TOPIC, DEFAULT_ZONE_VAR_KAFKA_USERNAME, \
+    DEFAULT_ZONE_VAR_KAFKA_KAFKA_PASSWORD
 from apps.node_mgmt.models.sidecar import Node, Collector, CollectorConfiguration, SidecarEnv
 
 logger = logging.getLogger("app")
@@ -216,6 +217,13 @@ class Sidecar:
         :param variables: 字典，包含变量名和对应值
         :return: 渲染后的字符串
         """
+        _variables = {
+            "DEFAULT_ZONE_VAR_KAFKA_BROKER": DEFAULT_ZONE_VAR_KAFKA_BROKER,
+            "DEFAULT_ZONE_VAR_KAFKA_TOPIC": DEFAULT_ZONE_VAR_KAFKA_TOPIC,
+            "DEFAULT_ZONE_VAR_KAFKA_USERNAME": DEFAULT_ZONE_VAR_KAFKA_USERNAME,
+            "DEFAULT_ZONE_VAR_KAFKA_KAFKA_PASSWORD": DEFAULT_ZONE_VAR_KAFKA_KAFKA_PASSWORD,
+            **variables,
+        }
         template_str = template_str.replace('node.', 'node__')
         template = Template(template_str)
         return template.safe_substitute(variables)
