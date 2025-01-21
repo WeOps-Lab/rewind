@@ -5,8 +5,8 @@ from apps.node_mgmt.child_config.telegraf.ping import PingConfig
 from apps.node_mgmt.child_config.telegraf.snmp import SnmpConfig
 from apps.node_mgmt.child_config.telegraf.trap import TrapConfig
 from apps.node_mgmt.child_config.telegraf.web import WebConfig
-from apps.node_mgmt.models.sidecar import ChildConfig
-
+from apps.node_mgmt.models.sidecar import ChildConfig, Node, CollectorConfiguration
+from apps.node_mgmt.nats.node import node_list
 
 OBJECT_TYPE_MAP = {
     "host": HostConfig.patch_set_node_config,
@@ -39,6 +39,8 @@ class ChildConfigCommon:
             qs = qs.filter(config_type=config_type)
         if collect_instance_id:
             qs = qs.filter(collect_instance_id=collect_instance_id)
+
+        qs = qs.select_related('collector_config').prefetch_related('collector_config__nodes')
         result = [
             {
                 "id": obj.id,
@@ -47,6 +49,7 @@ class ChildConfigCommon:
                 "collect_instance_id": obj.collect_instance_id,
                 "content": obj.content,
                 "collector_config_id": obj.collector_config_id,
+                "agents": [f"{node.ip}-{node.cloud_region_id}" for node in obj.collector_config.nodes.all()],
             }
             for obj in qs
         ]
