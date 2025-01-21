@@ -1,6 +1,6 @@
-import nats_client
 from django.utils.translation import gettext_lazy as _
 
+import nats_client
 from apps.core.backends import cache
 from apps.core.utils.keycloak_client import KeyCloakClient
 from apps.system_mgmt.services.role_manage import RoleManage
@@ -77,7 +77,10 @@ def get_client_detail(client_id):
 def get_group_users(group):
     client = KeyCloakClient()
     users = client.realm_client.get_group_members(group)
-    return_data = [{"username": i["username"], "first_name": i["firstName"], "last_name": i["lastName"]} for i in users]
+    return_data = [
+        {"username": i["username"], "first_name": i.get("firstName", ""), "last_name": i.get("lastName", "")}
+        for i in users
+    ]
     return {"result": True, "data": return_data}
 
 
