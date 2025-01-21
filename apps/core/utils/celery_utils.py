@@ -19,17 +19,17 @@ class CeleryUtils:
         """
         if crontab:
             minute, hour, day_of_month, month_of_year, day_of_week = crontab.split()
-            kwargs = dict(
+            data = dict(
                 minute=minute,
                 hour=hour,
                 day_of_month=day_of_month,
                 month_of_year=month_of_year,
                 day_of_week=day_of_week,
             )
-            schedule, _ = CrontabSchedule.objects.get_or_create(**kwargs, defaults=kwargs)
+            schedule, _ = CrontabSchedule.objects.get_or_create(**data, defaults=data)
         elif interval:
-            kwargs = dict(every=interval, period='seconds')
-            schedule, _ = IntervalSchedule.objects.get_or_create(**kwargs, defaults=kwargs)
+            data = dict(every=interval, period='seconds')
+            schedule, _ = IntervalSchedule.objects.get_or_create(**data, defaults=data)
         else:
             raise ValueError('Either crontab or interval must be provided')
 

@@ -30,12 +30,12 @@ class UserAPISecretViewSet(viewsets.ModelViewSet):
         username = request.user.username
         if UserAPISecret.objects.filter(username=username).exists():
             return JsonResponse({"result": False, "message": _("This user already has an API Secret")})
-        kwargs = {
+        additional_data = {
             "username": username,
             "api_secret": UserAPISecret.generate_api_secret(),
             "team": request.data.get("team"),
         }
-        serializer = self.get_serializer(data=kwargs)
+        serializer = self.get_serializer(data=additional_data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
