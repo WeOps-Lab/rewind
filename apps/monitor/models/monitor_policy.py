@@ -15,6 +15,8 @@ class MonitorPolicy(TimeInfo, MaintainerInfo):
     name = models.CharField(max_length=100, verbose_name='监控策略名称')
     organizations = models.JSONField(default=list, verbose_name='策略所属组织')
 
+    alert_name = models.CharField(max_length=200, default="", verbose_name='告警名称')
+
     collect_type = models.CharField(max_length=50, default="", verbose_name='采集类型')
 
     query_condition = models.JSONField(default=dict, verbose_name='查询条件')
@@ -67,6 +69,11 @@ class MonitorEvent(models.Model):
     level = models.CharField(max_length=20, choices=LEVEL_CHOICES, verbose_name='事件级别')
     content = models.TextField(blank=True, verbose_name='事件内容')
     notice_result = models.JSONField(default=list, verbose_name='通知结果')
+
+
+class MonitorEventRawData(models.Model):
+    event = models.ForeignKey(MonitorEvent, on_delete=models.CASCADE, verbose_name='事件')
+    data = models.JSONField(default=dict, verbose_name='原始数据')
 
 
 class MonitorAlert(TimeInfo):

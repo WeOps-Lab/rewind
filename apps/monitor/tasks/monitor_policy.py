@@ -1,5 +1,6 @@
 import logging
 import uuid
+from string import Template
 
 from celery.app import shared_task
 from datetime import datetime, timezone
@@ -9,7 +10,7 @@ from django.core.mail import send_mail
 
 from apps.monitor.constants import THRESHOLD_METHODS, LEVEL_WEIGHT, MONITOR_OBJS
 from apps.monitor.models import MonitorPolicy, MonitorInstanceOrganization, MonitorAlert, MonitorEvent, MonitorInstance, \
-    Metric
+    Metric, MonitorEventRawData
 from apps.monitor.utils.system_mgmt_api import SystemMgmtUtils
 from apps.monitor.utils.victoriametrics_api import VictoriaMetricsAPI
 
@@ -177,10 +178,15 @@ class MonitorPolicyScan:
         method = METHOD.get(self.policy.algorithm)
         if not method:
             raise ValueError("invalid algorithm method")
-        return method(query, start_timestamp, end_timestamp, step, ",".join(self.policy.group_by))
+        return method(query, start_timestamp, end_timestamp, step, self.instance_id_key)
 
     def set_monitor_obj_instance_key(self):
         """获取监控对象实例key"""
+
+        if self.policy.collect_type == "trap":
+            self.instance_id_key = "source"
+            return
+
         for monitor_obj in MONITOR_OBJS:
             if monitor_obj["name"] == self.policy.monitor_object.name:
                 self.instance_id_key= monitor_obj["instance_id_key"]
@@ -197,7 +203,7 @@ class MonitorPolicyScan:
             if self.instances_map and instance_id not in self.instances_map:
                 continue
             value = metric_info["values"][-1]
-            result[instance_id] = float(value[1])
+            result[instance_id] = {"value": float(value[1]), "raw_data": metric_info}
         return result
 
     def format_aggregration_metrics_v2(self, metrics, value_points=1):
@@ -219,17 +225,21 @@ class MonitorPolicyScan:
         events = []
 
         # 计算告警事件
-        for instance_id, value in aggregation_result.items():
+        for instance_id, info in aggregation_result.items():
+            value = info["value"]
             for threshold_info in self.policy.threshold:
                 method = THRESHOLD_METHODS.get(threshold_info["method"])
                 if not method:
                     raise ValueError("invalid threshold method")
                 if method(value, threshold_info["value"]):
+                    template = Template(self.policy.alert_name)
+                    content = template.safe_substitute(info["raw_data"]["metric"])
                     event = {
                         "instance_id": instance_id,
                         "value": value,
                         "level": threshold_info["level"],
-                        "content": f'{self.policy.monitor_object.type}-{self.policy.monitor_object.name} {self.instances_map.get(instance_id, "")} {self.policy.metric.display_name} {threshold_info["method"]} {threshold_info["value"]}',
+                        "content":  content,
+                        "raw_data": info["raw_data"],
                     }
                     events.append(event)
                     break
@@ -309,19 +319,30 @@ class MonitorPolicyScan:
 
     def create_events(self, events):
         """创建事件"""
-        new_event_creates = [
-            MonitorEvent(
-                id=uuid.uuid4().hex,
-                policy_id=self.policy.id,
-                monitor_instance_id=event["instance_id"],
-                value=event["value"],
-                level=event["level"],
-                content=event["content"],
-                notice_result=True,
+        create_events, create_raw_data = [], []
+        for event in events:
+            event_id = uuid.uuid4().hex
+            if event.get("raw_data"):
+                create_raw_data.append(
+                    MonitorEventRawData(
+                        event_id=event_id,
+                        data=event["raw_data"],
+                    )
+                )
+            create_events.append(
+                MonitorEvent(
+                    id=event_id,
+                    policy_id=self.policy.id,
+                    monitor_instance_id=event["instance_id"],
+                    value=event["value"],
+                    level=event["level"],
+                    content=event["content"],
+                    notice_result=True,
+                )
             )
-            for event in events
-        ]
-        event_objs = MonitorEvent.objects.bulk_create(new_event_creates, batch_size=200)
+
+        event_objs = MonitorEvent.objects.bulk_create(create_events, batch_size=200)
+        MonitorEventRawData.objects.bulk_create(create_raw_data, batch_size=100)
         return event_objs
 
     def get_users_email(self, usernames):
