@@ -9,9 +9,9 @@ class SkillExecuteService:
     def execute_skill(cls, bot, action_name, user_message, chat_history, sender_id, channel):
         logger.info(f"执行[{bot.id}]的[{action_name}]动作,发送者ID:[{sender_id}],消息: {user_message}")
         llm_skill: LLMSkill = bot.llm_skills.first()
-        user = get_user_info(bot.id, channel, sender_id)
+        user, groups = get_user_info(bot.id, channel, sender_id)
 
-        skill_prompt, rag_score_threshold = cls.get_rule_result(channel, llm_skill, user)
+        skill_prompt, rag_score_threshold = cls.get_rule_result(channel, llm_skill, user, groups)
 
         params = {
             "user_message": user_message,  # 用户消息
@@ -39,14 +39,14 @@ class SkillExecuteService:
         return result
 
     @classmethod
-    def get_rule_result(cls, channel, llm_skill, user):
+    def get_rule_result(cls, channel, llm_skill, user, groups):
         if channel == "web":
             return llm_skill.skill_prompt, [
                 {"knowledge_base": int(key), "score": float(value)}
                 for key, value in llm_skill.rag_score_threshold_map.items()
             ]
         rules = SkillRule.objects.filter(skill_id=llm_skill.id, is_enabled=True).order_by("-id")
-        bot_rule = cls.get_bot_rule(rules, user, channel)
+        bot_rule = cls.get_bot_rule(rules, user, channel, groups)
         all_knowledge_list = [int(i) for i in llm_skill.rag_score_threshold_map.keys()]
 
         if bot_rule is None:
@@ -63,7 +63,7 @@ class SkillExecuteService:
         return skill_prompt, rag_score_threshold
 
     @staticmethod
-    def get_bot_rule(rules, user, channel):
+    def get_bot_rule(rules, user, channel, groups):
         if not user:
             return None
         for i in rules:
@@ -74,6 +74,10 @@ class SkillExecuteService:
                         continue
                     if u["obj"] == "user" and u["value"] in user.name:
                         return i
+                    if u["obj"] == "group":
+                        for group in groups:
+                            if u["value"] in group["name"]:
+                                return i
             else:
                 flag = True
                 for u in condition["conditions"]:
@@ -82,7 +86,12 @@ class SkillExecuteService:
                     if u["obj"] == "user":
                         flag = flag and u["value"] in user.name
                     else:
-                        flag = False
+                        group_flag = False
+                        for group in groups:
+                            if u["value"] in group["name"]:
+                                group_flag = True
+                                break
+                        flag = flag and group_flag
                 if flag:
                     return i
         return None

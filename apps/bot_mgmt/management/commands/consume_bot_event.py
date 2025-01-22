@@ -35,7 +35,7 @@ def on_message(channel, method_frame, header_frame, body):
                     input_channel = (
                         channel_user.channel_type if channel_user.channel_type != ChannelChoices.WEB else "socketio"
                     )
-            user = get_user_info(bot_id, input_channel, sender_id)
+            user, _ = get_user_info(bot_id, input_channel, sender_id)
             bot = Bot.objects.get(id=bot_id)
             BotConversationHistory.objects.get_or_create(
                 bot_id=bot_id,

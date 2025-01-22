@@ -97,7 +97,7 @@ def get_user_info(bot_id, input_channel, sender_id):
         )
         user_groups.append(UserGroup(user_id=user.id, group_id=channel_group.id))
     UserGroup.objects.bulk_create(user_groups, batch_size=100)
-    return user
+    return user, groups
 
 
 def get_ding_talk_user_groups(sender_id, client):
