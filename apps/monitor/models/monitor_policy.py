@@ -11,11 +11,14 @@ class MonitorPolicy(TimeInfo, MaintainerInfo):
     NOTICE_TYPE_CHOICES = [('email', 'Email'), ('wechat', 'Wechat'), ('sms', 'SMS')]
 
     monitor_object = models.ForeignKey(MonitorObject, on_delete=models.CASCADE, verbose_name='监控对象')
-    name = models.CharField(max_length=100, verbose_name='监控策略名称')
-    organizations = models.JSONField(default=list, verbose_name='所属组织')
 
-    metric = models.ForeignKey(Metric, on_delete=models.CASCADE, verbose_name='监控指标')
-    filter = models.JSONField(default=list, verbose_name='过滤条件')
+    name = models.CharField(max_length=100, verbose_name='监控策略名称')
+    organizations = models.JSONField(default=list, verbose_name='策略所属组织')
+
+    collect_type = models.CharField(max_length=50, default="", verbose_name='采集类型')
+
+    query_condition = models.JSONField(default=dict, verbose_name='查询条件')
+
     source = models.JSONField(default=dict, verbose_name="策略适用的资源")
 
     schedule = models.JSONField(default=dict, verbose_name="策略执行周期, eg: 1h执行一次, 5m执行一次")
@@ -26,13 +29,14 @@ class MonitorPolicy(TimeInfo, MaintainerInfo):
     threshold = models.JSONField(default=list, verbose_name="阈值")
     recovery_condition = models.SmallIntegerField(default=1, verbose_name="多少周期不满足阈值自动恢复")
 
-
-    no_data_alert = models.SmallIntegerField(default=1, verbose_name="连续多少周期无数据, 生成告警")
+    no_data_period = models.JSONField(default=dict, verbose_name="无数据告警的数据周期（eg:10m内无数据）")
     no_data_level = models.CharField(max_length=20, default="", verbose_name="无数据告警级别")
+    no_data_recovery_period = models.JSONField(default=dict, verbose_name="无数据告警恢复的数据周期（eg:10m内有数据）")
 
     notice = models.BooleanField(default=True, verbose_name="是否通知")
     notice_type = models.CharField(max_length=10, default="email", choices=NOTICE_TYPE_CHOICES, verbose_name="通知方式")
     notice_users = models.JSONField(default=list, verbose_name="通知人")
+
     # 是否启动策略
     enable = models.BooleanField(default=True, verbose_name="是否启用")
     last_run_time = models.DateTimeField(blank=True, null=True, verbose_name="最后一次执行时间")

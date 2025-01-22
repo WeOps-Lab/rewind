@@ -8,7 +8,8 @@ from django.conf.global_settings import DEFAULT_FROM_EMAIL
 from django.core.mail import send_mail
 
 from apps.monitor.constants import THRESHOLD_METHODS, LEVEL_WEIGHT, MONITOR_OBJS
-from apps.monitor.models import MonitorPolicy, MonitorInstanceOrganization, MonitorAlert, MonitorEvent, MonitorInstance
+from apps.monitor.models import MonitorPolicy, MonitorInstanceOrganization, MonitorAlert, MonitorEvent, MonitorInstance, \
+    Metric
 from apps.monitor.utils.system_mgmt_api import SystemMgmtUtils
 from apps.monitor.utils.victoriametrics_api import VictoriaMetricsAPI
 
@@ -20,7 +21,7 @@ def scan_policy_task(policy_id):
     """扫描监控策略"""
     logger.info("start to update monitor instance grouping rule")
 
-    policy_obj = MonitorPolicy.objects.filter(id=policy_id).select_related("metric", "monitor_object").first()
+    policy_obj = MonitorPolicy.objects.filter(id=policy_id).select_related("monitor_object").first()
     if not policy_obj:
         raise ValueError(f"No MonitorPolicy found with id {policy_id}")
 
@@ -117,50 +118,62 @@ class MonitorPolicyScan:
         # 使用逗号连接多个条件
         return ",".join(vm_filters)
 
-    def for_mat_period(self):
+    def for_mat_period(self, period, points=1):
         """格式化周期"""
-        if not self.policy.period:
+        if not period:
             raise ValueError("policy period is empty")
-        if self.policy.period["type"] == "min":
-            return f'{self.policy.period["value"]}{"m"}'
-        elif self.policy.period["type"] == "hour":
-            return f'{self.policy.period["value"]}{"h"}'
-        elif self.policy.period["type"] == "day":
-            return f'{self.policy.period["value"]}{"d"}'
+        if period["type"] == "min":
+            return f'{int(period["value"]/points)}{"m"}'
+        elif period["type"] == "hour":
+            return f'{int(period["value"]/points)}{"h"}'
+        elif period["type"] == "day":
+            return f'{int(period["value"]/points)}{"d"}'
         else:
-            raise ValueError(f"invalid period type: {self.policy.period['type']}")
+            raise ValueError(f"invalid period type: {period['type']}")
 
-    def period_to_seconds(self):
+    def period_to_seconds(self, period):
         """周期转换为秒"""
-        if not self.policy.period:
+        if not period:
             raise ValueError("policy period is empty")
-        if self.policy.period["type"] == "min":
-            return self.policy.period["value"] * 60
-        elif self.policy.period["type"] == "hour":
-            return self.policy.period["value"] * 3600
-        elif self.policy.period["type"] == "day":
-            return self.policy.period["value"] * 86400
+        if period["type"] == "min":
+            return period["value"] * 60
+        elif period["type"] == "hour":
+            return period["value"] * 3600
+        elif period["type"] == "day":
+            return period["value"] * 86400
         else:
-            raise ValueError(f"invalid period type: {self.policy.period['type']}")
+            raise ValueError(f"invalid period type: {period['type']}")
 
-    def query_aggregration_metrics(self):
+    def format_pmq(self):
+        """格式化PMQ"""
+
+        query_condition = self.policy.query_condition
+        _type = query_condition.get("type")
+        if type == "pmq":
+            return query_condition.get("query")
+        else:
+            metric_id = query_condition.get("metric_id")
+            metric_obj = Metric.objects.filter(id=metric_id).first()
+            query = metric_obj.query
+            # 纬度条件
+            _filter = query_condition.get("filter", [])
+            vm_filter_str = self.format_to_vm_filter(_filter)
+            vm_filter_str = f"{vm_filter_str}" if vm_filter_str else ""
+            # 去掉label尾部多余的逗号
+            if vm_filter_str.endswith(","):
+                vm_filter_str = vm_filter_str[:-1]
+            query = query.replace("__$labels__", vm_filter_str)
+            return query
+
+    def query_aggregration_metrics(self, period, points=1):
         """查询指标"""
         end_timestamp = int(datetime.now(timezone.utc).timestamp())
-        period_seconds = self.period_to_seconds()
+        period_seconds = self.period_to_seconds(period)
         start_timestamp = end_timestamp - period_seconds
-        query = self.policy.metric.query
-        # 实例条件
-        instances_str = "|".join(self.instances_map.keys())
-        instance_str = f"instance_id=~'{instances_str}'," if instances_str else ""
-        # 纬度条件
-        vm_filter_str = self.format_to_vm_filter(self.policy.filter)
-        vm_filter_str = f"{vm_filter_str}" if vm_filter_str else ""
-        label_str = f"{instance_str}{vm_filter_str}"
-        # 去掉label尾部多余的逗号
-        if label_str.endswith(","):
-            label_str = label_str[:-1]
-        query = query.replace("__$labels__", label_str)
-        step = self.for_mat_period()
+
+        query = self.format_pmq()
+
+        step = self.for_mat_period(period, points)
         method = METHOD.get(self.policy.algorithm)
         if not method:
             raise ValueError("invalid algorithm method")
@@ -180,28 +193,33 @@ class MonitorPolicyScan:
         result = {}
         for metric_info in metrics.get("data", {}).get("result", []):
             instance_id = metric_info["metric"].get(self.instance_id_key)
+            # 过滤不在实例列表中的实例（策略实例范围）
+            if self.instances_map and instance_id not in self.instances_map:
+                continue
             value = metric_info["values"][-1]
             result[instance_id] = float(value[1])
         return result
 
-    def compare_event(self, aggregation_result):
-        """比较事件"""
-        compare_result = []
+    def format_aggregration_metrics_v2(self, metrics, value_points=1):
+        """格式化聚合指标"""
+        result = {}
+        for metric_info in metrics.get("data", {}).get("result", []):
+            instance_id = metric_info["metric"].get(self.instance_id_key)
+            # 过滤不在实例列表中的实例（策略实例范围）
+            if self.instances_map and instance_id not in self.instances_map:
+                continue
+            values = metric_info["values"][-value_points:]
+            result[instance_id] = [float(value) for value in values]
+        return result
 
-        # 计算无数据事件
-        for instance_id in self.instances_map.keys():
-            if instance_id not in aggregation_result:
-                compare_result.append({
-                    "instance_id": instance_id,
-                    "value": None,
-                    "level": "no_data",
-                    "content": "no data",
-                })
+    def alert_event(self):
+        """告警事件"""
+        aggregration_metrics = self.query_aggregration_metrics(self.policy.period)
+        aggregation_result = self.format_aggregration_metrics(aggregration_metrics)
+        events = []
 
         # 计算告警事件
         for instance_id, value in aggregation_result.items():
-
-            event = None
             for threshold_info in self.policy.threshold:
                 method = THRESHOLD_METHODS.get(threshold_info["method"])
                 if not method:
@@ -213,22 +231,83 @@ class MonitorPolicyScan:
                         "level": threshold_info["level"],
                         "content": f'{self.policy.monitor_object.type}-{self.policy.monitor_object.name} {self.instances_map.get(instance_id, "")} {self.policy.metric.display_name} {threshold_info["method"]} {threshold_info["value"]}',
                     }
+                    events.append(event)
                     break
 
-            # 未触发阈值的事件
-            if not event:
-                event = {
+        return events
+
+    def no_data_event(self):
+        """无数据告警事件"""
+        if not self.policy.no_data_period:
+            return []
+
+        events = []
+        _aggregration_metrics = self.query_aggregration_metrics(self.policy.no_data_period)
+        _aggregation_result = self.format_aggregration_metrics(_aggregration_metrics)
+
+        # 计算无数据事件
+        for instance_id in self.instances_map.keys():
+            if instance_id not in _aggregation_result:
+                events.append({
                     "instance_id": instance_id,
-                    "value": value,
-                    "level": "info",
-                    "content": "",
-                }
+                    "value": None,
+                    "level": "no_data",
+                    "content": "no data",
+                })
 
-            compare_result.append(event)
+        return events
 
-        return compare_result
+    def recovery_alert(self):
+        """告警恢复"""
+        if self.policy.recovery_condition <= 0:
+            return
+        _period = {
+            "type": self.policy.period["type"],
+            "value": self.policy.period["value"] * self.policy.recovery_condition
+        }
+        _aggregration_metrics = self.query_aggregration_metrics(_period, self.policy.recovery_condition)
+        _aggregation_result = self.format_aggregration_metrics_v2(_aggregration_metrics, self.policy.recovery_condition)
 
-    def create_event(self, events):
+        recovery_alert_instance_ids = []
+
+        active_alert_instance_ids = {alert.monitor_instance_id for alert in self.active_alerts}
+        for instance_id, values in _aggregation_result.items():
+            if instance_id not in active_alert_instance_ids:
+                continue
+            # 都是info级别，告警恢复
+            is_info = True
+            for value in values:
+                for threshold_info in self.policy.threshold:
+                    method = THRESHOLD_METHODS.get(threshold_info["method"])
+                    if not method:
+                        raise ValueError("invalid threshold method")
+                    if method(value, threshold_info["value"]):
+                        is_info = False
+                        break
+            if is_info:
+                recovery_alert_instance_ids.append(instance_id)
+
+        MonitorAlert.objects.filter(
+            policy_id=self.policy.id,
+            monitor_instance_id__in=recovery_alert_instance_ids,
+            status="new",
+        ).update(status="recovered", end_event_time=datetime.now(timezone.utc), operator="system")
+
+    def recovery_no_data_alert(self):
+        """无数据告警恢复"""
+        if not self.policy.no_data_recovery_period:
+            return
+        _aggregration_metrics = self.query_aggregration_metrics(self.policy.no_data_recovery_period)
+        _aggregation_result = self.format_aggregration_metrics(_aggregration_metrics)
+        instance_ids = set(_aggregation_result.keys())
+        MonitorAlert.objects.filter(
+            policy_id=self.policy.id,
+            monitor_instance_id__in=instance_ids,
+            alert_type="no_data",
+            status="new",
+        ).update(status="recovered", end_event_time=datetime.now(timezone.utc), operator="system")
+
+    def create_events(self, events):
         """创建事件"""
         new_event_creates = [
             MonitorEvent(
@@ -298,125 +377,78 @@ class MonitorPolicyScan:
         # 批量更新通知结果
         MonitorEvent.objects.bulk_update(event_objs, ["notice_result"], batch_size=200)
 
-    def recovery_alert(self, event_objs):
-        """告警恢复处理"""
-        if self.policy.recovery_condition <= 0:
-            return
-        event_objs_map = {event.monitor_instance_id: event for event in event_objs}
-        recovery_alerts, alert_level_updates = [], []
-        for alert in self.active_alerts:
-            event_obj = event_objs_map.get(alert.monitor_instance_id)
-            if not event_obj:
-                continue
-            if alert.alert_type == "no_data":
-                # 无数据告警恢复
-                if event_obj.level != "no_data":
-                    alert.status = "recovered"
-                    alert.end_event_time = event_obj.created_at
-                    alert.operator = "system"
-                    recovery_alerts.append(alert)
+    def handle_alert_events(self, event_objs):
+        """处理告警事件"""
+        new_alert_events, old_alert_events = [], []
+        instance_ids = {event.monitor_instance_id for event in self.active_alerts}
+        for event_obj in event_objs:
+            if event_obj.monitor_instance_id in instance_ids:
+                old_alert_events.append(event_obj)
             else:
-                if event_obj.level == "no_data":
-                    continue
-                # 正常告警恢复
-                if event_obj.level == "info":
-                    events = MonitorEvent.objects.filter(
-                        policy_id=self.policy.id,
-                        monitor_instance_id=event_obj.monitor_instance_id,
-                    ).order_by("-created_at")[:self.policy.recovery_condition]
-                    if all(event.level == "info" for event in events):
-                        alert.status = "recovered"
-                        alert.end_event_time = event_obj.created_at
-                        alert.operator = "system"
-                        recovery_alerts.append(alert)
-                else:
-                    # 告警等级升级
-                    new_level = event_obj.level
-                    old_level = alert.level
-                    if LEVEL_WEIGHT.get(new_level) > LEVEL_WEIGHT.get(old_level):
-                        alert.level = new_level
-                        alert.value = event_obj.value
-                        alert.content = event_obj.content
-                        alert_level_updates.append(alert)
-        if alert_level_updates:
-            MonitorAlert.objects.bulk_update(alert_level_updates, ["level", "value", "content"], batch_size=200)
-        if recovery_alerts:
-            MonitorAlert.objects.bulk_update(recovery_alerts, ["status", "end_event_time", "operator"], batch_size=200)
+                new_alert_events.append(event_obj)
+
+        self.update_alert(old_alert_events)
+        self.create_alert(new_alert_events)
+
+
+    def update_alert(self, event_objs):
+        event_map = {event.monitor_instance_id: event for event in event_objs}
+        alert_level_updates = []
+        for alert in self.active_alerts:
+            event_obj = event_map.get(alert.monitor_instance_id)
+            if not event_obj or event_obj.level == "no_data":
+                continue
+            # 告警等级升级
+            if LEVEL_WEIGHT.get(event_obj.level) > LEVEL_WEIGHT.get(alert.level):
+                alert.level = event_obj.level
+                alert.value = event_obj.value
+                alert.content = event_obj.content
+                alert_level_updates.append(alert)
+        MonitorAlert.objects.bulk_update(alert_level_updates, ["level", "value", "content"], batch_size=200)
 
     def create_alert(self, event_objs):
         """告警生成处理"""
-        no_data_events, alert_events = [], []
+        create_alerts = []
         for event_obj in event_objs:
-            if event_obj.level == "info":
-                continue
             if event_obj.level == "no_data":
-                if self.policy.no_data_alert <= 0:
-                    continue
-                no_data_events.append(event_obj)
+                alert_type = "alert"
+                level = event_obj.level,
+                value = event_obj.value,
+                content = event_obj.content,
             else:
-                alert_events.append(event_obj)
+                alert_type = "no_data"
+                level = self.policy.no_data_level,
+                value = None,
+                content = "no data",
+            create_alerts.append(
+                MonitorAlert(
+                    policy_id=self.policy.id,
+                    monitor_instance_id=event_obj.monitor_instance_id,
+                    alert_type=alert_type,
+                    level=level,
+                    value=value,
+                    content=content,
+                    status="new",
+                    start_event_time=event_obj.created_at,
+                    operator="",
+                ))
 
-        # 正常告警
-        alert_objs = [
-            MonitorAlert(
-                policy_id=self.policy.id,
-                monitor_instance_id=event_obj.monitor_instance_id,
-                alert_type="alert",
-                level=event_obj.level,
-                value=event_obj.value,
-                content=event_obj.content,
-                status="new",
-                start_event_time=event_obj.created_at,
-                operator="",
-            )
-            for event_obj in alert_events
-        ]
-
-        # 无数据告警
-        for event_obj in no_data_events:
-            events = MonitorEvent.objects.filter(
-                policy_id=self.policy.id,
-                monitor_instance_id=event_obj.monitor_instance_id,
-            ).order_by("-created_at")[:self.policy.no_data_alert]
-            if all(event.level == "no_data" for event in events):
-                alert_objs.append(
-                    MonitorAlert(
-                        policy_id=self.policy.id,
-                        monitor_instance_id=event_obj.monitor_instance_id,
-                        alert_type="no_data",
-                        level=self.policy.no_data_level,
-                        value=None,
-                        content="no data",
-                        status="new",
-                        start_event_time=event_obj.created_at,
-                        operator="system",
-                    )
-                )
-        MonitorAlert.objects.bulk_create(alert_objs, batch_size=200)
-
-    def alert_handling(self, event_objs):
-        """告警处理"""
-
-        active_alert_map = {alert.monitor_instance_id for alert in self.active_alerts}
-        recovery_alert_events, create_alert_events = [], []
-        for event_obj in event_objs:
-            if event_obj.monitor_instance_id in active_alert_map:
-                recovery_alert_events.append(event_obj)
-            else:
-                create_alert_events.append(event_obj)
-
-        # 告警恢复处理
-        self.recovery_alert(recovery_alert_events)
-
-        # 告警生成处理
-        self.create_alert(create_alert_events)
+        MonitorAlert.objects.bulk_create(create_alerts, batch_size=200)
 
     def run(self):
         """运行"""
         self.set_monitor_obj_instance_key()
-        aggregration_metrics = self.query_aggregration_metrics()
-        aggregation_result = self.format_aggregration_metrics(aggregration_metrics)
-        events = self.compare_event(aggregation_result)
-        event_objs = self.create_event(events)
-        self.alert_handling(event_objs)
+
+        # 告警事件
+        alert_events =  self.alert_event()
+        # 无数据事件
+        no_data_events = self.no_data_event()
+        # 告警恢复
+        self.recovery_alert()
+        # 无数据告警恢复
+        self.recovery_no_data_alert()
+
+        # 告警事件记录
+        event_objs = self.create_events(alert_events + no_data_events)
+        self.handle_alert_events(event_objs)
         self.notice(event_objs)
