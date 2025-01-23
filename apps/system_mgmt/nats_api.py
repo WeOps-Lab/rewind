@@ -47,9 +47,13 @@ def get_user_menus(client_id, roles, username):
 
 
 @nats_client.register
-def get_client():
+def get_client(client_id=""):
     client = KeyCloakClient()
     res = client.realm_client.get_clients()
+    if client_id:
+        filter_client = [client_id]
+    else:
+        filter_client = ["opspilot", "system-manager"]
     return {
         "result": True,
         "data": [
@@ -61,7 +65,7 @@ def get_client():
                 "url": i["baseUrl"],
             }
             for i in res
-            if i["clientId"] in ["opspilot", "system-manager"]
+            if i["clientId"] in filter_client
         ],
     }
 
