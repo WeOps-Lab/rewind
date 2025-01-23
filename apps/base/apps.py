@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class HandleConfig(AppConfig):
+class BaseConfig(AppConfig):
     name = "apps.base"
     verbose_name = "base"
