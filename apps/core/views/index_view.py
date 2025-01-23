@@ -1,3 +1,5 @@
+import os
+
 from django.http import JsonResponse
 from django.shortcuts import render
 from rest_framework.decorators import api_view
@@ -28,7 +30,8 @@ def login_info(request):
 
 def get_client(request):
     client = SystemMgmt()
-    return_data = client.get_client()
+    client_id = os.getenv("CLIENT_ID", "")
+    return_data = client.get_client(client_id)
     return JsonResponse(return_data)
 
 
