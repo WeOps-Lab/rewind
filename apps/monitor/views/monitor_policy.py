@@ -68,6 +68,12 @@ class MonitorPolicyVieSet(viewsets.ModelViewSet):
             self.update_policy_organizations(policy_id, organizations)
         return response
 
+    def destroy(self, request, *args, **kwargs):
+        policy_id = kwargs['pk']
+        PeriodicTask.objects.filter(name=f'scan_policy_task_{policy_id}').delete()
+        PolicyOrganization.objects.filter(policy_id=policy_id).delete()
+        return super().destroy(request, *args, **kwargs)
+
     def format_crontab(self, schedule):
         """
             将 schedule 格式化为 CrontabSchedule 实例
