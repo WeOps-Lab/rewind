@@ -23,7 +23,7 @@
     {
       "metric_group": "Ping",
       "name": "ping_response_time",
-      "query": "avg(ping_average_response_ms{__$labels__})",
+      "query": "avg(ping_average_response_ms{__$labels__})by (instance_id)",
       "display_name": "Average Response Time",
       "data_type": "Number",
       "unit": "ms",
@@ -68,10 +68,10 @@
     {
       "metric_group": "Ping",
       "name": "ping_error_response_code",
-      "query": "ping_result_code{__$labels__}",
-      "display_name": "Error Response Code",
-      "data_type": "Number",
-      "unit": "short",
+      "query": "avg(ping_result_code{__$labels__}) by (instance_id)",
+      "display_name": "Ping State",
+      "data_type": "Enum",
+      "unit": "[{\"name\":\"Failure\",\"id\":1},{\"name\":\"Success\",\"id\":0}]",
       "dimensions": [
         {
           "name": "agent_id",

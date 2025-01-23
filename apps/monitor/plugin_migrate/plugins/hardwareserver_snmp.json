@@ -8,7 +8,7 @@
     {
       "metric_group": "Base",
       "name": "sysUpTime",
-      "query": "sum(snmp_uptime{__$labels__}) by (instance_id) / 60 / 60 / 24",
+      "query": "sum(snmp_uptime{__$labels__}) by (instance_id) / 6000 / 60 / 24",
       "display_name": "System Uptime",
       "data_type": "Number",
       "unit": "d",
@@ -48,10 +48,10 @@
     {
       "metric_group": "Bandwidth",
       "name": "ifHighSpeed",
-      "query": "interface_ifSpeed{__$labels__}",
+      "query": "interface_ifSpeed{__$labels__}/1000000",
       "display_name": "Interface Bandwidth",
       "data_type": "Number",
-      "unit": "Mbits",
+      "unit": "decmbytes",
       "dimensions": [
         {
           "name": "ifDescr",
