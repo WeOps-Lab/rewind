@@ -447,6 +447,7 @@ class MonitorPolicyScan:
                 MonitorAlert(
                     policy_id=self.policy.id,
                     monitor_instance_id=event_obj.monitor_instance_id,
+                    monitor_instance_name=self.instances_map.get(event_obj.monitor_instance_id) or event_obj.monitor_instance_id,
                     alert_type=alert_type,
                     level=level,
                     value=value,

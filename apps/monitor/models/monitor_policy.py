@@ -81,6 +81,7 @@ class MonitorAlert(TimeInfo):
 
     policy_id = models.IntegerField(db_index=True, default=0, verbose_name='监控策略ID')
     monitor_instance_id = models.CharField(db_index=True, default="", max_length=100, verbose_name='监控对象实例ID')
+    monitor_instance_name = models.CharField(default="", max_length=100, verbose_name='监控对象实例名称')
     alert_type = models.CharField(default="alert", choices=ALERT_TYPE_CHOICES, max_length=50, verbose_name='告警类型')
     level = models.CharField(default="", max_length=20, verbose_name='最高告警级别')
     value = models.FloatField(blank=True, null=True, verbose_name='最高告警值')
