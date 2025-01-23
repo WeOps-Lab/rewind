@@ -86,6 +86,8 @@ class MonitorPolicyScan:
 
     def instances_map(self):
         """获取策略适用的实例"""
+        if not self.policy.source:
+            return {}
         source_type, source_values = self.policy.source["type"], self.policy.source["values"]
         if source_type == "instance":
             instance_list = source_values
