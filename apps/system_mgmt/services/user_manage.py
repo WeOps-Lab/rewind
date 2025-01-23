@@ -51,22 +51,29 @@ class UserManage(object):
     def get_user_roles(self, client_id, user_id):
         roles = []
         user_roles = self.keycloak_client.get_realm_roles_of_user(user_id)
+        role_map = {role["id"]: role["name"] for role in user_roles}
+
+        # Fetch policies once
         policies = self.keycloak_client.realm_client.get_client_authz_policies(client_id)
-        role_map = {i["id"]: i["name"] for i in user_roles}
-        for i in policies:
-            role_obj = json.loads(i["config"].get("roles", "[]"))
-            if not role_obj:
-                continue
-            role_obj = role_obj[0]
-            if role_obj["id"] in role_map:
-                roles.append(
-                    {
-                        "policy_id": i["id"],
-                        "display_name": i["name"],
-                        "role_id": role_obj["id"],
-                        "role_name": role_map.get(role_obj["id"], ""),
-                    }
-                )
+
+        # Build policy map for quick lookup
+        policy_map = {
+            role_obj["id"]: policy
+            for policy in policies
+            for role_obj in json.loads(policy["config"].get("roles", "[]"))
+        }
+
+        # Assemble roles list
+        roles = [
+            {
+                "policy_id": policy_map[role_id]["id"] if role_id in policy_map else [],
+                "display_name": policy_map[role_id]["name"] if role_id in policy_map else [],
+                "role_id": role_id,
+                "role_name": role_name,
+            }
+            for role_id, role_name in role_map.items()
+        ]
+
         return roles
 
     def user_list_by_role(self, role_name):
