@@ -133,7 +133,6 @@ THRESHOLD_METHODS = {
 
 # 告警等级权重
 LEVEL_WEIGHT = {
-    "info": 1,
     "warning": 2,
     "error": 3,
     "critical": 4,

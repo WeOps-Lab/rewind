@@ -9,4 +9,5 @@ class SystemMgmtUtils:
 
     @staticmethod
     def get_user_all():
-        return SystemMgmt().get_all_users()
+        result = SystemMgmt().get_all_users()
+        return result["data"]

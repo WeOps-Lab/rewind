@@ -217,7 +217,7 @@ class MonitorPolicyScan:
             if self.instances_map and instance_id not in self.instances_map:
                 continue
             values = metric_info["values"][-value_points:]
-            result[instance_id] = [float(value) for value in values]
+            result[instance_id] = [float(value[1]) for value in values]
         return result
 
     def alert_event(self):
@@ -433,16 +433,16 @@ class MonitorPolicyScan:
         """告警生成处理"""
         create_alerts = []
         for event_obj in event_objs:
-            if event_obj.level == "no_data":
+            if event_obj.level != "no_data":
                 alert_type = "alert"
-                level = event_obj.level,
-                value = event_obj.value,
-                content = event_obj.content,
+                level = event_obj.level
+                value = event_obj.value
+                content = event_obj.content
             else:
                 alert_type = "no_data"
-                level = self.policy.no_data_level,
-                value = None,
-                content = "no data",
+                level = self.policy.no_data_level
+                value = None
+                content = "no data"
             create_alerts.append(
                 MonitorAlert(
                     policy_id=self.policy.id,
