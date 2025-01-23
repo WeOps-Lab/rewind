@@ -11,18 +11,23 @@ from apps.core.decorators.api_perminssion import HasRole
 from apps.core.utils.viewset_utils import AuthViewSet
 from apps.knowledge_mgmt.models import KnowledgeBase
 from apps.model_provider_mgmt.models import LLMModel, LLMSkill
-from apps.model_provider_mgmt.serializers.llm_serializer import LLMModelSerializer, LLMSerializer
+from apps.model_provider_mgmt.models.llm_skill import SkillRequestLog
+from apps.model_provider_mgmt.serializers.llm_serializer import (
+    LLMModelSerializer,
+    LLMSerializer,
+    SkillRequestLogSerializer,
+)
 from apps.model_provider_mgmt.services.llm_service import llm_service
 
 
-class ObjFilter(FilterSet):
+class LLMFilter(FilterSet):
     name = filters.CharFilter(field_name="name", lookup_expr="icontains")
 
 
 class LLMViewSet(AuthViewSet):
     serializer_class = LLMSerializer
     queryset = LLMSkill.objects.all()
-    filterset_class = ObjFilter
+    filterset_class = LLMFilter
 
     def create(self, request, *args, **kwargs):
         params = request.data
@@ -101,3 +106,14 @@ class LLMModelViewSet(viewsets.ModelViewSet):
     serializer_class = LLMModelSerializer
     queryset = LLMModel.objects.all()
     search_fields = ["name"]
+
+
+class LogFilter(FilterSet):
+    skill_id = filters.NumberFilter(field_name="skill_id", lookup_expr="exact")
+    current_ip = filters.CharFilter(field_name="current_ip", lookup_expr="icontains")
+
+
+class SkillRequestLogViewSet(viewsets.ModelViewSet):
+    serializer_class = SkillRequestLogSerializer
+    queryset = SkillRequestLog.objects.all()
+    filterset_class = LogFilter

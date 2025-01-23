@@ -10,7 +10,7 @@ from django_minio_backend import MinioBackend
 from apps.bot_mgmt.models import Bot, BotConversationHistory
 from apps.bot_mgmt.models.bot import BotChannel
 from apps.bot_mgmt.services.skill_excute_service import SkillExecuteService
-from apps.bot_mgmt.utils import set_time_range
+from apps.bot_mgmt.utils import get_client_ip, insert_skill_log, set_time_range
 
 # from apps.core.decorators.api_perminssion import HasRole
 from apps.core.logger import logger
@@ -78,16 +78,29 @@ def skill_execute(request):
     channel = kwargs.get("channel", "socketio")
     if channel == "socketio":
         channel = "web"
+    return_data = get_skill_execute_result(
+        bot_id, channel, chat_history, kwargs, request, sender_id, skill_id, user_message
+    )
+    return JsonResponse({"result": return_data})
+
+
+def get_skill_execute_result(bot_id, channel, chat_history, kwargs, request, sender_id, skill_id, user_message):
     api_token = request.META.get("HTTP_AUTHORIZATION").split("TOKEN")[-1].strip()
     if not api_token:
-        return JsonResponse({"result": {"content": "No authorization"}})
+        return {"content": "No authorization"}
     bot = Bot.objects.filter(id=bot_id, api_token=api_token).first()
     if not bot:
         logger.info(f"api_token: {api_token}")
-        return JsonResponse({"result": {"content": "No bot found"}})
-    result = SkillExecuteService.execute_skill(bot, skill_id, user_message, chat_history, sender_id, channel)
-
-    return JsonResponse({"result": result})
+        return {"content": "No bot found"}
+    try:
+        result = SkillExecuteService.execute_skill(bot, skill_id, user_message, chat_history, sender_id, channel)
+    except Exception as e:
+        logger.exception(e)
+        result = {"content": str(e)}
+    if getattr(request, "api_pass", False):
+        current_ip = get_client_ip(request)
+        insert_skill_log(current_ip, bot.llm_skills.first().id, result, kwargs)
+    return result
 
 
 # @HasRole("admin")

@@ -10,6 +10,7 @@ from apps.bot_mgmt.services.ding_talk_client import DingTalkClient
 from apps.channel_mgmt.models import ChannelChoices
 from apps.core.backends import cache
 from apps.core.logger import logger
+from apps.model_provider_mgmt.models.llm_skill import SkillRequestLog
 
 
 def set_time_range(end_time_str, start_time_str):
@@ -142,3 +143,22 @@ def get_department_hierarchy(department_id, department_list):
 
     # 返回结果，按照从上级到当前的顺序
     return result[::-1]
+
+
+def get_client_ip(request):
+    x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(",")[-1].strip()
+    else:
+        ip = request.META.get("REMOTE_ADDR")
+    return ip
+
+
+def insert_skill_log(current_ip, skill_id, response_detail, request_detail):
+    SkillRequestLog.objects.create(
+        skill_id=skill_id,
+        response_detail=response_detail,
+        request_detail=request_detail,
+        state=request_detail,
+        current_ip=current_ip,
+    )

@@ -49,3 +49,12 @@ class SkillRule(MaintainerInfo, TimeInfo):
     action = models.IntegerField(default=0, verbose_name="动作", choices=ActionChoice.CHOICE)
     action_set = models.JSONField(default=dict, verbose_name="动作设置")
     is_enabled = models.BooleanField(default=True, verbose_name="是否启用")
+
+
+class SkillRequestLog(models.Model):
+    skill = models.ForeignKey("model_provider_mgmt.LLMSkill", on_delete=models.CASCADE, verbose_name="技能")
+    created_at = models.DateTimeField(auto_now_add=True)
+    current_ip = models.GenericIPAddressField()
+    state = models.BooleanField(default=True)
+    request_detail = models.JSONField(default=dict)
+    response_detail = models.JSONField(default=dict)
