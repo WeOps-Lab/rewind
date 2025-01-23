@@ -61,7 +61,7 @@ def create_default_roles(client_id, client, roles):
                 "roles": [{"id": role_info["id"]}],
             }
             policy_obj = client.realm_client.create_client_authz_role_based_policy(client_id, policy_data, True)
-            policy_id = policy_obj["_id"]
+            policy_id = policy_obj["id"]
         if not i["menus"]:
             continue
         menu_ids = [u["_id"] for u in all_resource if u["name"] in i["menus"]]
