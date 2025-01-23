@@ -1,36 +1,27 @@
 import hashlib
 from Crypto.Cipher import AES
-
+from Crypto.Util.Padding import pad, unpad
 from base64 import urlsafe_b64decode, urlsafe_b64encode
-
-from config.default import SECRET_KEY
+from config.components.base import SECRET_KEY
 
 
 class AESCryptor:
     def __init__(self):
         self.__encryptKey = SECRET_KEY
         self.__key = hashlib.md5(self.__encryptKey.encode("utf8")).digest()
-
-    @staticmethod
-    def pad(text, block_size=32):
-        pad = block_size - (len(text) % block_size)
-        return (text + pad * chr(pad)).encode("utf8")
-
-    @staticmethod
-    def un_pad(text):
-        index = text[-1]
-        return text[:-index].decode("utf8")
+        self.__block_size = AES.block_size
 
     def encode(self, plaintext):
-        """ AES 加密 """
-        ciphertext = AES.new(
-            self.__key, AES.MODE_ECB
-        ).encrypt(self.pad(plaintext))
-        return urlsafe_b64encode(ciphertext).decode("utf8").rstrip("=")
+        """ AES encryption """
+        iv = AES.new(self.__key, AES.MODE_CBC).iv
+        cipher = AES.new(self.__key, AES.MODE_CBC, iv)
+        ciphertext = cipher.encrypt(pad(plaintext.encode("utf8"), self.__block_size))
+        return urlsafe_b64encode(iv + ciphertext).decode("utf8").rstrip("=")
 
     def decode(self, ciphertext):
-        """ AES 解密 """
-        ciphertext = urlsafe_b64decode(
-            ciphertext + "=" * (4 - len(ciphertext) % 4))
-        cipher = AES.new(self.__key, AES.MODE_ECB)
-        return self.un_pad(cipher.decrypt(ciphertext))
+        """ AES decryption """
+        ciphertext = urlsafe_b64decode(ciphertext + "=" * (4 - len(ciphertext) % 4))
+        iv = ciphertext[:self.__block_size]
+        ciphertext = ciphertext[self.__block_size:]
+        cipher = AES.new(self.__key, AES.MODE_CBC, iv)
+        return unpad(cipher.decrypt(ciphertext), self.__block_size).decode("utf8")
