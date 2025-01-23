@@ -17,7 +17,7 @@ class InstanceConfigService:
             pmq = f'any({{instance_id="{collect_instance_id}", instance_type="{instance_type}"}}) by (instance_id,collect_type)'
             config_map = {(i["collect_instance_id"], i["collect_type"]): i for i in configs}
 
-        metrics = VictoriaMetricsAPI().query(pmq, "1h")
+        metrics = VictoriaMetricsAPI().query(pmq, "10m")
         instance_config_map = {}
         for metric_info in metrics.get("data", {}).get("result", []):
             instance_id = metric_info.get("metric", {}).get("instance_id")
