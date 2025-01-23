@@ -2,7 +2,6 @@ from django.db import models
 
 from apps.core.models.maintainer_info import MaintainerInfo
 from apps.core.models.time_info import TimeInfo
-from apps.monitor.models.monitor_metrics import Metric
 from apps.monitor.models.monitor_object import MonitorObject
 
 

@@ -68,38 +68,17 @@ class MonitorAlertVieSet(
 
         # 获取当前页中所有的 policy_id 和 monitor_instance_id
         policy_ids = [alert["policy_id"] for alert in results if alert["policy_id"]]
-        instance_ids = [alert["monitor_instance_id"] for alert in results if alert["monitor_instance_id"]]
 
         # 查询所有相关的策略和实例
-        policies = MonitorPolicy.objects.filter(id__in=policy_ids).select_related("metric")
-        instances = MonitorInstance.objects.filter(id__in=instance_ids)
+        policies = MonitorPolicy.objects.filter(id__in=policy_ids)
 
         # 将策略和实例数据映射到字典中
         policy_dict = {policy.id: policy for policy in policies}
-        instance_dict = {instance.id: instance for instance in instances}
 
-        metrics = {policy.metric.id: policy.metric for policy in policies}
-        monitor_object_name = None
-        lan = SettingLanguage(request.user.locale)
         # 补充策略和实例到每个 alert 中
         for alert in results:
             # 在 results 字典中添加完整的 policy 和 monitor_instance 信息
-            alert["policy"] = MonitorPolicySerializer(policy_dict.get(alert["policy_id"])).data if alert[
-                "policy_id"] else None
-            alert["monitor_instance"] = MonitorInstanceSerializer(
-                instance_dict.get(alert["monitor_instance_id"])).data if alert["monitor_instance_id"] else None
-            alert["metric"] = MetricSerializer(metrics.get(alert["policy"]["metric"])).data if alert["policy"] else None
-            # 翻译指标名称和描述
-            if monitor_object_name is None:
-                monitor_object = MonitorObject.objects.filter(id=alert["policy"]["monitor_object"]).first()
-                if monitor_object:
-                    monitor_object_name = monitor_object.name
-            if monitor_object_name:
-                metric_map = lan.get_val("MONITOR_OBJECT_METRIC", monitor_object_name)
-                if not metric_map:
-                    metric_map = {}
-                alert["metric"]["display_name"] = metric_map.get(alert["metric"]["name"], {}).get("name") or alert["metric"]["name"]
-                alert["metric"]["display_description"] = metric_map.get(alert["metric"]["name"], {}).get("desc") or alert["metric"]["description"]
+            alert["policy"] = MonitorPolicySerializer(policy_dict.get(alert["policy_id"])).data if alert["policy_id"] else None
 
         # 返回成功响应
         return WebUtils.response_success(dict(count=queryset.count(), results=results))
