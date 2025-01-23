@@ -10,7 +10,7 @@ from rest_framework.viewsets import GenericViewSet
 from apps.core.utils.web_utils import WebUtils
 from apps.monitor.language.service import SettingLanguage
 from apps.monitor.models import MonitorAlert, MonitorEvent, MonitorPolicy, MonitorInstance, MonitorObject, \
-    PolicyOrganization
+    PolicyOrganization, MonitorEventRawData
 from apps.monitor.filters.monitor_alert import MonitorAlertFilter
 from apps.monitor.serializers.monitor_alert import MonitorAlertSerializer
 from apps.monitor.serializers.monitor_instance import MonitorInstanceSerializer
@@ -142,3 +142,16 @@ class MonitorEventVieSet(viewsets.ViewSet):
             for i in events
         ]
         return WebUtils.response_success(dict(count=q_set.count(), results=result))
+
+    @swagger_auto_schema(
+        operation_description="查询告警最新事件的原始数据",
+        manual_parameters=[
+            openapi.Parameter("alert_id", openapi.IN_PATH, description="告警id", type=openapi.TYPE_INTEGER, required=True),
+        ],
+    )
+    @action(methods=['get'], detail=False, url_path='raw_data/(?P<alert_id>[^/.]+)')
+    def get_raw_data(self, request, alert_id):
+        alert_obj = MonitorAlert.objects.get(id=alert_id)
+        event_obj = MonitorEvent.objects.filter(policy_id=alert_obj.policy_id, monitor_instance_id=alert_obj.monitor_instance_id).order_by("-created_at").first()
+        raw_data = MonitorEventRawData.objects.filter(event_id=event_obj.id).first()
+        return WebUtils.response_success(raw_data.data if raw_data else {})
