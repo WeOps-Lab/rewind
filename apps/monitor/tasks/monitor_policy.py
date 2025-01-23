@@ -150,7 +150,7 @@ class MonitorPolicyScan:
 
         query_condition = self.policy.query_condition
         _type = query_condition.get("type")
-        if type == "pmq":
+        if _type == "pmq":
             return query_condition.get("query")
         else:
             metric_id = query_condition.get("metric_id")
