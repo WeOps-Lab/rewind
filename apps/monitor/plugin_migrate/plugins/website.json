@@ -53,7 +53,7 @@
     {
       "metric_group": "HTTP",
       "name": "http_content.length",
-      "query": "http_response_content_length/1024{__$labels__}",
+      "query": "http_response_content_length{__$labels__}/1024",
       "display_name": "HTTP Content Length",
       "data_type": "Number",
       "unit": "kibibytes",
