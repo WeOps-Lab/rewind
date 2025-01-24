@@ -16,13 +16,16 @@ class SystemMgmt(object):
         return_data = self.client.run("get_client_detail", client_id)
         return return_data
 
-    def get_user_menus(self, client_id, roles, username):
+    def get_user_menus(self, client_id, roles, username, is_superuser):
         """
         :param client_id: 客户端的ID
         :param roles: 查询用户的角色ID列表
         :param username: 查询用户的用户名
+        :param is_superuser: 是否超管
         """
-        return_data = self.client.run("get_user_menus", client_id=client_id, roles=roles, username=username)
+        return_data = self.client.run(
+            "get_user_menus", client_id=client_id, roles=roles, username=username, is_superuser=is_superuser
+        )
         return return_data
 
     def verify_token(self, token, client_id):
