@@ -46,5 +46,6 @@ def get_user_menus(request):
         client_id=request.GET["id"],
         roles=request.user.roles,
         username=request.user.username,
+        is_superuser=request.user.is_superuser,
     )
     return JsonResponse(return_data)
