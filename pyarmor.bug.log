@@ -1,0 +1,25 @@
+[BUG]: No module named 'PyInstaller'
+
+## Command Line
+/Users/umr/Documents/neverland/rewind/.venv/bin/pyarmor gen --outer --pack onedir --mix-str -O ./dist -r --exclude *.venv .
+
+## Environments
+Python 3.10.11
+Pyarmor 9.0.7 (group), 006480, Megalab
+Platform darwin.aarch64
+Native darwin.arm64
+Home /Users/umr/.pyarmor
+
+## Traceback
+Traceback (most recent call last):
+  File "/Users/umr/Documents/neverland/rewind/.venv/lib/python3.10/site-packages/pyarmor/cli/__main__.py", line 784, in main
+    main_entry(sys.argv[1:])
+  File "/Users/umr/Documents/neverland/rewind/.venv/lib/python3.10/site-packages/pyarmor/cli/__main__.py", line 777, in main_entry
+    return args.func(ctx, args)
+  File "/Users/umr/Documents/neverland/rewind/.venv/lib/python3.10/site-packages/pyarmor/cli/__main__.py", line 237, in cmd_gen
+    from .repack import find_packer
+  File "/Users/umr/Documents/neverland/rewind/.venv/lib/python3.10/site-packages/pyarmor/cli/repack.py", line 14, in <module>
+    from PyInstaller.archive.writers import ZlibArchiveWriter, CArchiveWriter
+ModuleNotFoundError: No module named 'PyInstaller'
+
+

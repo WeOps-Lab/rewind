@@ -25,7 +25,8 @@ class BotViewSet(AuthViewSet):
             return JsonResponse({"result": False, "message": _("Bot count exceeds quota limit.")})
         current_team = request.COOKIES.get("current_team")
         bot_obj = Bot.objects.create(
-            name=data.get("name"), introduction=data.get("introduction"), team=[current_team], channels=[]
+            name=data.get("name"), introduction=data.get("introduction"), team=[current_team], channels=[],
+            created_by=request.user.username
         )
         channel_list = Channel.objects.all()
         BotChannel.objects.bulk_create(
@@ -61,6 +62,7 @@ class BotViewSet(AuthViewSet):
         if llm_skills:
             obj.llm_skills.set(LLMSkill.objects.filter(id__in=llm_skills))
         obj.api_token = obj.get_api_token() if is_publish else ""
+        obj.updated_by = request.user.username
         obj.save()
         if is_publish:
             client = KubernetesClient()
