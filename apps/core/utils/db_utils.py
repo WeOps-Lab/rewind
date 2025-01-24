@@ -1,5 +1,7 @@
 from django.db import connection
 
+from apps.core.logger import logger
+
 
 class SQLExecute(object):
     @staticmethod
@@ -17,7 +19,8 @@ class SQLExecute(object):
             result = cursor.fetchall()
             columns = [col[0] for col in cursor.description]
             return_data = [dict(zip(columns, row)) for row in result]
-        except Exception:
+        except Exception as e:
+            logger.exception(e)
             return_data = []
         cursor.close()
         sql_connection.close()

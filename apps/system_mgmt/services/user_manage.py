@@ -24,7 +24,7 @@ class UserManage(object):
         """用户列表"""
         if group_id:
             users = self.keycloak_client.realm_client.get_group_members(group_id, query_params)
-            user_count = self.keycloak_client.get_group_user_count(group_id, {"search": query_params["search"]})
+            user_count = self.keycloak_client.get_group_user_count(group_id, query_params["search"])
         else:
             users = self.keycloak_client.realm_client.get_users(query_params)
             user_count = self.keycloak_client.realm_client.users_count(query_params)

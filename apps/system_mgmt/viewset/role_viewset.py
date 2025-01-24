@@ -27,7 +27,7 @@ class RoleViewSet(viewsets.ViewSet):
     @action(detail=False, methods=["GET"])
     def get_all_menus(self, request):
         client_id = request.GET.get("client_id")
-        data = RoleManage().get_all_menus(client_id)
+        data = RoleManage().get_all_menus(client_id, is_superuser=True)
         return JsonResponse({"result": True, "data": data})
 
     @action(detail=False, methods=["GET"])
