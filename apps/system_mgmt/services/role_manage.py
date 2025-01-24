@@ -36,7 +36,7 @@ class RoleManage(object):
         result = self.keycloak_client.realm_client.get_realm_role_members(role_name, query)
         return result
 
-    def get_all_menus(self, client_id, user_menus=None, username=""):
+    def get_all_menus(self, client_id, user_menus=None, username="", is_superuser=False):
         cache_key = f"all_menus_{client_id}"
         if user_menus:
             user_menus.sort()
@@ -46,6 +46,8 @@ class RoleManage(object):
             menus = self.keycloak_client.realm_client.get_client_authz_resources(client_id)
             if user_menus:
                 menus = [i for i in menus if i["name"] in user_menus]
+            elif not is_superuser:
+                menus = []
             all_menus = self.transform_data(menus)
             cache.set(cache_key, all_menus, 60 * 30)
         return all_menus
@@ -67,6 +69,8 @@ class RoleManage(object):
 
     @staticmethod
     def transform_data(data):
+        if not data:
+            return []
         data = [
             {
                 "name": i["name"],

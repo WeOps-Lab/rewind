@@ -34,15 +34,16 @@ def verify_token(token, client_id):
 
 
 @nats_client.register
-def get_user_menus(client_id, roles, username):
+def get_user_menus(client_id, roles, username, is_superuser):
     client = RoleManage()
     client_id = client_id
-    policy_ids = client.get_policy_by_by_roles(client_id, roles)
     menus = []
-    for i in policy_ids:
-        menus.extend(client.role_menus(client_id, i))
-    menus = list(set(menus))
-    user_menus = client.get_all_menus(client_id, user_menus=menus, username=username)
+    if not is_superuser:
+        policy_ids = client.get_policy_by_by_roles(client_id, roles)
+        for i in policy_ids:
+            menus.extend(client.role_menus(client_id, i))
+        menus = list(set(menus))
+    user_menus = client.get_all_menus(client_id, user_menus=menus, username=username, is_superuser=is_superuser)
     return {"result": True, "data": user_menus}
 
 
