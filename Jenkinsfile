@@ -51,6 +51,18 @@ pipeline {
             }
        }
 
+       stage('更新云环境'){
+            steps {
+                script {
+                    sh """
+                        cd ${env.KUBE_DIR}/system-manager/overlays/cwoa/ && \
+                            sudo kubectl delete -k . || true &&\
+                            sudo kubectl apply -k .
+                    """
+                }
+            }
+       }
+
        stage('更新环境'){
             agent { 
                 label 'docker' 
