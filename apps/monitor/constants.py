@@ -19,7 +19,7 @@ MONITOR_OBJS = [
         "name": "Website",
         "default_metric": 'any({instance_type="web"}) by (instance_id)',
         "instance_id_key": "instance_id",
-        "supplementary_indicators": ["http_code", "http_success.rate"],
+        "supplementary_indicators": ["http_duration", "http_success.rate"],
     },
     {
         "type": "Web",

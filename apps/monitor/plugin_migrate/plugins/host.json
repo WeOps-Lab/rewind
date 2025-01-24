@@ -298,7 +298,7 @@
     {
       "metric_group": "Memory",
       "name": "mem.pct_used",
-      "query": "avg(mem_used_percent{instance_type=\"os\", __$labels__})",
+      "query": "avg(mem_used_percent{instance_type=\"os\", __$labels__}) by (instance_id)",
       "display_name": "Application Memory Usage Percentage",
       "data_type": "Number",
       "unit": "percent",
