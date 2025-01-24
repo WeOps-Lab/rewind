@@ -117,3 +117,8 @@ class SkillRequestLogViewSet(viewsets.ModelViewSet):
     serializer_class = SkillRequestLogSerializer
     queryset = SkillRequestLog.objects.all()
     filterset_class = LogFilter
+
+    def list(self, request, *args, **kwargs):
+        if not request.GET.get("skill_id"):
+            return JsonResponse({"result": False, "message": _("Skill id not found")})
+        return super().list(request, *args, **kwargs)
