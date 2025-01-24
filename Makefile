@@ -61,9 +61,6 @@ start-nats:
 
 release:
 	rm -Rf ./dist
-	pyarmor cfg data_files="*"
-	pyarmor cfg package_name_format megalab
-	pyarmor cfg optimize 2
 	pyarmor gen \
 		--platform linux.x86_64 \
 		--platform darwin.x86_64 \
