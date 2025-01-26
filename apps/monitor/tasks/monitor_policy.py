@@ -476,3 +476,13 @@ class MonitorPolicyScan:
         event_objs = self.create_events(alert_events + no_data_events)
         self.handle_alert_events(event_objs)
         self.notice(event_objs)
+
+    def clear_count_alert_event(self, instances):
+        """清除计数告警事件"""
+        # TODO 清除计数告警事件
+        pass
+
+    def add_count_alert_event(self, instances):
+        """添加计数告警事件"""
+        # TODO 添加计数告警事件
+        pass
