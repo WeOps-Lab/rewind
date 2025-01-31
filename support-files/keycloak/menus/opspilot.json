@@ -1,202 +1,271 @@
 {
-        "client_id": "opspilot",
-        "name": "OpsPilot",
-        "url": "/opspilot/studio",
-        "description": "Create roles for the OpsPilot app to manage data permissions, menu permissions, and feature permissions.",
-        "menus": [
-            {
-                "name": "Studio",
-                "children": [
-                    {
-                        "id": "bot_list",
-                        "name": "Bot-list",
-                        "icon": "jiqiren2",
-                        "title": "Studio",
-                        "url": "/opspilot/studio",
-                        "operation": ["View", "Add", "Edit", "Delete"]
-                    },
-                    {
-                        "id": "bot_settings",
-                        "name": "Bot-Setting",
-                        "icon": "shezhi",
-                        "title": "Settings",
-                        "url": "/opspilot/studio/detail/settings",
-                        "operation": ["View", "Edit", "Save&Publish"]
-                    },
-                    {
-                        "id": "bot_channel",
-                        "name": "Bot-Channel",
-                        "icon": "channel1",
-                        "title": "Channel",
-                        "url": "/opspilot/studio/detail/channel",
-                        "operation": ["View", "Setting"]
-                    },
-                    {
-                        "id": "bot_conversation_log",
-                        "name": "Bot-Conversation-Log",
-                        "icon": "talk-line",
-                        "title": "Conversation Logs",
-                        "url": "/opspilot/studio/detail/logs",
-                        "operation": ["View", "Mark"]
-                    },
-                    {
-                        "id": "bot_statistics",
-                        "name": "Bot-Statistics",
-                        "icon": "tongji",
-                        "title": "Statistics",
-                        "url": "/opspilot/studio/detail/statistics",
-                        "operation": ["View"]
-                    }
-                ]
-            },
-            {
-                "name": "Skill",
-                "children": [
-                    {
-                        "id": "skill_list",
-                        "name": "Skill-list",
-                        "icon": "weibiaoti3",
-                        "title": "Skill",
-                        "url": "/opspilot/skill",
-                        "operation": ["View", "Add", "Edit", "Delete"]
-                    },
-                    {
-                        "id": "skill_setting",
-                        "name": "Skill-Setting",
-                        "icon": "shezhi",
-                        "title": "Setting",
-                        "url": "/opspilot/skill/detail/settings",
-                        "operation": ["View", "Edit"]
-                    },
-                    {
-                        "id": "skill_rule",
-                        "name": "Skill-Rule",
-                        "icon": "guize",
-                        "title": "Rules",
-                        "url": "/opspilot/skill/detail/rules",
-                        "operation": ["View", "Add", "Edit", "Delete"]
-                    },
-                    {
-                        "id": "skill_api",
-                        "name": "Skill-Api",
-                        "icon": "api",
-                        "title": "API",
-                        "url": "/opspilot/skill/detail/api",
-                        "operation": ["View"]
-                    }
-                ]
-            },
-            {
-                "name": "Knowledge",
-                "children": [
-                    {
-                        "id": "knowledge_list",
-                        "name": " Knowledge-list",
-                        "icon": "zhishiku1",
-                        "title": "Knowledge",
-                        "url": "/opspilot/knowledge",
-                        "operation": ["View", "Add", "Edit", "Delete"]
-                    },
-                    {
-                        "id": "knowledge_document",
-                        "name": " Knowledge-Document",
-                        "icon": "shiyongwendang",
-                        "title": "Documents",
-                        "url": "/opspilot/knowledge/detail/documents",
-                        "operation": ["View", "Add", "Set", "Train", "Delete"]
-                    },
-                    {
-                        "id": "knowledge_testing",
-                        "name": " Knowledge-Testing",
-                        "icon": "ceshi",
-                        "title": "Testing",
-                        "url": "/opspilot/knowledge/detail/testing",
-                        "operation": ["View", "Edit"]
-                    },
-                    {
-                        "id": "knowledge_setting",
-                        "name": " Knowledge-Setting",
-                        "icon": "shezhi",
-                        "title": "Settings",
-                        "url": "/opspilot/knowledge/detail/settings",
-                        "operation": ["View", "Edit"]
-                    },
-                    {
-                        "id": "knowledge_api",
-                        "name": " Knowledge-API",
-                        "icon": "api",
-                        "title": "API",
-                        "url": "/opspilot/knowledge/detail/api",
-                        "operation": ["View"]
-                    }
-                ]
-            },
-            {
-                "name": "Provide",
-                "children": [
-                    {
-                        "id": "provide_list",
-                        "name": "Provide-list",
-                        "icon": "moxing2",
-                        "title": "Provider",
-                        "url": "/opspilot/provider",
-                        "operation": ["View", "Setting"]
-                    }
-                ]
-            },
-            {
-                "name": "Setting",
-                "icon": "settings-fill",
-                "children": [
-                    {
-                        "id": "mange_quota",
-                        "name": "Mange Quota",
-                        "icon": "_quota_management",
-                        "title": "Manage Quota",
-                        "url": "/opspilot/settings",
-                        "operation": ["View", "Add", "Edit", "Delete"]
-                    },
-                    {
-                        "id": "my_quota",
-                        "name": "My Quota",
-                        "icon": "quota",
-                        "title": "My Quota",
-                        "url": "/opspilot/settings/quota",
-                        "operation": ["View"]
-                    },
-                    {
-                        "id": "api_secret_key",
-                        "name": "API Secret Key",
-                        "icon": "key",
-                        "title": "API Secret Keys",
-                        "url": "/opspilot/settings/key",
-                        "operation": ["View", "Add", "Delete"]
-                    }
-                ]
-            }
-        ],
-        "roles": [
-            {"name": "admin", "role_name": "opspilot_admin", "menus": []},
-            {
-                "name": "normal",
-                "role_name": "opspilot_normal",
-                "menus": [
-                    "bot_list-View",
-                    "bot_settings-View",
-                    "bot_channel-View",
-                    "bot_conversation_log-View",
-                    "bot_statistics-View",
-                    "knowledge_document-View",
-                    "knowledge_list-View",
-                    "knowledge_setting-View",
-                    "knowledge_testing-View",
-                    "my_quota-View",
-                    "provide_list-View",
-                    "skill_api-View",
-                    "skill_list-View",
-                    "skill_rule-View",
-                    "skill_setting-View"
-                ]
-            }
-        ]
+  "client_id": "opspilot",
+  "name": "OpsPilot",
+  "url": "/opspilot/studio",
+  "description": "Create roles for the OpsPilot app to manage data permissions, menu permissions, and feature permissions.",
+  "menus": [
+    {
+      "name": "Studio",
+      "children": [
+        {
+          "id": "bot_list",
+          "name": "Bot-list",
+          "icon": "jiqiren2",
+          "title": "Studio",
+          "url": "/opspilot/studio",
+          "operation": [
+            "View",
+            "Add",
+            "Edit",
+            "Delete"
+          ]
+        },
+        {
+          "id": "bot_settings",
+          "name": "Bot-Setting",
+          "icon": "shezhi",
+          "title": "Settings",
+          "url": "/opspilot/studio/detail/settings",
+          "operation": [
+            "View",
+            "Edit",
+            "Save&Publish"
+          ]
+        },
+        {
+          "id": "bot_channel",
+          "name": "Bot-Channel",
+          "icon": "channel1",
+          "title": "Channel",
+          "url": "/opspilot/studio/detail/channel",
+          "operation": [
+            "View",
+            "Setting"
+          ]
+        },
+        {
+          "id": "bot_conversation_log",
+          "name": "Bot-Conversation-Log",
+          "icon": "talk-line",
+          "title": "Conversation Logs",
+          "url": "/opspilot/studio/detail/logs",
+          "operation": [
+            "View",
+            "Mark"
+          ]
+        },
+        {
+          "id": "bot_statistics",
+          "name": "Bot-Statistics",
+          "icon": "tongji",
+          "title": "Statistics",
+          "url": "/opspilot/studio/detail/statistics",
+          "operation": [
+            "View"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Skill",
+      "children": [
+        {
+          "id": "skill_list",
+          "name": "Skill-list",
+          "icon": "weibiaoti3",
+          "title": "Skill",
+          "url": "/opspilot/skill",
+          "operation": [
+            "View",
+            "Add",
+            "Edit",
+            "Delete"
+          ]
+        },
+        {
+          "id": "skill_setting",
+          "name": "Skill-Setting",
+          "icon": "shezhi",
+          "title": "Setting",
+          "url": "/opspilot/skill/detail/settings",
+          "operation": [
+            "View",
+            "Edit"
+          ]
+        },
+        {
+          "id": "skill_rule",
+          "name": "Skill-Rule",
+          "icon": "guize",
+          "title": "Rules",
+          "url": "/opspilot/skill/detail/rules",
+          "operation": [
+            "View",
+            "Add",
+            "Edit",
+            "Delete"
+          ]
+        },
+        {
+          "id": "skill_api",
+          "name": "Skill-Api",
+          "icon": "api",
+          "title": "API",
+          "url": "/opspilot/skill/detail/api",
+          "operation": [
+            "View"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Knowledge",
+      "children": [
+        {
+          "id": "knowledge_list",
+          "name": " Knowledge-list",
+          "icon": "zhishiku1",
+          "title": "Knowledge",
+          "url": "/opspilot/knowledge",
+          "operation": [
+            "View",
+            "Add",
+            "Edit",
+            "Delete"
+          ]
+        },
+        {
+          "id": "knowledge_document",
+          "name": " Knowledge-Document",
+          "icon": "shiyongwendang",
+          "title": "Documents",
+          "url": "/opspilot/knowledge/detail/documents",
+          "operation": [
+            "View",
+            "Add",
+            "Set",
+            "Train",
+            "Delete"
+          ]
+        },
+        {
+          "id": "knowledge_testing",
+          "name": " Knowledge-Testing",
+          "icon": "ceshi",
+          "title": "Testing",
+          "url": "/opspilot/knowledge/detail/testing",
+          "operation": [
+            "View",
+            "Edit"
+          ]
+        },
+        {
+          "id": "knowledge_setting",
+          "name": " Knowledge-Setting",
+          "icon": "shezhi",
+          "title": "Settings",
+          "url": "/opspilot/knowledge/detail/settings",
+          "operation": [
+            "View",
+            "Edit"
+          ]
+        },
+        {
+          "id": "knowledge_api",
+          "name": " Knowledge-API",
+          "icon": "api",
+          "title": "API",
+          "url": "/opspilot/knowledge/detail/api",
+          "operation": [
+            "View"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Provide",
+      "children": [
+        {
+          "id": "provide_list",
+          "name": "Provide-list",
+          "icon": "moxing2",
+          "title": "Provider",
+          "url": "/opspilot/provider",
+          "operation": [
+            "View",
+            "Setting"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Setting",
+      "icon": "settings-fill",
+      "children": [
+        {
+          "id": "mange_quota",
+          "name": "Mange Quota",
+          "icon": "_quota_management",
+          "title": "Manage Quota",
+          "url": "/opspilot/settings",
+          "operation": [
+            "View",
+            "Add",
+            "Edit",
+            "Delete"
+          ]
+        },
+        {
+          "id": "my_quota",
+          "name": "My Quota",
+          "icon": "quota",
+          "title": "My Quota",
+          "url": "/opspilot/settings/quota",
+          "operation": [
+            "View"
+          ]
+        },
+        {
+          "id": "api_secret_key",
+          "name": "API Secret Key",
+          "icon": "key",
+          "title": "API Secret Keys",
+          "url": "/opspilot/settings/key",
+          "operation": [
+            "View",
+            "Add",
+            "Delete"
+          ]
+        }
+      ]
     }
+  ],
+  "roles": [
+    {
+      "name": "admin",
+      "role_name": "opspilot_admin",
+      "menus": []
+    },
+    {
+      "name": "normal",
+      "role_name": "opspilot_normal",
+      "menus": [
+        "bot_list-View",
+        "bot_settings-View",
+        "bot_channel-View",
+        "bot_conversation_log-View",
+        "bot_statistics-View",
+        "knowledge_document-View",
+        "knowledge_list-View",
+        "knowledge_setting-View",
+        "knowledge_testing-View",
+        "my_quota-View",
+        "provide_list-View",
+        "skill_api-View",
+        "skill_list-View",
+        "skill_rule-View",
+        "skill_setting-View"
+      ]
+    }
+  ]
+}
