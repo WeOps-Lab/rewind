@@ -1,10 +1,10 @@
 import json
 import logging
+import os
 
 from django.core.management import BaseCommand
 
 from apps.core.utils.keycloak_client import KeyCloakClient
-from apps.system_mgmt.templates.init_menus import MENUS
 
 logger = logging.getLogger(__name__)
 
@@ -14,7 +14,20 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         keycloak_client = KeyCloakClient()
+        menu_dir = 'support-files/keycloak/menus'
+        MENUS = []
+        for root, dirs, files in os.walk(menu_dir):
+            for file in files:
+                if file.endswith('.json'):
+                    file_path = os.path.join(root, file)
+                    try:
+                        with open(file_path, 'r', encoding='utf-8') as f:
+                            menu_data = json.load(f)
+                            MENUS.append(menu_data)
+                    except Exception as e:
+                        logger.error(f"Error reading {file_path}: {e}")
 
+        print(f"Read {len(MENUS)} menu files")
         for app_obj in MENUS:
             payload = {
                 "clientId": app_obj["client_id"],

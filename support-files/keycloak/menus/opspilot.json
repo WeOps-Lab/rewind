@@ -1,9 +1,8 @@
-MENUS = [
-    {
+{
         "client_id": "opspilot",
         "name": "OpsPilot",
         "url": "/opspilot/studio",
-        "description": "Create roles for the OpsPilot app to manage data permissions, menu permissions, and feature permissions.",  # noqa
+        "description": "Create roles for the OpsPilot app to manage data permissions, menu permissions, and feature permissions.",
         "menus": [
             {
                 "name": "Studio",
@@ -14,7 +13,7 @@ MENUS = [
                         "icon": "jiqiren2",
                         "title": "Studio",
                         "url": "/opspilot/studio",
-                        "operation": ["View", "Add", "Edit", "Delete"],
+                        "operation": ["View", "Add", "Edit", "Delete"]
                     },
                     {
                         "id": "bot_settings",
@@ -22,7 +21,7 @@ MENUS = [
                         "icon": "shezhi",
                         "title": "Settings",
                         "url": "/opspilot/studio/detail/settings",
-                        "operation": ["View", "Edit", "Save&Publish"],
+                        "operation": ["View", "Edit", "Save&Publish"]
                     },
                     {
                         "id": "bot_channel",
@@ -30,7 +29,7 @@ MENUS = [
                         "icon": "channel1",
                         "title": "Channel",
                         "url": "/opspilot/studio/detail/channel",
-                        "operation": ["View", "Setting"],
+                        "operation": ["View", "Setting"]
                     },
                     {
                         "id": "bot_conversation_log",
@@ -38,7 +37,7 @@ MENUS = [
                         "icon": "talk-line",
                         "title": "Conversation Logs",
                         "url": "/opspilot/studio/detail/logs",
-                        "operation": ["View", "Mark"],
+                        "operation": ["View", "Mark"]
                     },
                     {
                         "id": "bot_statistics",
@@ -46,9 +45,9 @@ MENUS = [
                         "icon": "tongji",
                         "title": "Statistics",
                         "url": "/opspilot/studio/detail/statistics",
-                        "operation": ["View"],
-                    },
-                ],
+                        "operation": ["View"]
+                    }
+                ]
             },
             {
                 "name": "Skill",
@@ -59,7 +58,7 @@ MENUS = [
                         "icon": "weibiaoti3",
                         "title": "Skill",
                         "url": "/opspilot/skill",
-                        "operation": ["View", "Add", "Edit", "Delete"],
+                        "operation": ["View", "Add", "Edit", "Delete"]
                     },
                     {
                         "id": "skill_setting",
@@ -67,7 +66,7 @@ MENUS = [
                         "icon": "shezhi",
                         "title": "Setting",
                         "url": "/opspilot/skill/detail/settings",
-                        "operation": ["View", "Edit"],
+                        "operation": ["View", "Edit"]
                     },
                     {
                         "id": "skill_rule",
@@ -75,7 +74,7 @@ MENUS = [
                         "icon": "guize",
                         "title": "Rules",
                         "url": "/opspilot/skill/detail/rules",
-                        "operation": ["View", "Add", "Edit", "Delete"],
+                        "operation": ["View", "Add", "Edit", "Delete"]
                     },
                     {
                         "id": "skill_api",
@@ -83,9 +82,9 @@ MENUS = [
                         "icon": "api",
                         "title": "API",
                         "url": "/opspilot/skill/detail/api",
-                        "operation": ["View"],
-                    },
-                ],
+                        "operation": ["View"]
+                    }
+                ]
             },
             {
                 "name": "Knowledge",
@@ -96,7 +95,7 @@ MENUS = [
                         "icon": "zhishiku1",
                         "title": "Knowledge",
                         "url": "/opspilot/knowledge",
-                        "operation": ["View", "Add", "Edit", "Delete"],
+                        "operation": ["View", "Add", "Edit", "Delete"]
                     },
                     {
                         "id": "knowledge_document",
@@ -104,7 +103,7 @@ MENUS = [
                         "icon": "shiyongwendang",
                         "title": "Documents",
                         "url": "/opspilot/knowledge/detail/documents",
-                        "operation": ["View", "Add", "Set", "Train", "Delete"],
+                        "operation": ["View", "Add", "Set", "Train", "Delete"]
                     },
                     {
                         "id": "knowledge_testing",
@@ -112,7 +111,7 @@ MENUS = [
                         "icon": "ceshi",
                         "title": "Testing",
                         "url": "/opspilot/knowledge/detail/testing",
-                        "operation": ["View", "Edit"],
+                        "operation": ["View", "Edit"]
                     },
                     {
                         "id": "knowledge_setting",
@@ -120,7 +119,7 @@ MENUS = [
                         "icon": "shezhi",
                         "title": "Settings",
                         "url": "/opspilot/knowledge/detail/settings",
-                        "operation": ["View", "Edit"],
+                        "operation": ["View", "Edit"]
                     },
                     {
                         "id": "knowledge_api",
@@ -128,9 +127,9 @@ MENUS = [
                         "icon": "api",
                         "title": "API",
                         "url": "/opspilot/knowledge/detail/api",
-                        "operation": ["View"],
-                    },
-                ],
+                        "operation": ["View"]
+                    }
+                ]
             },
             {
                 "name": "Provide",
@@ -141,9 +140,9 @@ MENUS = [
                         "icon": "moxing2",
                         "title": "Provider",
                         "url": "/opspilot/provider",
-                        "operation": ["View", "Setting"],
-                    },
-                ],
+                        "operation": ["View", "Setting"]
+                    }
+                ]
             },
             {
                 "name": "Setting",
@@ -155,7 +154,7 @@ MENUS = [
                         "icon": "_quota_management",
                         "title": "Manage Quota",
                         "url": "/opspilot/settings",
-                        "operation": ["View", "Add", "Edit", "Delete"],
+                        "operation": ["View", "Add", "Edit", "Delete"]
                     },
                     {
                         "id": "my_quota",
@@ -163,7 +162,7 @@ MENUS = [
                         "icon": "quota",
                         "title": "My Quota",
                         "url": "/opspilot/settings/quota",
-                        "operation": ["View"],
+                        "operation": ["View"]
                     },
                     {
                         "id": "api_secret_key",
@@ -171,10 +170,10 @@ MENUS = [
                         "icon": "key",
                         "title": "API Secret Keys",
                         "url": "/opspilot/settings/key",
-                        "operation": ["View", "Add", "Delete"],
-                    },
-                ],
-            },
+                        "operation": ["View", "Add", "Delete"]
+                    }
+                ]
+            }
         ],
         "roles": [
             {"name": "admin", "role_name": "opspilot_admin", "menus": []},
@@ -196,68 +195,8 @@ MENUS = [
                     "skill_api-View",
                     "skill_list-View",
                     "skill_rule-View",
-                    "skill_setting-View",
-                ],
-            },
-        ],
-    },
-    {
-        "client_id": "system-manager",
-        "name": "Setting",
-        "url": "",
-        "description": "Create roles for the Setting app to manage data permissions, menu permissions, and feature permissions.",  # noqa
-        "menus": [
-            {
-                "name": "User",
-                "children": [
-                    {
-                        "id": "user_list",
-                        "name": "User-list",
-                        "icon": "yonghu1",
-                        "title": "User",
-                        "url": "/system-manager/user",
-                        "operation": ["View", "Add", "Edit", "Delete"],
-                    },
-                ],
-            },
-            {
-                "name": "Group",
-                "children": [
-                    {
-                        "id": "group_list",
-                        "name": "Group-list",
-                        "icon": "jiedianhuiyuanfenzu",
-                        "title": "Group",
-                        "url": "/system-manager/group",
-                        "operation": ["View", "Add", "Edit", "Delete"],
-                    },
-                ],
-            },
-            {
-                "name": "Application",
-                "children": [
-                    {
-                        "id": "application_list",
-                        "name": "Application-list",
-                        "icon": "guanli",
-                        "title": "Application",
-                        "url": "/system-manager/role",
-                        "operation": ["View"],
-                    },
-                    {
-                        "id": "applicaiton_role",
-                        "name": "Application-role",
-                        "icon": "guanliyuan_jiaoseguanli",
-                        "title": "Role",
-                        "url": "/system-manager/role/manage",
-                        "operation": ["View", "Edit", "Add", "Add user", "Edit Permission", "Delete"],
-                    },
-                ],
-            },
-        ],
-        "roles": [
-            {"name": "admin", "role_name": "system-manager_admin", "menus": []},
-            {"name": "normal", "role_name": "system-manager_normal", "menus": ["user_list-View", "group_list-View"]},
-        ],
-    },
-]
+                    "skill_setting-View"
+                ]
+            }
+        ]
+    }
