@@ -1,31 +1,40 @@
-from apps.core.logger import logger
+import json
+import logging
+
+from django.core.management import BaseCommand
+
 from apps.core.utils.keycloak_client import KeyCloakClient
 from apps.system_mgmt.templates.init_menus import MENUS
 
+logger = logging.getLogger(__name__)
 
-def init_apps(**kwargs):
-    print("init client start")
-    client = KeyCloakClient()
-    for app_obj in MENUS:
-        payload = {
-            "clientId": app_obj["client_id"],
-            "name": app_obj["name"],
-            "description": app_obj["description"],
-            "baseUrl": app_obj["url"],
-            "serviceAccountsEnabled": True,
-            "directAccessGrantsEnabled": True,
-            "authorizationServicesEnabled": True,
-        }
-        client_id = client.realm_client.create_client(payload, True)
-        print(f"create {app_obj['client_id']} success")
-        resource = client.realm_client.get_client_authz_resources(client_id)
-        default_resource = [i for i in resource if i["name"] == "Default Resource"]
-        if default_resource:
-            client.realm_client.delete_client_authz_resource(client_id, default_resource[0]["_id"])
-        create_resource(client_id, app_obj["menus"], client)
-        print(f"create {app_obj['client_id']} resource success")
-        create_default_roles(client_id, client, app_obj["roles"])
-        print(f"create {app_obj['client_id']} roles success")
+
+class Command(BaseCommand):
+    help = "初始化Realm资源数据"
+
+    def handle(self, *args, **options):
+        keycloak_client = KeyCloakClient()
+
+        for app_obj in MENUS:
+            payload = {
+                "clientId": app_obj["client_id"],
+                "name": app_obj["name"],
+                "description": app_obj["description"],
+                "baseUrl": app_obj["url"],
+                "serviceAccountsEnabled": True,
+                "directAccessGrantsEnabled": True,
+                "authorizationServicesEnabled": True,
+            }
+            client_id = keycloak_client.realm_client.create_client(payload, True)
+            print(f"create {app_obj['client_id']} success")
+            resource = keycloak_client.realm_client.get_client_authz_resources(client_id)
+            default_resource = [i for i in resource if i["name"] == "Default Resource"]
+            if default_resource:
+                keycloak_client.realm_client.delete_client_authz_resource(client_id, default_resource[0]["_id"])
+            create_resource(client_id, app_obj["menus"], keycloak_client)
+            print(f"create {app_obj['client_id']} resource success")
+            create_default_roles(client_id, keycloak_client, app_obj["roles"])
+            print(f"create {app_obj['client_id']} roles success")
 
 
 def create_resource(client_id, menus, client):
