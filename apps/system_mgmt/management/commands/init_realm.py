@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 
 from django.core.management import BaseCommand
 
@@ -55,3 +56,8 @@ class Command(BaseCommand):
         new_secret = keycloak_client.realm_client.generate_client_secrets(target_client["id"])
         print(f"New secret generated: {new_secret['value']}")
         print(f"export KEYCLOAK_WEB_CLIENT_SECRET={new_secret['value']}")
+
+        if os.path.exists('/tmp'):
+            with open('/tmp/keycloak_web_secret.env', 'w') as f:
+                content = f'KEYCLOAK_WEB_CLIENT_SECRET={new_secret["value"]}'
+                f.write(content)
