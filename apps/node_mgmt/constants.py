@@ -56,10 +56,12 @@ compression_codec=1
 if default_sidecar_mode == "nats":
     TELEGRAF_CONFIG += """
 [[outputs.nats]]
-servers = ["nats://${NATS_SERVERS}"]
-name = "${node.ip}"
+servers = ["${NATS_SERVERS}"]
+name = "${node.ip}-${node.cloud_region}"
 username = "${NATS_USERNAME}"
 password = "${NATS_PASSWORD}"
-subject = "NATS_SUBJECT"
+subject = "${NATS_SUBJECT}.${node.ip_filter}"
 data_format = "influx"
+[outputs.nats.jetstream]
+name = "metrics-${node.cloud_region}-${node.ip_filter}"
 """

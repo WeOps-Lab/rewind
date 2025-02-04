@@ -201,6 +201,7 @@ class Sidecar:
             "node__cloud_region": node_obj.cloud_region_id,
             "node__name": node_obj.name,
             "node__ip": node_obj.ip,
+            "node__ip_filter": node_obj.ip.replace(".", "-").replace("*", "-").replace("*", ">"),
             "node__operating_system": node_obj.operating_system,
             "node__collector_configuration_directory": node_obj.collector_configuration_directory,
         }
