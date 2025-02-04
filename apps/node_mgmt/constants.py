@@ -64,4 +64,6 @@ subject = "${NATS_SUBJECT}.${node.ip_filter}"
 data_format = "influx"
 [outputs.nats.jetstream]
 name = "metrics-${node.cloud_region}-${node.ip_filter}"
+max_age = "20m"
+max_bytes = 104857600
 """
