@@ -57,13 +57,8 @@ if default_sidecar_mode == "nats":
     TELEGRAF_CONFIG += """
 [[outputs.nats]]
 servers = ["${NATS_SERVERS}"]
-name = "${node.ip}-${node.cloud_region}"
 username = "${NATS_USERNAME}"
 password = "${NATS_PASSWORD}"
-subject = "${NATS_SUBJECT}.${node.ip_filter}"
+subject = "metrics.${node.ip_filter}"
 data_format = "influx"
-[outputs.nats.jetstream]
-name = "metrics-${node.cloud_region}-${node.ip_filter}"
-max_age = "20m"
-max_bytes = 104857600
 """
