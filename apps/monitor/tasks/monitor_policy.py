@@ -34,42 +34,77 @@ def scan_policy_task(policy_id):
     logger.info("end to update monitor instance grouping rule")
 
 
-def new_value(metric_query, start, end, step, group_by):
+def _sum(metric_query, start, end, step, group_by):
+    query = f"sum({metric_query}) by ({group_by})"
+    metrics = VictoriaMetricsAPI().query_range(query, start, end, step)
+    return metrics
+
+
+def _avg(metric_query, start, end, step, group_by):
+    query = f"avg({metric_query}) by ({group_by})"
+    metrics = VictoriaMetricsAPI().query_range(query, start, end, step)
+    return metrics
+
+
+def _max(metric_query, start, end, step, group_by):
+    query = f"max({metric_query}) by ({group_by})"
+    metrics = VictoriaMetricsAPI().query_range(query, start, end, step)
+    return metrics
+
+
+def _min(metric_query, start, end, step, group_by):
+    query = f"min({metric_query}) by ({group_by})"
+    metrics = VictoriaMetricsAPI().query_range(query, start, end, step)
+    return metrics
+
+
+def _count(metric_query, start, end, step, group_by):
+    query = f"count({metric_query}) by ({group_by})"
+    metrics = VictoriaMetricsAPI().query_range(query, start, end, step)
+    return metrics
+
+
+def last_over_time(metric_query, start, end, step, group_by):
     query = f"any(last_over_time({metric_query})) by ({group_by})"
     metrics = VictoriaMetricsAPI().query_range(query, start, end, step)
     return metrics
 
 
-def max_value(metric_query, start, end, step, group_by):
+def max_over_time(metric_query, start, end, step, group_by):
     query = f"any(max_over_time({metric_query})) by ({group_by})"
     metrics = VictoriaMetricsAPI().query_range(query, start, end, step)
     return metrics
 
 
-def min_value(metric_query, start, end, step, group_by):
+def min_over_time(metric_query, start, end, step, group_by):
     query = f"any(min_over_time({metric_query})) by ({group_by})"
     metrics = VictoriaMetricsAPI().query_range(query, start, end, step)
     return metrics
 
 
-def avg_value(metric_query, start, end, step, group_by):
+def avg_over_time(metric_query, start, end, step, group_by):
     query = f"any(avg_over_time({metric_query})) by ({group_by})"
     metrics = VictoriaMetricsAPI().query_range(query, start, end, step)
     return metrics
 
 
-def sum_value(metric_query, start, end, step, group_by):
+def sum_over_time(metric_query, start, end, step, group_by):
     query = f"any(sum_over_time({metric_query})) by ({group_by})"
     metrics = VictoriaMetricsAPI().query_range(query, start, end, step)
     return metrics
 
 
 METHOD = {
-    "sum": sum_value,
-    "avg": avg_value,
-    "max": max_value,
-    "min": min_value,
-    "new": new_value,
+    "sum": _sum,
+    "avg": _avg,
+    "max": _max,
+    "min": _min,
+    "count": _count,
+    "max_over_time": max_over_time,
+    "min_over_time": min_over_time,
+    "avg_over_time": avg_over_time,
+    "sum_over_time": sum_over_time,
+    "last_over_time": last_over_time,
 }
 
 
