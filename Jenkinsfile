@@ -38,7 +38,7 @@ pipeline {
        stage('构建镜像') {
             steps {
                 script {
-                    sh "sudo docker build -f ./support-files/docker/Dockerfile -t ${IMAGE_NAME}:${IMAGE_TAG} ."
+                    sh "docker build -f ./support-files/docker/Dockerfile -t ${IMAGE_NAME}:${IMAGE_TAG} ."
                 }
             }
        }
@@ -46,7 +46,7 @@ pipeline {
        stage('推送镜像'){
             steps {
                 script {
-                    sh "sudo docker push  ${IMAGE_NAME}:${IMAGE_TAG}"
+                    sh "docker push  ${IMAGE_NAME}:${IMAGE_TAG}"
                 }
             }
        }
