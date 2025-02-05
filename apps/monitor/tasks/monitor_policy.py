@@ -322,38 +322,6 @@ class MonitorPolicyScan:
         MonitorAlert.objects.filter(id__in=ids, info_event_count__gte=self.policy.recovery_condition).update(
             status="recovered", end_event_time=datetime.now(timezone.utc), operator="system")
 
-        # _period = {
-        #     "type": self.policy.period["type"],
-        #     "value": self.policy.period["value"] * self.policy.recovery_condition
-        # }
-        # _aggregration_metrics = self.query_aggregration_metrics(_period, self.policy.recovery_condition)
-        # _aggregation_result = self.format_aggregration_metrics_v2(_aggregration_metrics, self.policy.recovery_condition)
-        #
-        # recovery_alert_instance_ids = []
-        #
-        # active_alert_instance_ids = {alert.monitor_instance_id for alert in self.active_alerts}
-        # for instance_id, values in _aggregation_result.items():
-        #     if instance_id not in active_alert_instance_ids:
-        #         continue
-        #     # 都是info级别，告警恢复
-        #     is_info = True
-        #     for value in values:
-        #         for threshold_info in self.policy.threshold:
-        #             method = THRESHOLD_METHODS.get(threshold_info["method"])
-        #             if not method:
-        #                 raise ValueError("invalid threshold method")
-        #             if method(value, threshold_info["value"]):
-        #                 is_info = False
-        #                 break
-        #     if is_info:
-        #         recovery_alert_instance_ids.append(instance_id)
-        #
-        # MonitorAlert.objects.filter(
-        #     policy_id=self.policy.id,
-        #     monitor_instance_id__in=recovery_alert_instance_ids,
-        #     status="new",
-        # ).update(status="recovered", end_event_time=datetime.now(timezone.utc), operator="system")
-
     def recovery_no_data_alert(self):
         """无数据告警恢复"""
         if not self.policy.no_data_recovery_period:
@@ -508,6 +476,22 @@ class MonitorPolicyScan:
 
         MonitorAlert.objects.bulk_create(create_alerts, batch_size=200)
 
+    def count_events(self, alert_events, info_events):
+        """计数事件"""
+        alerts_map = {i.monitor_instance_id : i.id for i in self.active_alerts if i.alert_type == "alert"}
+        info_alerts = {alerts_map[event["instance_id"]] for event in info_events if event["instance_id"] in alerts_map}
+        alert_alerts = {alerts_map[event["instance_id"]] for event in alert_events if event["instance_id"] in alerts_map}
+        self.add_count_alert_event(info_alerts)
+        self.clear_count_alert_event(alert_alerts)
+
+    def clear_count_alert_event(self, ids):
+        """清除计数告警事件"""
+        MonitorAlert.objects.filter(id__in=list(ids)).update(info_event_count=0)
+
+    def add_count_alert_event(self, ids):
+        """添加计数告警事件"""
+        MonitorAlert.objects.filter(id__in=list(ids)).update(info_event_count=F("info_event_count") + 1)
+
     def run(self):
         """运行"""
         self.set_monitor_obj_instance_key()
@@ -530,19 +514,3 @@ class MonitorPolicyScan:
         event_objs = self.create_events(alert_events + no_data_events)
         self.handle_alert_events(event_objs)
         self.notice(event_objs)
-
-    def count_events(self, alert_events, info_events):
-        """计数事件"""
-        alerts_map = {i.monitor_instance_id : i.id for i in self.active_alerts if i.alert_type == "alert"}
-        info_alerts = {alerts_map[event["instance_id"]] for event in info_events if event["instance_id"] in alerts_map}
-        alert_alerts = {alerts_map[event["instance_id"]] for event in alert_events if event["instance_id"] in alerts_map}
-        self.add_count_alert_event(info_alerts)
-        self.clear_count_alert_event(alert_alerts)
-
-    def clear_count_alert_event(self, ids):
-        """清除计数告警事件"""
-        MonitorAlert.objects.filter(id__in=list(ids)).update(info_event_count=0)
-
-    def add_count_alert_event(self, ids):
-        """添加计数告警事件"""
-        MonitorAlert.objects.filter(id__in=list(ids)).update(info_event_count=F("info_event_count") + 1)
