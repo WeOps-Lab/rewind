@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 
 from django.conf.global_settings import DEFAULT_FROM_EMAIL
 from django.core.mail import send_mail
-
+from django.db.models import F
 from apps.monitor.constants import THRESHOLD_METHODS, LEVEL_WEIGHT, MONITOR_OBJS
 from apps.monitor.models import MonitorPolicy, MonitorInstanceOrganization, MonitorAlert, MonitorEvent, MonitorInstance, \
     Metric, MonitorEventRawData
@@ -34,42 +34,77 @@ def scan_policy_task(policy_id):
     logger.info("end to update monitor instance grouping rule")
 
 
-def new_value(metric_query, start, end, step, group_by):
+def _sum(metric_query, start, end, step, group_by):
+    query = f"sum({metric_query}) by ({group_by})"
+    metrics = VictoriaMetricsAPI().query_range(query, start, end, step)
+    return metrics
+
+
+def _avg(metric_query, start, end, step, group_by):
+    query = f"avg({metric_query}) by ({group_by})"
+    metrics = VictoriaMetricsAPI().query_range(query, start, end, step)
+    return metrics
+
+
+def _max(metric_query, start, end, step, group_by):
+    query = f"max({metric_query}) by ({group_by})"
+    metrics = VictoriaMetricsAPI().query_range(query, start, end, step)
+    return metrics
+
+
+def _min(metric_query, start, end, step, group_by):
+    query = f"min({metric_query}) by ({group_by})"
+    metrics = VictoriaMetricsAPI().query_range(query, start, end, step)
+    return metrics
+
+
+def _count(metric_query, start, end, step, group_by):
+    query = f"count({metric_query}) by ({group_by})"
+    metrics = VictoriaMetricsAPI().query_range(query, start, end, step)
+    return metrics
+
+
+def last_over_time(metric_query, start, end, step, group_by):
     query = f"any(last_over_time({metric_query})) by ({group_by})"
     metrics = VictoriaMetricsAPI().query_range(query, start, end, step)
     return metrics
 
 
-def max_value(metric_query, start, end, step, group_by):
+def max_over_time(metric_query, start, end, step, group_by):
     query = f"any(max_over_time({metric_query})) by ({group_by})"
     metrics = VictoriaMetricsAPI().query_range(query, start, end, step)
     return metrics
 
 
-def min_value(metric_query, start, end, step, group_by):
+def min_over_time(metric_query, start, end, step, group_by):
     query = f"any(min_over_time({metric_query})) by ({group_by})"
     metrics = VictoriaMetricsAPI().query_range(query, start, end, step)
     return metrics
 
 
-def avg_value(metric_query, start, end, step, group_by):
+def avg_over_time(metric_query, start, end, step, group_by):
     query = f"any(avg_over_time({metric_query})) by ({group_by})"
     metrics = VictoriaMetricsAPI().query_range(query, start, end, step)
     return metrics
 
 
-def sum_value(metric_query, start, end, step, group_by):
+def sum_over_time(metric_query, start, end, step, group_by):
     query = f"any(sum_over_time({metric_query})) by ({group_by})"
     metrics = VictoriaMetricsAPI().query_range(query, start, end, step)
     return metrics
 
 
 METHOD = {
-    "sum": sum_value,
-    "avg": avg_value,
-    "max": max_value,
-    "min": min_value,
-    "new": new_value,
+    "sum": _sum,
+    "avg": _avg,
+    "max": _max,
+    "min": _min,
+    "count": _count,
+    "max_over_time": max_over_time,
+    "min_over_time": min_over_time,
+    "avg_over_time": avg_over_time,
+    "sum_over_time": sum_over_time,
+    "last_over_time": last_over_time,
 }
 
 
@@ -224,11 +259,12 @@ class MonitorPolicyScan:
         """告警事件"""
         aggregration_metrics = self.query_aggregration_metrics(self.policy.period)
         aggregation_result = self.format_aggregration_metrics(aggregration_metrics)
-        events = []
+        alert_events, info_events = [], []
 
         # 计算告警事件
         for instance_id, info in aggregation_result.items():
             value = info["value"]
+            is_info = True
             for threshold_info in self.policy.threshold:
                 method = THRESHOLD_METHODS.get(threshold_info["method"])
                 if not method:
@@ -243,10 +279,17 @@ class MonitorPolicyScan:
                         "content":  content,
                         "raw_data": info["raw_data"],
                     }
-                    events.append(event)
+                    alert_events.append(event)
+                    is_info = False
                     break
-
-        return events
+            if is_info:
+                info_events.append({
+                    "instance_id": instance_id,
+                    "value": value,
+                    "level": "info",
+                    "content": "info",
+                })
+        return alert_events, info_events
 
     def no_data_event(self):
         """无数据告警事件"""
@@ -273,37 +316,11 @@ class MonitorPolicyScan:
         """告警恢复"""
         if self.policy.recovery_condition <= 0:
             return
-        _period = {
-            "type": self.policy.period["type"],
-            "value": self.policy.period["value"] * self.policy.recovery_condition
-        }
-        _aggregration_metrics = self.query_aggregration_metrics(_period, self.policy.recovery_condition)
-        _aggregation_result = self.format_aggregration_metrics_v2(_aggregration_metrics, self.policy.recovery_condition)
 
-        recovery_alert_instance_ids = []
+        ids = [i.id for i in self.active_alerts if i.alert_type == "alert"]
 
-        active_alert_instance_ids = {alert.monitor_instance_id for alert in self.active_alerts}
-        for instance_id, values in _aggregation_result.items():
-            if instance_id not in active_alert_instance_ids:
-                continue
-            # 都是info级别，告警恢复
-            is_info = True
-            for value in values:
-                for threshold_info in self.policy.threshold:
-                    method = THRESHOLD_METHODS.get(threshold_info["method"])
-                    if not method:
-                        raise ValueError("invalid threshold method")
-                    if method(value, threshold_info["value"]):
-                        is_info = False
-                        break
-            if is_info:
-                recovery_alert_instance_ids.append(instance_id)
-
-        MonitorAlert.objects.filter(
-            policy_id=self.policy.id,
-            monitor_instance_id__in=recovery_alert_instance_ids,
-            status="new",
-        ).update(status="recovered", end_event_time=datetime.now(timezone.utc), operator="system")
+        MonitorAlert.objects.filter(id__in=ids, info_event_count__gte=self.policy.recovery_condition).update(
+            status="recovered", end_event_time=datetime.now(timezone.utc), operator="system")
 
     def recovery_no_data_alert(self):
         """无数据告警恢复"""
@@ -459,14 +476,35 @@ class MonitorPolicyScan:
 
         MonitorAlert.objects.bulk_create(create_alerts, batch_size=200)
 
+    def count_events(self, alert_events, info_events):
+        """计数事件"""
+        alerts_map = {i.monitor_instance_id : i.id for i in self.active_alerts if i.alert_type == "alert"}
+        info_alerts = {alerts_map[event["instance_id"]] for event in info_events if event["instance_id"] in alerts_map}
+        alert_alerts = {alerts_map[event["instance_id"]] for event in alert_events if event["instance_id"] in alerts_map}
+        self.add_count_alert_event(info_alerts)
+        self.clear_count_alert_event(alert_alerts)
+
+    def clear_count_alert_event(self, ids):
+        """清除计数告警事件"""
+        MonitorAlert.objects.filter(id__in=list(ids)).update(info_event_count=0)
+
+    def add_count_alert_event(self, ids):
+        """添加计数告警事件"""
+        MonitorAlert.objects.filter(id__in=list(ids)).update(info_event_count=F("info_event_count") + 1)
+
     def run(self):
         """运行"""
         self.set_monitor_obj_instance_key()
 
         # 告警事件
-        alert_events =  self.alert_event()
+        alert_events, info_events = self.alert_event()
+
+        # 正常、异常事件计数
+        self.count_events(alert_events, info_events)
+
         # 无数据事件
         no_data_events = self.no_data_event()
+
         # 告警恢复
         self.recovery_alert()
         # 无数据告警恢复
