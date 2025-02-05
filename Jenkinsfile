@@ -31,7 +31,7 @@ pipeline {
 
         stage('克隆代码仓库') {
             steps {
-                git url: '${env.GITHUB_PROXY}https://github.com/WeOps-Lab/rewind', branch: BRANCH_NAME
+                git url: 'https://ghfast.top/https://github.com/WeOps-Lab/rewind', branch: BRANCH_NAME
             }
        }
 
