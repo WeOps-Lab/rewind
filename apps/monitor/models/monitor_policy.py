@@ -90,6 +90,7 @@ class MonitorAlert(TimeInfo):
     start_event_time = models.DateTimeField(blank=True, null=True, verbose_name='开始事件时间')
     end_event_time = models.DateTimeField(blank=True, null=True, verbose_name='结束事件时间')
     operator = models.CharField(blank=True, null=True, max_length=50, verbose_name='告警处理人')
+    info_event_count = models.IntegerField(default=0, verbose_name='信息事件数量')
 
     class Meta:
         verbose_name = '监控告警'
