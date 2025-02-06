@@ -9,7 +9,7 @@ class SettingLanguage:
         default_language = os.getenv("DEFAULT_LANGUAGE")
         if default_language:
             language = default_language
-        if language == "zh-Hans":
+        if language == "zh-CN":
             from apps.monitor.language.pack.zh import LANGUAGE_DICT
         elif language == "en":
             from apps.monitor.language.pack.en import LANGUAGE_DICT
