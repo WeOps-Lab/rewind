@@ -60,3 +60,4 @@ jsonpickle==3.4.2
 nats-py==2.9.0
 
 adrf==0.1.9
+pyarmor==9.0.7

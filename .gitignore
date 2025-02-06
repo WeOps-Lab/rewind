@@ -19,3 +19,5 @@ USERRES
 staticfiles/
 local_settings.py
 requirements.txt
+dist
+*.log
