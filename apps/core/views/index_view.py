@@ -30,6 +30,12 @@ def login_info(request):
 
 def get_client(request):
     client = SystemMgmt()
+    return_data = client.get_client("")
+    return JsonResponse(return_data)
+
+
+def get_my_client(request):
+    client = SystemMgmt()
     client_id = os.getenv("CLIENT_ID", "")
     return_data = client.get_client(client_id)
     return JsonResponse(return_data)
