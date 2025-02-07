@@ -90,7 +90,9 @@
           "url": "/opspilot/skill/detail/settings",
           "operation": [
             "View",
-            "Edit"
+            "Edit",
+            "Test",
+            "Mark"
           ]
         },
         {
