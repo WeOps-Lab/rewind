@@ -14,9 +14,11 @@ class RoleManage(object):
     def __init__(self):
         self.keycloak_client = KeyCloakClient()
 
-    def get_role_list(self, client_id):
+    def get_role_list(self, client_ids):
         """角色列表"""
-        policies = self.keycloak_client.realm_client.get_client_authz_policies(client_id)
+        policies = []
+        for client_id in client_ids:
+            policies.extend(self.keycloak_client.realm_client.get_client_authz_policies(client_id))
         all_roles = self.keycloak_client.get_realm_roles()
         role_map = {i["id"]: i["name"] for i in all_roles}
         roles = [

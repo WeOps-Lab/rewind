@@ -23,10 +23,10 @@ class UserViewSet(viewsets.ViewSet):
         data = UserManage().user_all()
         return JsonResponse({"result": True, "data": data})
 
-    @action(detail=False, methods=["GET"])
+    @action(detail=False, methods=["POST"])
     def get_user_detail(self, request):
-        pk = request.GET.get("user_id")
-        client_id = request.GET.get("id")
+        pk = request.data.get("user_id")
+        client_id = request.data.get("id")
         data = UserManage().get_user_info(pk, client_id)
         return JsonResponse({"result": True, "data": data})
 

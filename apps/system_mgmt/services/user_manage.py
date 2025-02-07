@@ -35,10 +35,10 @@ class UserManage(object):
         users = self.keycloak_client.realm_client.get_users()
         return users
 
-    def get_user_info(self, user_id, client_id):
+    def get_user_info(self, user_id, client_ids):
         """获取用户信息"""
         user_info = self.keycloak_client.realm_client.get_user(user_id)
-        roles = self.get_user_roles(client_id, user_id)
+        roles = self.get_user_roles(client_ids, user_id)
         try:
             groups = self.keycloak_client.realm_client.get_user_groups(user_id)
         except Exception:
@@ -48,13 +48,14 @@ class UserManage(object):
         user_info.update(groups=groups)
         return user_info
 
-    def get_user_roles(self, client_id, user_id):
-        roles = []
+    def get_user_roles(self, client_ids, user_id):
         user_roles = self.keycloak_client.get_realm_roles_of_user(user_id)
         role_map = {role["id"]: role["name"] for role in user_roles}
 
         # Fetch policies once
-        policies = self.keycloak_client.realm_client.get_client_authz_policies(client_id)
+        policies = []
+        for client_id in client_ids:
+            policies.extend(self.keycloak_client.realm_client.get_client_authz_policies(client_id))
 
         # Build policy map for quick lookup
         policy_map = {

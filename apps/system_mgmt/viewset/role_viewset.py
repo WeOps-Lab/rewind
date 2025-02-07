@@ -7,9 +7,11 @@ from apps.system_mgmt.services.user_manage import UserManage
 
 
 class RoleViewSet(viewsets.ViewSet):
-    @action(detail=False, methods=["GET"])
+    @action(detail=False, methods=["POST"])
     def search_role_list(self, request):
-        client_id = request.GET.get("client_id")
+        client_id = request.data.get("client_id", [])
+        if not isinstance(client_id, list):
+            client_id = [client_id]
         data = RoleManage().get_role_list(client_id)
         return JsonResponse({"result": True, "data": data})
 
