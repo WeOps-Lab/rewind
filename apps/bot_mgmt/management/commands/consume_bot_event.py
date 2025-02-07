@@ -71,6 +71,7 @@ class Command(BaseCommand):
                     )
                 )
                 channel = connection.channel()
+                channel.queue_declare(queue="pilot", durable=True)
                 channel.basic_consume("pilot", on_message)
                 try:
                     channel.start_consuming()
