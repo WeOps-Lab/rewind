@@ -1,12 +1,15 @@
 import datetime
 import hashlib
 import json
+import time
 
+from django.conf import settings
 from django.db.models import Count, Sum
 from django.db.models.functions import TruncDate
 from django.http import FileResponse, JsonResponse
 from django_minio_backend import MinioBackend
 
+from apps.base.models import UserAPISecret
 from apps.bot_mgmt.models import Bot, BotConversationHistory
 from apps.bot_mgmt.models.bot import BotChannel
 from apps.bot_mgmt.services.skill_excute_service import SkillExecuteService
@@ -15,7 +18,8 @@ from apps.bot_mgmt.utils import get_client_ip, insert_skill_log, set_time_range
 # from apps.core.decorators.api_perminssion import HasRole
 from apps.core.logger import logger
 from apps.core.utils.exempt import api_exempt
-from apps.model_provider_mgmt.models import TokenConsumption
+from apps.model_provider_mgmt.models import LLMSkill, TokenConsumption
+from apps.model_provider_mgmt.services.llm_service import llm_service
 
 
 @api_exempt
@@ -64,6 +68,64 @@ def model_download(request):
     response["ETag"] = etag
 
     return response
+
+
+@api_exempt
+def openai_completions(request):
+    kwargs = json.loads(request.body)
+    token = request.META.get("HTTP_AUTHORIZATION") or request.META.get(settings.API_TOKEN_HEADER_NAME)
+    if not token:
+        return JsonResponse({"choices": [{"message": {"role": "user", "content": "No authorization"}}]})
+    token = token.split("Bearer ")[-1]
+    if not UserAPISecret.objects.filter(api_secret=token).exists():
+        return JsonResponse({"choices": [{"message": {"role": "user", "content": "No authorization"}}]})
+    chat_history = [{"text": i["content"], "event": i["role"]} for i in kwargs.get("messages", [])[-2:]]
+    skill_id = kwargs.get("model")
+    skill_obj = LLMSkill.objects.filter(id=skill_id).first()
+    if not skill_obj:
+        return JsonResponse({"choices": [{"message": {"role": "user", "content": "No skill"}}]})
+    params = {
+        "llm_model": skill_obj.llm_model_id,
+        "skill_prompt": kwargs.get("prompt", "") or skill_obj.skill_prompt,
+        "temperature": kwargs.get("temperature") or skill_obj.temperature,
+        "chat_history": chat_history,
+        "user_message": chat_history[-1]["text"],
+        "conversation_window_size": kwargs.get("conversation_window_size") or skill_obj.conversation_window_size,
+        "enable_rag": kwargs.get("enable_rag") or skill_obj.enable_rag,
+        "rag_score_threshold": [
+            {"knowledge_base": int(key), "score": float(value)}
+            for key, value in skill_obj.rag_score_threshold_map.items()
+        ],
+        "enable_rag_knowledge_source": skill_obj.enable_rag_knowledge_source,
+    }
+    data, doc_map, title_map = llm_service.invoke_chat(params)
+    content = data["content"]
+    if skill_obj.enable_rag_knowledge_source:
+        knowledge_titles = {doc_map.get(k, {}).get("name") for k in title_map.keys()}
+        last_content = content.strip().split("\n")[-1]
+        if "引用知识" not in last_content and knowledge_titles:
+            content += "\n"
+            content += f'引用知识: {", ".join(knowledge_titles)}'
+    return_data = {
+        "id": skill_obj.name,
+        "object": "chat.completion",
+        "created": int(time.time()),
+        "model": kwargs["model"],
+        "usage": {
+            "prompt_tokens": data["input_tokens"],
+            "completion_tokens": data["output_tokens"],
+            "total_tokens": data["input_tokens"] + data["output_tokens"],
+            "completion_tokens_details": {
+                "reasoning_tokens": 0,
+                "accepted_prediction_tokens": 0,
+                "rejected_prediction_tokens": 0,
+            },
+        },
+        "choices": [
+            {"message": {"role": "user", "content": content}, "logprobs": None, "finish_reason": "stop", "index": 0}
+        ],
+    }
+    return JsonResponse(return_data)
 
 
 @api_exempt

@@ -14,30 +14,8 @@ class LLMService:
         self.knowledge_search_service = KnowledgeSearchService()
 
     def chat(self, kwargs: dict):
-        llm_model = LLMModel.objects.get(id=kwargs["llm_model"])
-        context = ""
-        title_map = doc_map = {}
         citing_knowledge = []
-        if kwargs["enable_rag"]:
-            context, title_map, doc_map = self.search_doc(context, kwargs)
-        chat_server = RemoteRunnable(settings.OPENAI_CHAT_SERVICE_URL)
-        chat_kwargs = {
-            "system_message_prompt": kwargs["skill_prompt"],
-            "openai_api_base": llm_model.decrypted_llm_config["openai_base_url"],
-            "openai_api_key": llm_model.decrypted_llm_config["openai_api_key"],
-            "temperature": kwargs["temperature"],
-            "model": llm_model.decrypted_llm_config["model"],
-            "user_message": kwargs["user_message"],
-            "chat_history": kwargs["chat_history"],
-            "conversation_window_size": kwargs["conversation_window_size"],
-            "rag_context": context,
-        }
-        result = chat_server.invoke(chat_kwargs)
-        if type(result) == str:
-            result = json.loads(result)
-        if not result["result"]:
-            raise Exception(result["message"])
-        data = result["data"]
+        data, doc_map, title_map = self.invoke_chat(kwargs)
         if "bot_id" in kwargs:
             TokenConsumption.objects.create(
                 bot_id=kwargs["bot_id"],
@@ -59,6 +37,32 @@ class LLMService:
                 for k, v in title_map.items()
             ]
         return {"content": data["content"], "citing_knowledge": citing_knowledge}
+
+    def invoke_chat(self, kwargs):
+        llm_model = LLMModel.objects.get(id=kwargs["llm_model"])
+        context = ""
+        title_map = doc_map = {}
+        if kwargs["enable_rag"]:
+            context, title_map, doc_map = self.search_doc(context, kwargs)
+        chat_server = RemoteRunnable(settings.OPENAI_CHAT_SERVICE_URL)
+        chat_kwargs = {
+            "system_message_prompt": kwargs["skill_prompt"],
+            "openai_api_base": llm_model.decrypted_llm_config["openai_base_url"],
+            "openai_api_key": llm_model.decrypted_llm_config["openai_api_key"],
+            "temperature": kwargs["temperature"],
+            "model": llm_model.decrypted_llm_config["model"],
+            "user_message": kwargs["user_message"],
+            "chat_history": kwargs["chat_history"],
+            "conversation_window_size": kwargs["conversation_window_size"],
+            "rag_context": context,
+        }
+        result = chat_server.invoke(chat_kwargs)
+        if isinstance(result, str):
+            result = json.loads(result)
+        if not result["result"]:
+            raise Exception(result["message"])
+        data = result["data"]
+        return data, doc_map, title_map
 
     def search_doc(self, context, kwargs):
         title_map = {}
