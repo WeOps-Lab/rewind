@@ -20,18 +20,21 @@ logger = logging.getLogger("app")
 @shared_task
 def scan_policy_task(policy_id):
     """扫描监控策略"""
-    logger.info("start to update monitor instance grouping rule")
+    logger.info(f"start to update monitor instance grouping rule, [{policy_id}]")
 
     policy_obj = MonitorPolicy.objects.filter(id=policy_id).select_related("monitor_object").first()
     if not policy_obj:
         raise ValueError(f"No MonitorPolicy found with id {policy_id}")
 
     if policy_obj.enable:
-        policy_obj.last_run_time = datetime.now(timezone.utc)           # 更新最后执行时间
+        if not policy_obj.last_run_time:
+            policy_obj.last_run_time = datetime.now(timezone.utc)
+        policy_obj.last_run_time = datetime.fromtimestamp(policy_obj.last_run_time.timestamp() + period_to_seconds(policy_obj.period), tz=timezone.utc)
         policy_obj.save()
+        # todo start-end时间抽离出来
         MonitorPolicyScan(policy_obj).run()                        # 执行监控策略
 
-    logger.info("end to update monitor instance grouping rule")
+    logger.info(f"end to update monitor instance grouping rule, [{policy_id}]")
 
 
 def _sum(metric_query, start, end, step, group_by):
@@ -92,6 +95,20 @@ def sum_over_time(metric_query, start, end, step, group_by):
     query = f"any(sum_over_time({metric_query})) by ({group_by})"
     metrics = VictoriaMetricsAPI().query_range(query, start, end, step)
     return metrics
+
+
+def period_to_seconds(period):
+    """周期转换为秒"""
+    if not period:
+        raise ValueError("policy period is empty")
+    if period["type"] == "min":
+        return period["value"] * 60
+    elif period["type"] == "hour":
+        return period["value"] * 3600
+    elif period["type"] == "day":
+        return period["value"] * 86400
+    else:
+        raise ValueError(f"invalid period type: {period['type']}")
 
 
 METHOD = {
@@ -169,19 +186,6 @@ class MonitorPolicyScan:
         else:
             raise ValueError(f"invalid period type: {period['type']}")
 
-    def period_to_seconds(self, period):
-        """周期转换为秒"""
-        if not period:
-            raise ValueError("policy period is empty")
-        if period["type"] == "min":
-            return period["value"] * 60
-        elif period["type"] == "hour":
-            return period["value"] * 3600
-        elif period["type"] == "day":
-            return period["value"] * 86400
-        else:
-            raise ValueError(f"invalid period type: {period['type']}")
-
     def format_pmq(self):
         """格式化PMQ"""
 
@@ -205,8 +209,8 @@ class MonitorPolicyScan:
 
     def query_aggregration_metrics(self, period, points=1):
         """查询指标"""
-        end_timestamp = int(datetime.now(timezone.utc).timestamp())
-        period_seconds = self.period_to_seconds(period)
+        end_timestamp = int(self.policy.last_run_time.timestamp())
+        period_seconds = period_to_seconds(period)
         start_timestamp = end_timestamp - period_seconds
 
         query = self.format_pmq()
@@ -258,9 +262,11 @@ class MonitorPolicyScan:
     def alert_event(self):
         """告警事件"""
         aggregration_metrics = self.query_aggregration_metrics(self.policy.period)
+        # todo 使用pd计算，支持连续多个点满足条件的场景
         aggregation_result = self.format_aggregration_metrics(aggregration_metrics)
         alert_events, info_events = [], []
 
+        # todo 计算算法使用pd计算
         # 计算告警事件
         for instance_id, info in aggregation_result.items():
             value = info["value"]
@@ -513,4 +519,6 @@ class MonitorPolicyScan:
         # 告警事件记录
         event_objs = self.create_events(alert_events + no_data_events)
         self.handle_alert_events(event_objs)
+
+        # 事件通知
         self.notice(event_objs)
