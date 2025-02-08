@@ -1,6 +1,5 @@
 import logging
 import uuid
-from string import Template
 
 from celery.app import shared_task
 from datetime import datetime, timezone
@@ -8,9 +7,10 @@ from datetime import datetime, timezone
 from django.conf.global_settings import DEFAULT_FROM_EMAIL
 from django.core.mail import send_mail
 from django.db.models import F
-from apps.monitor.constants import THRESHOLD_METHODS, LEVEL_WEIGHT, MONITOR_OBJS
+from apps.monitor.constants import LEVEL_WEIGHT, MONITOR_OBJS
 from apps.monitor.models import MonitorPolicy, MonitorInstanceOrganization, MonitorAlert, MonitorEvent, MonitorInstance, \
     Metric, MonitorEventRawData
+from apps.monitor.tasks.task_utils.policy_calculate import vm_to_dataframe, calculate_alerts
 from apps.monitor.utils.system_mgmt_api import SystemMgmtUtils
 from apps.monitor.utils.victoriametrics_api import VictoriaMetricsAPI
 
@@ -31,7 +31,6 @@ def scan_policy_task(policy_id):
             policy_obj.last_run_time = datetime.now(timezone.utc)
         policy_obj.last_run_time = datetime.fromtimestamp(policy_obj.last_run_time.timestamp() + period_to_seconds(policy_obj.period), tz=timezone.utc)
         policy_obj.save()
-        # todo start-end时间抽离出来
         MonitorPolicyScan(policy_obj).run()                        # 执行监控策略
 
     logger.info(f"end to update monitor instance grouping rule, [{policy_id}]")
@@ -259,42 +258,51 @@ class MonitorPolicyScan:
             result[instance_id] = [float(value[1]) for value in values]
         return result
 
+    # def alert_event(self):
+    #     """告警事件"""
+    #     aggregration_metrics = self.query_aggregration_metrics(self.policy.period)
+    #     # todo 使用pd计算，支持连续多个点满足条件的场景
+    #     aggregation_result = self.format_aggregration_metrics(aggregration_metrics)
+    #     alert_events, info_events = [], []
+    #
+    #     # todo 计算算法使用pd计算
+    #     # 计算告警事件
+    #     for instance_id, info in aggregation_result.items():
+    #         value = info["value"]
+    #         is_info = True
+    #         for threshold_info in self.policy.threshold:
+    #             method = THRESHOLD_METHODS.get(threshold_info["method"])
+    #             if not method:
+    #                 raise ValueError("invalid threshold method")
+    #             if method(value, threshold_info["value"]):
+    #                 template = Template(self.policy.alert_name)
+    #                 content = template.safe_substitute(info["raw_data"]["metric"])
+    #                 event = {
+    #                     "instance_id": instance_id,
+    #                     "value": value,
+    #                     "level": threshold_info["level"],
+    #                     "content":  content,
+    #                     "raw_data": info["raw_data"],
+    #                 }
+    #                 alert_events.append(event)
+    #                 is_info = False
+    #                 break
+    #         if is_info:
+    #             info_events.append({
+    #                 "instance_id": instance_id,
+    #                 "value": value,
+    #                 "level": "info",
+    #                 "content": "info",
+    #             })
+    #     return alert_events, info_events
+
     def alert_event(self):
         """告警事件"""
-        aggregration_metrics = self.query_aggregration_metrics(self.policy.period)
-        # todo 使用pd计算，支持连续多个点满足条件的场景
-        aggregation_result = self.format_aggregration_metrics(aggregration_metrics)
-        alert_events, info_events = [], []
+        vm_data = self.query_aggregration_metrics(self.policy.period)
+        df = vm_to_dataframe(vm_data.get("data", {}).get("result", []), [self.instance_id_key])
 
-        # todo 计算算法使用pd计算
-        # 计算告警事件
-        for instance_id, info in aggregation_result.items():
-            value = info["value"]
-            is_info = True
-            for threshold_info in self.policy.threshold:
-                method = THRESHOLD_METHODS.get(threshold_info["method"])
-                if not method:
-                    raise ValueError("invalid threshold method")
-                if method(value, threshold_info["value"]):
-                    template = Template(self.policy.alert_name)
-                    content = template.safe_substitute(info["raw_data"]["metric"])
-                    event = {
-                        "instance_id": instance_id,
-                        "value": value,
-                        "level": threshold_info["level"],
-                        "content":  content,
-                        "raw_data": info["raw_data"],
-                    }
-                    alert_events.append(event)
-                    is_info = False
-                    break
-            if is_info:
-                info_events.append({
-                    "instance_id": instance_id,
-                    "value": value,
-                    "level": "info",
-                    "content": "info",
-                })
+        # 计算告警
+        alert_events, info_events = calculate_alerts(self.policy.alert_name, df, self.policy.threshold)
         return alert_events, info_events
 
     def no_data_event(self):
