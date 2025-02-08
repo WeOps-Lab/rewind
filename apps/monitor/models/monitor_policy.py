@@ -62,12 +62,13 @@ class MonitorEvent(models.Model):
     id = models.CharField(primary_key=True, max_length=50, verbose_name='事件ID')
     policy_id = models.IntegerField(db_index=True, verbose_name='监控策略ID')
     monitor_instance_id = models.CharField(db_index=True, max_length=100, verbose_name='监控对象实例ID')
-
     created_at = models.DateTimeField(db_index=True, auto_now_add=True, verbose_name="事件生成时间" )
     value = models.FloatField(blank=True, null=True, verbose_name='事件值')
     level = models.CharField(max_length=20, choices=LEVEL_CHOICES, verbose_name='事件级别')
     content = models.TextField(blank=True, verbose_name='事件内容')
     notice_result = models.JSONField(default=list, verbose_name='通知结果')
+    class Meta:
+        indexes = [models.Index(fields=["policy_id", "monitor_instance_id", "created_at"])]
 
 
 class MonitorEventRawData(models.Model):
@@ -82,8 +83,8 @@ class MonitorAlert(TimeInfo):
     policy_id = models.IntegerField(db_index=True, default=0, verbose_name='监控策略ID')
     monitor_instance_id = models.CharField(db_index=True, default="", max_length=100, verbose_name='监控对象实例ID')
     monitor_instance_name = models.CharField(default="", max_length=100, verbose_name='监控对象实例名称')
-    alert_type = models.CharField(default="alert", choices=ALERT_TYPE_CHOICES, max_length=50, verbose_name='告警类型')
-    level = models.CharField(default="", max_length=20, verbose_name='最高告警级别')
+    alert_type = models.CharField(db_index=True, default="alert", choices=ALERT_TYPE_CHOICES, max_length=50, verbose_name='告警类型')
+    level = models.CharField(db_index=True, default="", max_length=20, verbose_name='最高告警级别')
     value = models.FloatField(blank=True, null=True, verbose_name='最高告警值')
     content = models.TextField(blank=True, verbose_name='告警内容')
     status = models.CharField(db_index=True, max_length=20, default="new", choices=STATUS_CHOICES, verbose_name='告警状态')
