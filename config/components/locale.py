@@ -10,7 +10,7 @@ USE_TZ = True
 TIME_ZONE = "UTC"
 
 # 语言设置
-LANGUAGE_CODE = "zh-Hans"
+LANGUAGE_CODE = "zh-CN"
 # 国际化设置
 USE_I18N = True
 # 本地化设置
@@ -19,7 +19,7 @@ USE_L10N = True
 # 定义支持的语言
 LANGUAGES = (
     ("en", "English"),
-    ("zh-Hans", "简体中文"),
+    ("zh-CN", "简体中文"),
 )
 
 
