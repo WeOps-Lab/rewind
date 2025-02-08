@@ -6,7 +6,7 @@ import time
 from django.conf import settings
 from django.db.models import Count, Sum
 from django.db.models.functions import TruncDate
-from django.http import FileResponse, JsonResponse
+from django.http import FileResponse, JsonResponse, StreamingHttpResponse
 from django_minio_backend import MinioBackend
 
 from apps.base.models import UserAPISecret
@@ -70,20 +70,26 @@ def model_download(request):
     return response
 
 
-@api_exempt
-def openai_completions(request):
-    kwargs = json.loads(request.body)
-    token = request.META.get("HTTP_AUTHORIZATION") or request.META.get(settings.API_TOKEN_HEADER_NAME)
+def validate_openai_token(token):
+    """Validate the OpenAI API token"""
     if not token:
-        return JsonResponse({"choices": [{"message": {"role": "user", "content": "No authorization"}}]})
+        return False, {"choices": [{"message": {"role": "user", "content": "No authorization"}}]}
     token = token.split("Bearer ")[-1]
     if not UserAPISecret.objects.filter(api_secret=token).exists():
-        return JsonResponse({"choices": [{"message": {"role": "user", "content": "No authorization"}}]})
-    chat_history = [{"text": i["content"], "event": i["role"]} for i in kwargs.get("messages", [])[-2:]]
+        return False, {"choices": [{"message": {"role": "user", "content": "No authorization"}}]}
+    return True, None
+
+
+def get_skill_and_params(kwargs):
+    """Get skill object and prepare parameters for LLM invocation"""
     skill_id = kwargs.get("model")
-    skill_obj = LLMSkill.objects.filter(id=skill_id).first()
+    skill_obj = LLMSkill.objects.filter(name=skill_id).first()
+
     if not skill_obj:
-        return JsonResponse({"choices": [{"message": {"role": "user", "content": "No skill"}}]})
+        return None, None, {"choices": [{"message": {"role": "user", "content": "No skill"}}]}
+    num = kwargs.get("conversation_window_size") or skill_obj.conversation_window_size
+    chat_history = [{"text": i["content"], "event": i["role"]} for i in kwargs.get("messages", [])[-1 * num :]]
+
     params = {
         "llm_model": skill_obj.llm_model_id,
         "skill_prompt": kwargs.get("prompt", "") or skill_obj.skill_prompt,
@@ -98,14 +104,37 @@ def openai_completions(request):
         ],
         "enable_rag_knowledge_source": skill_obj.enable_rag_knowledge_source,
     }
-    data, doc_map, title_map = llm_service.invoke_chat(params)
-    content = data["content"]
+
+    return skill_obj, params, None
+
+
+def format_knowledge_sources(content, skill_obj, doc_map=None, title_map=None):
+    """Format and append knowledge source references if enabled"""
     if skill_obj.enable_rag_knowledge_source:
         knowledge_titles = {doc_map.get(k, {}).get("name") for k in title_map.keys()}
         last_content = content.strip().split("\n")[-1]
         if "引用知识" not in last_content and knowledge_titles:
-            content += "\n"
-            content += f'引用知识: {", ".join(knowledge_titles)}'
+            content += f'\n引用知识: {", ".join(knowledge_titles)}'
+    return content
+
+
+@api_exempt
+def openai_completions(request):
+    """Main entry point for OpenAI completions"""
+    kwargs = json.loads(request.body)
+    token = request.META.get("HTTP_AUTHORIZATION") or request.META.get(settings.API_TOKEN_HEADER_NAME)
+
+    is_valid, error_response = validate_openai_token(token)
+    if not is_valid:
+        return JsonResponse(error_response)
+
+    skill_obj, params, error = get_skill_and_params(kwargs)
+    if error:
+        return JsonResponse(error)
+
+    data, doc_map, title_map = llm_service.invoke_chat(params)
+    content = format_knowledge_sources(data["content"], skill_obj, doc_map, title_map)
+
     return_data = {
         "id": skill_obj.name,
         "object": "chat.completion",
@@ -125,7 +154,31 @@ def openai_completions(request):
             {"message": {"role": "user", "content": content}, "logprobs": None, "finish_reason": "stop", "index": 0}
         ],
     }
-    return JsonResponse(return_data)
+    if not kwargs.get("stream", False):
+        return JsonResponse(return_data)
+
+    # Updated streaming logic: yield valid JSON chunks
+    def generate_stream():
+        chunk_size = 20  # characters per chunk
+        for i in range(0, len(content), chunk_size):
+            chunk = content[i : i + chunk_size]
+            stream_chunk = {
+                "choices": [{"delta": {"content": chunk}, "index": 0, "finish_reason": None}],
+                "id": skill_obj.name,
+                "object": "chat.completion.chunk",
+                "created": int(time.time()),
+            }
+            yield f"data: {json.dumps(stream_chunk)}\n\n"
+        # Final chunk indicating completion
+        final_chunk = {
+            "choices": [{"delta": {}, "index": 0, "finish_reason": "stop"}],
+            "id": skill_obj.name,
+            "object": "chat.completion.chunk",
+            "created": int(time.time()),
+        }
+        yield f"data: {json.dumps(final_chunk)}\n\n"
+
+    return StreamingHttpResponse(generate_stream(), content_type="text/event-stream")
 
 
 @api_exempt

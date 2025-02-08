@@ -45,6 +45,8 @@ class LLMService:
         if kwargs["enable_rag"]:
             context, title_map, doc_map = self.search_doc(context, kwargs)
         chat_server = RemoteRunnable(settings.OPENAI_CHAT_SERVICE_URL)
+        num = kwargs["conversation_window_size"] * -1
+
         chat_kwargs = {
             "system_message_prompt": kwargs["skill_prompt"],
             "openai_api_base": llm_model.decrypted_llm_config["openai_base_url"],
@@ -52,10 +54,11 @@ class LLMService:
             "temperature": kwargs["temperature"],
             "model": llm_model.decrypted_llm_config["model"],
             "user_message": kwargs["user_message"],
-            "chat_history": kwargs["chat_history"],
+            "chat_history": kwargs["chat_history"][num:],
             "conversation_window_size": kwargs["conversation_window_size"],
             "rag_context": context,
         }
+        # TODO 需要在chat server增加图片支持
         result = chat_server.invoke(chat_kwargs)
         if isinstance(result, str):
             result = json.loads(result)
