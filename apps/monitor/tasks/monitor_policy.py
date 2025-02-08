@@ -258,44 +258,6 @@ class MonitorPolicyScan:
             result[instance_id] = [float(value[1]) for value in values]
         return result
 
-    # def alert_event(self):
-    #     """告警事件"""
-    #     aggregration_metrics = self.query_aggregration_metrics(self.policy.period)
-    #     # todo 使用pd计算，支持连续多个点满足条件的场景
-    #     aggregation_result = self.format_aggregration_metrics(aggregration_metrics)
-    #     alert_events, info_events = [], []
-    #
-    #     # todo 计算算法使用pd计算
-    #     # 计算告警事件
-    #     for instance_id, info in aggregation_result.items():
-    #         value = info["value"]
-    #         is_info = True
-    #         for threshold_info in self.policy.threshold:
-    #             method = THRESHOLD_METHODS.get(threshold_info["method"])
-    #             if not method:
-    #                 raise ValueError("invalid threshold method")
-    #             if method(value, threshold_info["value"]):
-    #                 template = Template(self.policy.alert_name)
-    #                 content = template.safe_substitute(info["raw_data"]["metric"])
-    #                 event = {
-    #                     "instance_id": instance_id,
-    #                     "value": value,
-    #                     "level": threshold_info["level"],
-    #                     "content":  content,
-    #                     "raw_data": info["raw_data"],
-    #                 }
-    #                 alert_events.append(event)
-    #                 is_info = False
-    #                 break
-    #         if is_info:
-    #             info_events.append({
-    #                 "instance_id": instance_id,
-    #                 "value": value,
-    #                 "level": "info",
-    #                 "content": "info",
-    #             })
-    #     return alert_events, info_events
-
     def alert_event(self):
         """告警事件"""
         vm_data = self.query_aggregration_metrics(self.policy.period)
