@@ -246,18 +246,6 @@ class MonitorPolicyScan:
             result[instance_id] = {"value": float(value[1]), "raw_data": metric_info}
         return result
 
-    def format_aggregration_metrics_v2(self, metrics, value_points=1):
-        """格式化聚合指标"""
-        result = {}
-        for metric_info in metrics.get("data", {}).get("result", []):
-            instance_id = metric_info["metric"].get(self.instance_id_key)
-            # 过滤不在实例列表中的实例（策略实例范围）
-            if self.instances_map and instance_id not in self.instances_map:
-                continue
-            values = metric_info["values"][-value_points:]
-            result[instance_id] = [float(value[1]) for value in values]
-        return result
-
     def alert_event(self):
         """告警事件"""
         vm_data = self.query_aggregration_metrics(self.policy.period)
