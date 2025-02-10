@@ -10,9 +10,6 @@
         {
           "id": "bot_list",
           "name": "Bot-list",
-          "icon": "jiqiren2",
-          "title": "Studio",
-          "url": "/opspilot/studio",
           "operation": [
             "View",
             "Add",
@@ -23,21 +20,17 @@
         {
           "id": "bot_settings",
           "name": "Bot-Setting",
-          "icon": "shezhi",
-          "title": "Settings",
-          "url": "/opspilot/studio/detail/settings",
           "operation": [
             "View",
             "Edit",
+            "Test",
+            "Mark",
             "Save&Publish"
           ]
         },
         {
           "id": "bot_channel",
           "name": "Bot-Channel",
-          "icon": "channel1",
-          "title": "Channel",
-          "url": "/opspilot/studio/detail/channel",
           "operation": [
             "View",
             "Setting"
@@ -46,9 +39,6 @@
         {
           "id": "bot_conversation_log",
           "name": "Bot-Conversation-Log",
-          "icon": "talk-line",
-          "title": "Conversation Logs",
-          "url": "/opspilot/studio/detail/logs",
           "operation": [
             "View",
             "Mark"
@@ -57,9 +47,6 @@
         {
           "id": "bot_statistics",
           "name": "Bot-Statistics",
-          "icon": "tongji",
-          "title": "Statistics",
-          "url": "/opspilot/studio/detail/statistics",
           "operation": [
             "View"
           ]
@@ -72,9 +59,6 @@
         {
           "id": "skill_list",
           "name": "Skill-list",
-          "icon": "weibiaoti3",
-          "title": "Skill",
-          "url": "/opspilot/skill",
           "operation": [
             "View",
             "Add",
@@ -85,9 +69,6 @@
         {
           "id": "skill_setting",
           "name": "Skill-Setting",
-          "icon": "shezhi",
-          "title": "Setting",
-          "url": "/opspilot/skill/detail/settings",
           "operation": [
             "View",
             "Edit",
@@ -98,9 +79,6 @@
         {
           "id": "skill_rule",
           "name": "Skill-Rule",
-          "icon": "guize",
-          "title": "Rules",
-          "url": "/opspilot/skill/detail/rules",
           "operation": [
             "View",
             "Add",
@@ -109,11 +87,15 @@
           ]
         },
         {
+          "id": "skill_invocation_logs",
+          "name": "Skill-Invocation-Logs",
+          "operation": [
+            "View"
+          ]
+        },
+        {
           "id": "skill_api",
           "name": "Skill-Api",
-          "icon": "api",
-          "title": "API",
-          "url": "/opspilot/skill/detail/api",
           "operation": [
             "View"
           ]
@@ -126,9 +108,6 @@
         {
           "id": "knowledge_list",
           "name": " Knowledge-list",
-          "icon": "zhishiku1",
-          "title": "Knowledge",
-          "url": "/opspilot/knowledge",
           "operation": [
             "View",
             "Add",
@@ -139,9 +118,6 @@
         {
           "id": "knowledge_document",
           "name": " Knowledge-Document",
-          "icon": "shiyongwendang",
-          "title": "Documents",
-          "url": "/opspilot/knowledge/detail/documents",
           "operation": [
             "View",
             "Add",
@@ -153,9 +129,6 @@
         {
           "id": "knowledge_testing",
           "name": " Knowledge-Testing",
-          "icon": "ceshi",
-          "title": "Testing",
-          "url": "/opspilot/knowledge/detail/testing",
           "operation": [
             "View",
             "Edit"
@@ -164,9 +137,6 @@
         {
           "id": "knowledge_setting",
           "name": " Knowledge-Setting",
-          "icon": "shezhi",
-          "title": "Settings",
-          "url": "/opspilot/knowledge/detail/settings",
           "operation": [
             "View",
             "Edit"
@@ -175,9 +145,6 @@
         {
           "id": "knowledge_api",
           "name": " Knowledge-API",
-          "icon": "api",
-          "title": "API",
-          "url": "/opspilot/knowledge/detail/api",
           "operation": [
             "View"
           ]
@@ -190,9 +157,6 @@
         {
           "id": "provide_list",
           "name": "Provide-list",
-          "icon": "moxing2",
-          "title": "Provider",
-          "url": "/opspilot/provider",
           "operation": [
             "View",
             "Setting"
@@ -207,9 +171,6 @@
         {
           "id": "mange_quota",
           "name": "Mange Quota",
-          "icon": "_quota_management",
-          "title": "Manage Quota",
-          "url": "/opspilot/settings",
           "operation": [
             "View",
             "Add",
@@ -220,9 +181,6 @@
         {
           "id": "my_quota",
           "name": "My Quota",
-          "icon": "quota",
-          "title": "My Quota",
-          "url": "/opspilot/settings/quota",
           "operation": [
             "View"
           ]
@@ -230,9 +188,6 @@
         {
           "id": "api_secret_key",
           "name": "API Secret Key",
-          "icon": "key",
-          "title": "API Secret Keys",
-          "url": "/opspilot/settings/key",
           "operation": [
             "View",
             "Add",

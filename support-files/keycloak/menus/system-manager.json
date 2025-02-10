@@ -10,9 +10,6 @@
         {
           "id": "user_list",
           "name": "User-list",
-          "icon": "yonghu1",
-          "title": "User",
-          "url": "/system-manager/user",
           "operation": [
             "View",
             "Add",
@@ -28,9 +25,6 @@
         {
           "id": "group_list",
           "name": "Group-list",
-          "icon": "jiedianhuiyuanfenzu",
-          "title": "Group",
-          "url": "/system-manager/group",
           "operation": [
             "View",
             "Add",
@@ -46,9 +40,6 @@
         {
           "id": "application_list",
           "name": "Application-list",
-          "icon": "guanli",
-          "title": "Application",
-          "url": "/system-manager/role",
           "operation": [
             "View"
           ]
@@ -56,9 +47,6 @@
         {
           "id": "applicaiton_role",
           "name": "Application-role",
-          "icon": "guanliyuan_jiaoseguanli",
-          "title": "Role",
-          "url": "/system-manager/role/manage",
           "operation": [
             "View",
             "Edit",
