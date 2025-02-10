@@ -14,14 +14,14 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         keycloak_client = KeyCloakClient()
-        menu_dir = 'support-files/keycloak/menus'
+        menu_dir = "support-files/keycloak/menus"
         MENUS = []
         for root, dirs, files in os.walk(menu_dir):
             for file in files:
-                if file.endswith('.json'):
+                if file.endswith(".json"):
                     file_path = os.path.join(root, file)
                     try:
-                        with open(file_path, 'r', encoding='utf-8') as f:
+                        with open(file_path, "r", encoding="utf-8") as f:
                             menu_data = json.load(f)
                             MENUS.append(menu_data)
                     except Exception as e:
@@ -59,7 +59,7 @@ def create_resource(client_id, menus, client):
                     "type": i["name"],
                     "name": f"{child['id']}-{operate}",
                     "displayName": f"{child['name']}-{operate}",
-                    "attributes": {"index": index, "url": child["url"], "icon": child["icon"], "title": child["title"]},
+                    "attributes": {"index": index},
                 }
                 index += 1
                 client.realm_client.create_client_authz_resource(client_id, payload, True)

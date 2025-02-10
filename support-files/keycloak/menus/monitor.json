@@ -1,0 +1,119 @@
+{
+  "client_id": "monitor",
+  "name": "Monitor",
+  "url": "",
+  "description": "Create roles for the Monitor app to manage data permissions, menu permissions, and feature permissions.",
+  "menus": [
+    {
+      "name": "Search",
+      "children": [
+        {
+          "id": "search",
+          "name": "Search",
+          "operation": [
+            "View"
+          ]
+        }
+      ]
+      },
+    {
+      "name": "Veiw",
+      "children": [
+        {
+          "id": "veiw-list",
+          "name": "List",
+          "operation": [
+            "View",
+            "Detail"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Event",
+      "children": [
+        {
+          "id": "alert_list",
+          "name": "Alert",
+          "operation": [
+            "View",
+            "Operate"
+          ]
+        },
+        {
+          "id": "strategy_list",
+          "name": "Strategy",
+          "operation": [
+            "View",
+            "Add",
+            "Edit",
+            "Delete"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Intergration",
+      "children": [
+        {
+          "id": "intergration_list",
+          "name": "Intergration-list",
+          "operation": [
+            "View",
+            "Setting"
+          ]
+        },
+        {
+          "id": "intergration_configure",
+          "name": "Intergration-configure",
+          "operation": [
+            "View",
+            "Add"
+          ]
+        },
+        {
+          "id": "intergration_metric",
+          "name": "Intergration-metric",
+          "operation": [
+            "View",
+            "Add Group",
+            "Add Metric",
+            "Edit Group",
+            "Edit Metric",
+            "Delete Group",
+            "Delete Metric"
+          ]
+        },
+        {
+          "id": "asset",
+          "name": "Asset",
+          "operation": [
+            "View",
+            "Edit",
+            "Delete"
+          ]
+        }
+      ]
+    }
+  ],
+
+
+
+  "roles": [
+    {
+      "name": "admin",
+      "role_name": "monitor_admin",
+      "menus": []
+    },
+    {
+      "name": "normal",
+      "role_name": "monitor_normal",
+      "menus": [
+        "search-View",
+        "veiw-list-View",
+        "alert_list-View",
+        "strategy_list-View"
+      ]
+    }
+  ]
+}

@@ -79,17 +79,12 @@ class RoleManage(object):
                 "type": i["type"],
                 "display_name": i["displayName"],
                 "index": int(i["attributes"]["index"][0]),
-                "icon": i["attributes"]["icon"][0],
-                "title": i["attributes"]["title"][0],
-                "url": i["attributes"]["url"][0],
             }
             for i in data
             if i.get("attributes", {}).get("index") is not None
         ]
         data.sort(key=lambda i: i["index"])
-        transformed = defaultdict(
-            lambda: defaultdict(lambda: {"display_name": "", "operation": [], "title": "", "url": "", "icon": ""})
-        )
+        transformed = defaultdict(lambda: defaultdict(lambda: {"display_name": "", "operation": []}))
         for item in data:
             type_ = item["type"]
             name_operation = item["name"].split("-")
@@ -101,9 +96,6 @@ class RoleManage(object):
                 transformed[type_][name]["display_name"] = display_name
 
             transformed[type_][name]["operation"].append(operation)
-            transformed[type_][name]["url"] = item["url"]
-            transformed[type_][name]["title"] = item["title"]
-            transformed[type_][name]["icon"] = item["icon"]
 
         result = []
         for type_, names in transformed.items():
@@ -114,9 +106,6 @@ class RoleManage(object):
                         "name": name,
                         "display_name": details["display_name"],
                         "operation": details["operation"],
-                        "title": details["title"],
-                        "url": details["url"],
-                        "icon": details["icon"],
                     }
                 )
             result.append({"name": type_, "display_name": type_, "children": children})
