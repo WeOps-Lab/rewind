@@ -54,7 +54,7 @@ def get_client(client_id=""):
     if client_id:
         filter_client = [client_id]
     else:
-        filter_client = ["opspilot", "system-manager"]
+        filter_client = [i["clientId"] for i in res]
     return {
         "result": True,
         "data": [
@@ -66,7 +66,7 @@ def get_client(client_id=""):
                 "url": i["baseUrl"],
             }
             for i in res
-            if i["clientId"] in filter_client
+            if i["clientId"] in filter_client and i.get("authorizationServicesEnabled")
         ],
     }
 
