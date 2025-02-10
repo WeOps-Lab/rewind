@@ -129,7 +129,7 @@ class MonitorPolicyScan:
         self.policy = policy
         self.instances_map = self.instances_map()
         self.active_alerts = self.get_active_alerts()
-        self.instance_id_key = None
+        self.instance_id_keys = None
 
     def get_active_alerts(self):
         """获取策略的活动告警"""
@@ -218,27 +218,29 @@ class MonitorPolicyScan:
         method = METHOD.get(self.policy.algorithm)
         if not method:
             raise ValueError("invalid algorithm method")
-        return method(query, start_timestamp, end_timestamp, step, self.instance_id_key)
+        group_by = ",".join(self.instance_id_keys)
+        return method(query, start_timestamp, end_timestamp, step, group_by)
 
     def set_monitor_obj_instance_key(self):
         """获取监控对象实例key"""
 
         if self.policy.collect_type == "trap":
-            self.instance_id_key = "source"
+            self.instance_id_keys = ["source"]
             return
 
         for monitor_obj in MONITOR_OBJS:
             if monitor_obj["name"] == self.policy.monitor_object.name:
-                self.instance_id_key= monitor_obj["instance_id_key"]
+                self.instance_id_keys= monitor_obj["instance_id_keys"]
                 break
-        if not self.instance_id_key:
+        if not self.instance_id_keys:
             raise ValueError("invalid monitor object instance key")
 
     def format_aggregration_metrics(self, metrics):
         """格式化聚合指标"""
         result = {}
         for metric_info in metrics.get("data", {}).get("result", []):
-            instance_id = metric_info["metric"].get(self.instance_id_key)
+            instance_id = str(tuple([metric_info["metric"].get(i) for i in self.instance_id_keys]))
+
             # 过滤不在实例列表中的实例（策略实例范围）
             if self.instances_map and instance_id not in self.instances_map:
                 continue
@@ -249,7 +251,7 @@ class MonitorPolicyScan:
     def alert_event(self):
         """告警事件"""
         vm_data = self.query_aggregration_metrics(self.policy.period)
-        df = vm_to_dataframe(vm_data.get("data", {}).get("result", []), [self.instance_id_key])
+        df = vm_to_dataframe(vm_data.get("data", {}).get("result", []), self.instance_id_keys)
 
         # 计算告警
         alert_events, info_events = calculate_alerts(self.policy.alert_name, df, self.policy.threshold)

@@ -1,3 +1,4 @@
+import ast
 import uuid
 
 from django.db.models import Prefetch
@@ -11,12 +12,12 @@ from apps.monitor.tasks.grouping_rule import sync_instance_and_group
 class MonitorObjectService:
 
     @staticmethod
-    def get_instances_by_metric(metric: str, instance_id_key: str):
+    def get_instances_by_metric(metric: str, instance_id_keys: list):
         """获取监控对象实例"""
         metrics = VictoriaMetricsAPI().query(metric)
         instance_map = {}
         for metric_info in metrics.get("data", {}).get("result", []):
-            instance_id = metric_info.get("metric", {}).get(instance_id_key)
+            instance_id = str(tuple([metric_info["metric"].get(i) for i in instance_id_keys]))
             if not instance_id:
                 continue
             agent_id = metric_info.get("metric", {}).get("agent_id")
@@ -41,11 +42,12 @@ class MonitorObjectService:
         qs = qs.prefetch_related(Prefetch('monitorinstanceorganization_set', to_attr='organizations'))
         if name:
             qs = qs.filter(name__icontains=name)
+
+        count = qs.count()
+
         if page_size == -1:
-            count = qs.count()
             objs = qs
         else:
-            count = qs.count()
             objs = qs[start:end]
 
         monitor_obj = MonitorObject.objects.filter(id=monitor_object_id).first()
@@ -55,7 +57,7 @@ class MonitorObjectService:
         obj_metric_map = obj_metric_map.get(monitor_obj.name)
         if not obj_metric_map:
             raise ValueError("Monitor object default metric does not exist")
-        instance_map = MonitorObjectService.get_instances_by_metric(obj_metric_map.get("default_metric", ""), obj_metric_map.get("instance_id_key"))
+        instance_map = MonitorObjectService.get_instances_by_metric(obj_metric_map.get("default_metric", ""), obj_metric_map.get("instance_id_keys"))
         result = []
 
         for obj in objs:
@@ -67,19 +69,30 @@ class MonitorObjectService:
                 "time": instance_map.get(obj.id, {}).get("time", ""),
             })
 
-        if add_metrics:
+        if add_metrics and page_size != -1:
             # 补充实例指标
-            instance_key = obj_metric_map["instance_id_key"]
+            instance_id_keys = obj_metric_map["instance_id_keys"]
+            instance_ids = []
+            for instance_info in result:
+                instance_id = ast.literal_eval(instance_info["instance_id"])
+                if len(instance_id) != len(instance_id_keys):
+                    continue
+                instance_ids.append(instance_id)
+
+            query_parts = []
+            for i, key in enumerate(instance_id_keys):
+                values = "|".join(set(item[i] for item in instance_ids))  # 去重并拼接
+                query_parts.append(f'{key}=~"{values}"')
+
             metrics_obj = Metric.objects.filter(
                 monitor_object_id=monitor_object_id, name__in=obj_metric_map.get("supplementary_indicators", []))
             for metric_obj in metrics_obj:
                 query = metric_obj.query
-                instance_str = "|".join([i["instance_id"] for i in result])
-                query = query.replace("__$labels__", f"{instance_key}=~'{instance_str}'")
+                query = query.replace("__$labels__", f"{', '.join(query_parts)}")
                 metrics = VictoriaMetricsAPI().query(query)
                 _metric_map = {}
                 for metric in metrics.get("data", {}).get("result", []):
-                    instance_id = metric.get("metric", {}).get(instance_key)
+                    instance_id = str(tuple([metric["metric"].get(i) for i in metric_obj.instance_id_keys]))
                     value = metric["value"][1]
                     _metric_map[instance_id] = value
                 for instance in result:

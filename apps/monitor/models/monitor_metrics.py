@@ -32,6 +32,7 @@ class Metric(TimeInfo, MaintainerInfo):
     data_type = models.CharField(max_length=50, default="", verbose_name='数据类型')
     description = models.TextField(blank=True, null=True, verbose_name='指标描述')
     dimensions = models.JSONField(default=list, verbose_name='维度')
+    instance_id_keys = models.JSONField(default=list, verbose_name='实例ID键(由指标维度组成)')
     is_pre = models.BooleanField(default=True, verbose_name='是否预定义')
     sort_order = models.IntegerField(default=0, verbose_name='排序')
 

@@ -38,13 +38,13 @@ class SyncInstance:
         for monitor_info in MONITOR_OBJS:
             if monitor_info["name"] not in self.monitor_map:
                 continue
-            instance_id_key = monitor_info["instance_id_key"]
             query = monitor_info["default_metric"]
             metrics = VictoriaMetricsAPI().query(query)
             for metric_info in metrics.get("data", {}).get("result", []):
-                instance_id = metric_info["metric"].get(instance_id_key)
+                instance_id = tuple([metric_info["metric"].get(i) for i in monitor_info["instance_id_keys"]])
                 if not instance_id:
                     continue
+                instance_id = str(instance_id)
                 instances_map[instance_id] = {
                     "id": instance_id,
                     "name": instance_id,
@@ -83,12 +83,12 @@ class RuleGrouping:
         obj_metric_map = obj_metric_map.get(rule.monitor_object.name)
         if not obj_metric_map:
             raise ValueError("Monitor object default metric does not exist")
-        instance_id_key = obj_metric_map["instance_id_key"]
         asso_list = []
         metrics = VictoriaMetricsAPI().query(rule.grouping_rules["query"])
         for metric_info in metrics.get("result", []):
-            instance_id = metric_info["metric"].get(instance_id_key)
+            instance_id = tuple([metric_info["metric"].get(i) for i in obj_metric_map["instance_id_keys"]])
             if instance_id:
+                instance_id = str(instance_id)
                 asso_list.extend([(instance_id, i) for i in rule.organizations])
         return asso_list
 
