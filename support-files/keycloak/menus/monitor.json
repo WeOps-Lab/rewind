@@ -17,10 +17,10 @@
       ]
       },
     {
-      "name": "Veiw",
+      "name": "View",
       "children": [
         {
-          "id": "veiw-list",
+          "id": "view_list",
           "name": "List",
           "operation": [
             "View",
