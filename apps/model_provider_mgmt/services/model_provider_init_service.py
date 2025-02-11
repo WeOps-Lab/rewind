@@ -83,6 +83,19 @@ class ModelProviderInitService:
                 },
             )
 
+            LLMModel.objects.get_or_create(
+                name="DeepSeek-R1:1.5b",
+                llm_model_type=LLMModelChoices.DEEP_SEEK,
+                defaults={
+                    "llm_config": {
+                        "openai_api_key": "your_openai_api_key",
+                        "openai_base_url": "https://api.deepseek.com",
+                        "temperature": 0.7,
+                        "model": "deepseek-r1:1.5b",
+                    }
+                },
+            )
+
         Token.objects.get_or_create(user=self.owner)
 
         OCRProvider.objects.get_or_create(

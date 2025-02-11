@@ -8,6 +8,7 @@ from apps.core.mixinx import EncryptMixin
 class LLMModelChoices(models.TextChoices):
     CHAT_GPT = "chat-gpt", "ChatGPT"
     ZHIPU = "zhipu", "智谱AI"
+    DEEP_SEEK = "deep-seek", "DeepSeek"
 
 
 class LLMModel(models.Model, EncryptMixin):

@@ -121,16 +121,36 @@ def format_knowledge_sources(content, skill_obj, doc_map=None, title_map=None):
 @api_exempt
 def openai_completions(request):
     """Main entry point for OpenAI completions"""
+
+    def generate_stream_error(message):
+        def generator():
+            error_chunk = {
+                "choices": [{"delta": {"content": message}, "index": 0, "finish_reason": "stop"}],
+                "id": "error",
+                "object": "chat.completion.chunk",
+                "created": int(time.time()),
+            }
+            yield f"data: {json.dumps(error_chunk)}\n\n"
+
+        return StreamingHttpResponse(generator(), content_type="text/event-stream")
+
     kwargs = json.loads(request.body)
+    stream_mode = kwargs.get("stream", False)
     token = request.META.get("HTTP_AUTHORIZATION") or request.META.get(settings.API_TOKEN_HEADER_NAME)
 
     is_valid, error_response = validate_openai_token(token)
     if not is_valid:
-        return JsonResponse(error_response)
+        if stream_mode:
+            return generate_stream_error(error_response["choices"][0]["message"]["content"])
+        else:
+            return JsonResponse(error_response)
 
     skill_obj, params, error = get_skill_and_params(kwargs)
     if error:
-        return JsonResponse(error)
+        if stream_mode:
+            return generate_stream_error(error["choices"][0]["message"]["content"])
+        else:
+            return JsonResponse(error)
 
     data, doc_map, title_map = llm_service.invoke_chat(params)
     content = format_knowledge_sources(data["content"], skill_obj, doc_map, title_map)
