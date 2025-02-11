@@ -20,6 +20,7 @@ W_SIDECAR_DOWNLOAD_URL = f"{LOCAL_HOST}/openapi/sidecar/download_file/?file_name
 L_SIDECAR_DOWNLOAD_URL = f"{LOCAL_HOST}/openapi/sidecar/download_file/?file_name=sidecar_linux.tar.gz"
 L_INSTALL_DOWNLOAD_URL = f"{LOCAL_HOST}/openapi/sidecar/download_file/?file_name=install_sidecar.sh"
 
+default_sidecar_mode = os.getenv("SIDECAR_INPUT_MODE", "telegraf")
 TELEGRAF_CONFIG = """
 [global_tags]
     agent_id="${node.ip}-${node.cloud_region}"
@@ -36,16 +37,28 @@ TELEGRAF_CONFIG = """
     hostname = "${node.ip}"
     omit_hostname = false
 
-[[outputs.kafka]]
-    brokers = ["${KAFKA_HOST}:${KAFKA_PORT}"]
-    topic = "${KAFKA_METRICS_TOPIC}"
-    sasl_username = "${KAFKA_USERNAME}"
-    sasl_password = "${KAFKA_PASSWORD}"
-    sasl_mechanism = "PLAIN"
-    max_message_bytes = 10000000
-    compression_codec=1
-
 [[inputs.internal]]
     tags = { "instance_id"="${node.ip}-${node.cloud_region}","instance_type"="internal","instance_name"="${node.name}" }
 """
 
+if default_sidecar_mode == "telegraf":
+    TELEGRAF_CONFIG += """
+[[outputs.kafka]]
+brokers = ["${KAFKA_HOST}:${KAFKA_PORT}"]
+topic = "${KAFKA_METRICS_TOPIC}"
+sasl_username = "${KAFKA_USERNAME}"
+sasl_password = "${KAFKA_PASSWORD}"
+sasl_mechanism = "PLAIN"
+max_message_bytes = 10000000
+compression_codec=1
+"""
+
+if default_sidecar_mode == "nats":
+    TELEGRAF_CONFIG += """
+[[outputs.nats]]
+servers = ["${NATS_SERVERS}"]
+username = "${NATS_USERNAME}"
+password = "${NATS_PASSWORD}"
+subject = "metrics.${node.ip_filter}"
+data_format = "influx"
+"""
