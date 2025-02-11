@@ -50,3 +50,9 @@ def update_instance_child_config(data: dict):
     id = data.get('id')
     content = data.get('content')
     ChildConfigCommon.update_instance_child_config(id, content)
+
+
+@nats_client.register
+def delete_instance_child_config(instance_ids: list):
+    """更新实例子配置"""
+    ChildConfigCommon.delete_child_config_by_instance_id(instance_ids)

@@ -58,3 +58,8 @@ class ChildConfigCommon:
     def update_instance_child_config(id, content):
         """更新实例子配置"""
         ChildConfig.objects.filter(id=id).update(content=content)
+
+    @staticmethod
+    def delete_child_config_by_instance_id(instance_ids):
+        """删除实例子配置"""
+        ChildConfig.objects.filter(collect_instance_id__in=instance_ids).delete()
