@@ -18,6 +18,7 @@
           "description": "agent_id"
         }
       ],
+      "instance_id_keys": ["instance_id"],
       "description": "Measures the success rate of multiple nodes probing targets (the percentage of successful responses out of the total number of requests)."
     },
     {
@@ -33,6 +34,7 @@
           "description": "agent_id"
         }
       ],
+      "instance_id_keys": ["instance_id"],
       "description": "This metric represents the total time taken from initiating an HTTP request to receiving the HTTP response. It is used to assess the performance of web services, especially when handling user requests. An extended duration may indicate lower backend processing efficiency or network latency, which can adversely affect the user experience. It is crucial for enhancing system responsiveness and optimizing performance."
     },
     {
@@ -48,6 +50,7 @@
           "description": "agent_id"
         }
       ],
+      "instance_id_keys": ["instance_id"],
       "description": "This metric represents the HTTP response status code for an HTTP request. It captures the value of the HTTP response status codes, such as 200 (OK), 404 (Not Found), 500 (Internal Server Error), etc. These status codes are vital for monitoring the health and performance of web applications, assisting in identifying potential issues."
     },
     {
@@ -63,6 +66,7 @@
           "description": "agent_id"
         }
       ],
+      "instance_id_keys": ["instance_id"],
       "description": "This metric indicates the length of the HTTP response content in bytes. Larger content lengths can result in extended data transfer times and consume more bandwidth. Monitoring this metric is crucial for optimizing website performance or analyzing bandwidth usage. Understanding the size of the response content can assist developers in making optimizations."
     }
   ]

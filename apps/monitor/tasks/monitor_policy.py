@@ -130,6 +130,7 @@ class MonitorPolicyScan:
         self.instances_map = self.instances_map()
         self.active_alerts = self.get_active_alerts()
         self.instance_id_keys = None
+        self.metric = None
 
     def get_active_alerts(self):
         """获取策略的活动告警"""
@@ -193,9 +194,7 @@ class MonitorPolicyScan:
         if _type == "pmq":
             return query_condition.get("query")
         else:
-            metric_id = query_condition.get("metric_id")
-            metric_obj = Metric.objects.filter(id=metric_id).first()
-            query = metric_obj.query
+            query = self.metric.query
             # 纬度条件
             _filter = query_condition.get("filter", [])
             vm_filter_str = self.format_to_vm_filter(_filter)
@@ -223,17 +222,17 @@ class MonitorPolicyScan:
 
     def set_monitor_obj_instance_key(self):
         """获取监控对象实例key"""
+        if self.policy.query_condition.get("type") == "pmq":
+            if self.policy.collect_type == "trap":
+                self.instance_id_keys = ["source"]
+                return
+            self.instance_id_keys = self.policy.query_condition.get("instance_id_keys", ["instance_id"])
+        else:
+            self.metric = Metric.objects.filter(id=self.policy.query_condition["metric_id"]).first()
+            if not self.metric:
+                raise ValueError(f"metric does not exist [{self.policy.query_condition['metric_id']}]")
 
-        if self.policy.collect_type == "trap":
-            self.instance_id_keys = ["source"]
-            return
-
-        for monitor_obj in MONITOR_OBJS:
-            if monitor_obj["name"] == self.policy.monitor_object.name:
-                self.instance_id_keys= monitor_obj["instance_id_keys"]
-                break
-        if not self.instance_id_keys:
-            raise ValueError("invalid monitor object instance key")
+            self.instance_id_keys = self.metric.instance_id_keys
 
     def format_aggregration_metrics(self, metrics):
         """格式化聚合指标"""

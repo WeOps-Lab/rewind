@@ -64,6 +64,7 @@ class MonitorPluginService:
                 existing_metric.data_type = metric["data_type"]
                 existing_metric.description = metric["description"]
                 existing_metric.dimensions = metric["dimensions"]
+                existing_metric.instance_id_keys = metric.get("instance_id_keys", [])
                 metrics_to_update.append(existing_metric)
             else:
                 metrics_to_create.append(
@@ -78,12 +79,13 @@ class MonitorPluginService:
                         data_type=metric["data_type"],
                         description=metric["description"],
                         dimensions=metric["dimensions"],
+                        instance_id_keys=metric.get("instance_id_keys", []),
                     )
                 )
 
         if metrics_to_update:
             Metric.objects.bulk_update(metrics_to_update, [
-                "metric_group_id", "display_name", "query", "unit", "data_type", "description", "dimensions"
+                "metric_group_id", "display_name", "query", "unit", "data_type", "description", "dimensions", "instance_id_keys"
             ], batch_size=200)
 
         if metrics_to_create:
@@ -143,6 +145,7 @@ class MonitorPluginService:
                     "data_type": i.data_type,
                     "description": i.description,
                     "dimensions": i.dimensions,
+                    "instance_id_keys": i.instance_id_keys,
                 } for i in metrics
             ]
         }
