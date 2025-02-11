@@ -227,3 +227,7 @@ class NodeUtils:
     @staticmethod
     def update_instance_child_config(data: dict):
         return NodeMgmt().update_instance_child_config(data)
+
+    @staticmethod
+    def delete_instance_child_config(instance_ids: list):
+        return NodeMgmt().delete_instance_child_config(instance_ids)

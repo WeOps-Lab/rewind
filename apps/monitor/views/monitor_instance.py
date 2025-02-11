@@ -5,9 +5,10 @@ from rest_framework.decorators import action
 
 from apps.core.utils.web_utils import WebUtils
 from apps.monitor.filters.monitor_object import MonitorInstanceGroupingRuleFilter
-from apps.monitor.models import MonitorInstanceGroupingRule
+from apps.monitor.models import MonitorInstanceGroupingRule, MonitorInstance
 from apps.monitor.serializers.monitor_object import MonitorInstanceGroupingRuleSerializer
 from apps.monitor.services.monitor_object import MonitorObjectService
+from apps.monitor.utils.node_mgmt_api import NodeUtils
 from config.drf.pagination import CustomPageNumberPagination
 
 
@@ -49,7 +50,6 @@ class MonitorInstanceVieSet(viewsets.ViewSet):
             },
             required=["monitor_instance_name", "interval"]
         )
-
     )
     @action(methods=['post'], detail=False, url_path='(?P<monitor_object_id>[^/.]+)/generate_instance_id')
     def generate_monitor_instance_id(self, request, monitor_object_id):
@@ -67,6 +67,26 @@ class MonitorInstanceVieSet(viewsets.ViewSet):
     @action(methods=['get'], detail=False, url_path='autodiscover_monitor_instance')
     def autodiscover_monitor_instance(self, request):
         MonitorObjectService.autodiscover_monitor_instance()
+        return WebUtils.response_success()
+
+    @swagger_auto_schema(
+        operation_id="remove_monitor_instance",
+        operation_description="移除监控实例",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "instance_ids": openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Schema(type=openapi.TYPE_STRING), description="监控实例ID列表"),
+                "clean_child_config": openapi.Schema(type=openapi.TYPE_BOOLEAN, description="是否清除子配置"),
+            },
+            required=["instance_ids", "clean_child_config"]
+        )
+    )
+    @action(methods=['post'], detail=False, url_path='remove_monitor_instance')
+    def remove_monitor_instance(self, request):
+        instance_ids = request.data.get("instance_ids", [])
+        MonitorInstance.objects.filter(id__in=instance_ids).delete()
+        if request.data.get("clean_child_config"):
+            NodeUtils.delete_instance_child_config(instance_ids)
         return WebUtils.response_success()
 
 
