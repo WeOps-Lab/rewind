@@ -30,7 +30,7 @@ class FormatChildConfig:
 
         for instance in instances:
             instance_id, instance_type = instance["instance_id"], instance["instance_type"]
-
+            interval = instance.get("interval", "10s")
             for node_id in instance["node_ids"]:
                 node_info = {"id": node_id, "configs": []}
 
@@ -39,6 +39,7 @@ class FormatChildConfig:
                         "type": config["type"],
                         "instance_id": instance_id,
                         "instance_type": instance_type,
+                        "interval": interval,
                     })
 
                 result["nodes"].append(node_info)
@@ -51,6 +52,7 @@ class FormatChildConfig:
 
         for instance in instances:
             instance_id, instance_type = instance["instance_id"], instance["instance_type"]
+            interval = instance.get("interval", "10s")
             url = instance["url"]
 
             for node_id in instance["node_ids"]:
@@ -61,6 +63,7 @@ class FormatChildConfig:
                         "type": config["type"],
                         "instance_id": instance_id,
                         "instance_type": instance_type,
+                        "interval": interval,
                         "url": url,
                     })
 
@@ -74,6 +77,7 @@ class FormatChildConfig:
 
         for instance in instances:
             instance_id, instance_type = instance["instance_id"], instance["instance_type"]
+            interval = instance.get("interval", "10s")
             url = instance["url"]
 
             for node_id in instance["node_ids"]:
@@ -84,6 +88,7 @@ class FormatChildConfig:
                         "type": config["type"],
                         "instance_id": instance_id,
                         "instance_type": instance_type,
+                        "interval": interval,
                         "url": url,
                     })
 
@@ -97,6 +102,7 @@ class FormatChildConfig:
 
         for instance in instances:
             instance_id, instance_type = instance["instance_id"], instance["instance_type"]
+            interval = instance.get("interval", "10s")
 
             for node_id in instance["node_ids"]:
                 node_info = {"id": node_id, "configs": []}
@@ -106,6 +112,7 @@ class FormatChildConfig:
                         "type": config["type"],
                         "instance_id": instance_id,
                         "instance_type": instance_type,
+                        "interval": interval,
                     })
 
                 result["nodes"].append(node_info)
@@ -118,6 +125,7 @@ class FormatChildConfig:
 
         for instance in instances:
             instance_id, instance_type = instance["instance_id"], instance["instance_type"]
+            interval = instance.get("interval", "10s")
             ip = instance["ip"]
 
             for node_id in instance["node_ids"]:
@@ -128,6 +136,7 @@ class FormatChildConfig:
                         "type": config["type"],
                         "instance_id": instance_id,
                         "instance_type": instance_type,
+                        "interval": interval,
                         "server": f"{config['username']}:{config['password']}@{config['protocol']}({ip})",
                     })
 
@@ -141,6 +150,7 @@ class FormatChildConfig:
 
         for instance in instances:
             instance_id, instance_type = instance["instance_id"], instance["instance_type"]
+            interval = instance.get("interval", "10s")
             ip = instance["ip"]
 
             for node_id in instance["node_ids"]:
@@ -151,6 +161,7 @@ class FormatChildConfig:
                         "type": config["type"],
                         "instance_id": instance_id,
                         "instance_type": instance_type,
+                        "interval": interval,
                         "snmp_config": snmp_config,
                     })
 
@@ -188,42 +199,7 @@ class NodeUtils:
 
     @staticmethod
     def batch_setting_node_child_config(data: dict):
-
-        # 格式化实例id,将实例id统一为字符串元祖（支持多维度组成的实例id）
-        for instance in data["instances"]:
-            instance["instance_id"] = str(tuple([instance["instance_id"]]))
-
-        # 实例更新
-        instance_map = {
-            instance["instance_id"]: {
-                "id": instance["instance_id"],
-                "name": instance["instance_name"],
-                "monitor_object_id": data["monitor_object_id"],
-                "group_ids": instance["group_ids"],
-            }
-            for instance in data["instances"]
-        }
-
-        old_instance_ids = set(MonitorInstance.objects.filter(id__in=list(instance_map.keys())).values_list("id", flat=True))
-        creates, assos = [], []
-        for instance_id, instance_info in instance_map.items():
-            group_ids = instance_info.pop("group_ids")
-            for group_id in group_ids:
-                assos.append((instance_id, group_id))
-            if instance_id not in old_instance_ids:
-                creates.append(MonitorInstance(**instance_info))
-        MonitorInstance.objects.bulk_create(creates, batch_size=200)
-        # 实例组织关联
-        old_asso_objs = MonitorInstanceOrganization.objects.filter(monitor_instance_id__in=old_instance_ids)
-        old_asso_set = {(asso.monitor_instance_id, asso.organization) for asso in old_asso_objs}
-        new_asso_set = set(assos) - old_asso_set
-        MonitorInstanceOrganization.objects.bulk_create(
-            [MonitorInstanceOrganization(monitor_instance_id=asso[0], organization=asso[1]) for asso in new_asso_set],
-            batch_size=200
-        )
-        # 实例配置关联（node）
-        result = FormatChildConfig.collector(data)
-        return NodeMgmt().batch_setting_node_child_config(result)
+        return NodeMgmt().batch_setting_node_child_config(data)
 
     @staticmethod
     def get_instance_child_config(query_data: dict):

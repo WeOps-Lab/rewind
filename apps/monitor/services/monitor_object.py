@@ -117,23 +117,22 @@ class MonitorObjectService:
             return instance_id
 
     @staticmethod
-    def create_monitor_instance(monitor_object_id, instances):
+    def check_monitor_instance(monitor_object_id, instance_info):
         """创建监控对象实例"""
-        create_objs, update_objs = [], []
-        old_instances = MonitorInstance.objects.filter(monitor_object_id=monitor_object_id)
-        old_instances_map = {i.id: i for i in old_instances}
-        for instance in instances:
-            instance_id = str(tuple(instance["instance_id"]))
-            if instance_id in old_instances_map:
-                instance_obj = old_instances_map[instance_id]
-                instance_obj.name = instance["name"]
-                update_objs.append(instance_obj)
-                continue
-            create_objs.append(MonitorInstance(id=instance_id, name=instance["name"], monitor_object_id=monitor_object_id))
-        if create_objs:
-            MonitorInstance.objects.bulk_create(create_objs, batch_size=100)
-        if update_objs:
-            MonitorInstance.objects.bulk_update(update_objs, ["name"], batch_size=100)
+
+        instance_id = str(tuple([instance_info["instance_id"]]))
+        objs = MonitorInstance.objects.filter(id=instance_id).first()
+        if objs:
+            raise Exception(f"实例已存在：{instance_info['instance_name']}")
+        # if "interval" not in instance_info:
+        #     instance_info["interval"] = "10s"
+        # MonitorInstance.objects.create(
+        #     id=instance_id,
+        #     name=instance_info["instance_name"],
+        #     interval=instance_info["interval"],
+        #     monitor_object_id=monitor_object_id,
+        # )
+
 
     @staticmethod
     def autodiscover_monitor_instance():

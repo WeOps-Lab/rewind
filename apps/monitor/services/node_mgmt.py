@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 
-from apps.monitor.utils.node_mgmt_api import NodeUtils
+from apps.monitor.models import MonitorInstance, MonitorInstanceOrganization
+from apps.monitor.utils.node_mgmt_api import NodeUtils, FormatChildConfig
 from apps.monitor.utils.victoriametrics_api import VictoriaMetricsAPI
 
 
@@ -81,3 +82,64 @@ class InstanceConfigService:
             return "inactive"
         else:
             return "unavailable"
+
+    @staticmethod
+    def create_monitor_instance_by_node_mgmt(data):
+        """创建监控对象实例"""
+
+        # 格式化实例id,将实例id统一为字符串元祖（支持多维度组成的实例id）
+        for instance in data["instances"]:
+            instance["instance_id"] = str(tuple([instance["instance_id"]]))
+            if "interval" not in instance:
+                instance["interval"] = "10s"
+
+        # 过滤已存在的实例
+        objs = MonitorInstance.objects.filter(id_in=[instance["instance_id"] for instance in data["instances"]])
+        instance_set = {obj.id for obj in objs}
+
+        # 格式化实例id,将实例id统一为字符串元祖（支持多维度组成的实例id）
+        new_instances, old_instances = [], []
+        for instance in data["instances"]:
+            if instance["instance_id"] in instance_set:
+                old_instances.append(instance)
+            else:
+                new_instances.append(instance)
+
+        data["instances"] = new_instances
+
+        # 实例更新
+        instance_map = {
+            instance["instance_id"]: {
+                "id": instance["instance_id"],
+                "name": instance["instance_name"],
+                "interval": instance["interval"],
+                "monitor_object_id": data["monitor_object_id"],
+                "group_ids": instance["group_ids"],
+            }
+            for instance in data["instances"]
+        }
+
+        old_instance_ids = set(
+            MonitorInstance.objects.filter(id__in=list(instance_map.keys())).values_list("id", flat=True))
+        creates, assos = [], []
+        for instance_id, instance_info in instance_map.items():
+            group_ids = instance_info.pop("group_ids")
+            for group_id in group_ids:
+                assos.append((instance_id, group_id))
+            if instance_id not in old_instance_ids:
+                creates.append(MonitorInstance(**instance_info))
+        MonitorInstance.objects.bulk_create(creates, batch_size=200)
+        # 实例组织关联
+        old_asso_objs = MonitorInstanceOrganization.objects.filter(monitor_instance_id__in=old_instance_ids)
+        old_asso_set = {(asso.monitor_instance_id, asso.organization) for asso in old_asso_objs}
+        new_asso_set = set(assos) - old_asso_set
+        MonitorInstanceOrganization.objects.bulk_create(
+            [MonitorInstanceOrganization(monitor_instance_id=asso[0], organization=asso[1]) for asso in new_asso_set],
+            batch_size=200
+        )
+        # 实例配置关联（node）
+        result = FormatChildConfig.collector(data)
+        NodeUtils.batch_setting_node_child_config(result)
+
+        if old_instances:
+            raise Exception(f"以下实例已存在：{'、'.join([instance['instance_name'] for instance in old_instances])}")
