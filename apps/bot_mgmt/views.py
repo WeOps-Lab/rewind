@@ -137,6 +137,7 @@ def openai_completions(request):
     kwargs = json.loads(request.body)
     stream_mode = kwargs.get("stream", False)
     token = request.META.get("HTTP_AUTHORIZATION") or request.META.get(settings.API_TOKEN_HEADER_NAME)
+    current_ip = get_client_ip(request)
 
     is_valid, error_response = validate_openai_token(token)
     if not is_valid:
@@ -175,6 +176,7 @@ def openai_completions(request):
         ],
     }
     if not kwargs.get("stream", False):
+        insert_skill_log(current_ip, skill_obj.id, return_data, kwargs)
         return JsonResponse(return_data)
 
     # Updated streaming logic: yield valid JSON chunks
@@ -196,6 +198,7 @@ def openai_completions(request):
             "object": "chat.completion.chunk",
             "created": int(time.time()),
         }
+        insert_skill_log(current_ip, skill_obj.id, final_chunk, kwargs)
         yield f"data: {json.dumps(final_chunk)}\n\n"
 
     return StreamingHttpResponse(generate_stream(), content_type="text/event-stream")
