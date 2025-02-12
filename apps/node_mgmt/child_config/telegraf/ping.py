@@ -5,7 +5,7 @@ from apps.node_mgmt.models.sidecar import CollectorConfiguration, ChildConfig
 CONFIG_MAP = {
     "ping": """[[inputs.ping]]
     urls = ["${url}"]
-    interval = "${interval}"
+    interval = "${interval}s"
     tags = { "instance_id"="${instance_id}", "instance_type"="${instance_type}", "collect_type"="ping" }""",
 }
 
