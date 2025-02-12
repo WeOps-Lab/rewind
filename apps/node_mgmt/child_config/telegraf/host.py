@@ -10,25 +10,32 @@ CONFIG_MAP = {
     collect_cpu_time = false
     report_active = false
     core_tags = false
+    interval = "${interval}"
     tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="host","config_type"="cpu" }""",
 
     "disk": """[[inputs.disk]]
     ignore_fs = ["tmpfs", "devtmpfs", "devfs", "iso9660", "overlay", "aufs", "squashfs"]
+    interval = "${interval}"
     tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="host","config_type"="disk" }""",
 
     "diskio": """[[inputs.diskio]]
+    interval = "${interval}"
     tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="host","config_type"="diskio" }""",
 
     "mem": """[[inputs.mem]]
+    interval = "${interval}"
     tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="host","config_type"="mem" }""",
 
     "net": """[[inputs.net]]
+    interval = "${interval}"
     tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="host","config_type"="net" }""",
 
     "processes": """[[inputs.processes]]
+    interval = "${interval}"
     tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="host","config_type"="processes" }""",
 
     "system": """[[inputs.system]]
+    interval = "${interval}"
     tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="host","config_type"="system" }""",
 }
 

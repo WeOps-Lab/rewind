@@ -4,6 +4,7 @@ from apps.node_mgmt.models.sidecar import CollectorConfiguration, ChildConfig
 
 CONFIG_MAP = {
     "switch": """[[inputs.snmp]]
+    interval = "${interval}"
     tags = { "instance_id"="${instance_id}", "instance_type"="${instance_type}", "collect_type"="snmp" }
     ${snmp_config}
 
@@ -26,6 +27,7 @@ CONFIG_MAP = {
         name = "ifDescr"
         is_tag = true""",
     "router": """[[inputs.snmp]]
+    interval = "${interval}"
     tags = { "instance_id"="${instance_id}", "instance_type"="${instance_type}", "collect_type"="snmp" }
     ${snmp_config}
 
@@ -48,6 +50,7 @@ CONFIG_MAP = {
         name = "ifDescr"
         is_tag = true""",
     "firewall": """[[inputs.snmp]]
+    interval = "${interval}"
     tags = { "instance_id"="${instance_id}", "instance_type"="${instance_type}", "collect_type"="snmp" }
     ${snmp_config}
 
@@ -70,6 +73,7 @@ CONFIG_MAP = {
         name = "ifDescr"
         is_tag = true""",
     "loadbalance": """[[inputs.snmp]]
+    interval = "${interval}"
     tags = { "instance_id"="${instance_id}", "instance_type"="${instance_type}", "collect_type"="snmp" }
     ${snmp_config}
 
@@ -92,6 +96,7 @@ CONFIG_MAP = {
         name = "ifDescr"
         is_tag = true""",
     "detection_device": """[[inputs.snmp]]
+    interval = "${interval}"
     tags = { "instance_id"="${instance_id}", "instance_type"="${instance_type}", "collect_type"="snmp" }
     ${snmp_config}
 
@@ -114,6 +119,7 @@ CONFIG_MAP = {
         name = "ifDescr"
         is_tag = true""",
     "scanning_device": """[[inputs.snmp]]
+    interval = "${interval}"
     tags = { "instance_id"="${instance_id}", "instance_type"="${instance_type}", "collect_type"="snmp" }
     ${snmp_config}
 
@@ -136,6 +142,7 @@ CONFIG_MAP = {
         name = "ifDescr"
         is_tag = true""",
     "bastion_host": """[[inputs.snmp]]
+    interval = "${interval}"
     tags = { "instance_id"="${instance_id}", "instance_type"="${instance_type}", "collect_type"="snmp" }
     ${snmp_config}
 
@@ -158,6 +165,7 @@ CONFIG_MAP = {
         name = "ifDescr"
         is_tag = true""",
     "storage": """[[inputs.snmp]]
+    interval = "${interval}"
     tags = { "instance_id"="${instance_id}", "instance_type"="${instance_type}", "collect_type"="snmp" }
     ${snmp_config}
 
@@ -180,6 +188,7 @@ CONFIG_MAP = {
         name = "ifDescr"
         is_tag = true""",
     "hardware_server": """[[inputs.snmp]]
+    interval = "${interval}"
     tags = { "instance_id"="${instance_id}", "instance_type"="${instance_type}", "collect_type"="snmp" }
     ${snmp_config}
 
