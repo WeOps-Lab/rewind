@@ -28,6 +28,8 @@ def set_time_range(end_time_str, start_time_str):
 
 
 def get_user_info(bot_id, input_channel, sender_id):
+    if input_channel == "web":
+        input_channel = "socketio"
     channel_type_map = {
         "socketio": ChannelChoices.WEB,
         "enterprise_wechat": ChannelChoices.ENTERPRISE_WECHAT,
