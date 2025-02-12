@@ -61,3 +61,10 @@ class NodeMgmt(object):
         """
         return_data = self.client.run('update_instance_child_config', data)
         return return_data
+
+    def delete_instance_child_config(self, instance_ids):
+        """
+        :param instance_ids: 实例ID列表
+        """
+        return_data = self.client.run('delete_instance_child_config', instance_ids)
+        return return_data
