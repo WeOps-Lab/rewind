@@ -6,7 +6,6 @@ from apps.monitor.models.monitor_object import MonitorObject
 
 
 class MonitorPolicy(TimeInfo, MaintainerInfo):
-    ALGORITHM_CHOICES = [('sum', 'SUM'), ('avg', 'AVG'), ('max', 'MAX'), ('min', 'MIN'), ('new', 'NEW')]
     NOTICE_TYPE_CHOICES = [('email', 'Email'), ('wechat', 'Wechat'), ('sms', 'SMS')]
 
     monitor_object = models.ForeignKey(MonitorObject, on_delete=models.CASCADE, verbose_name='监控对象')
@@ -25,7 +24,7 @@ class MonitorPolicy(TimeInfo, MaintainerInfo):
     schedule = models.JSONField(default=dict, verbose_name="策略执行周期, eg: 1h执行一次, 5m执行一次")
     period = models.JSONField(default=dict, verbose_name="每次监控检测的数据周期,eg: 1h内, 5m内")
 
-    algorithm = models.CharField(max_length=10, choices=ALGORITHM_CHOICES, verbose_name="聚合算法")
+    algorithm = models.CharField(max_length=50, verbose_name="聚合算法")
     group_by = models.JSONField(default=list, verbose_name="分组字段")
     threshold = models.JSONField(default=list, verbose_name="阈值")
     recovery_condition = models.SmallIntegerField(default=1, verbose_name="多少周期不满足阈值自动恢复")
