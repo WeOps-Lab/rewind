@@ -42,12 +42,13 @@ class SyncInstance:
             metrics = VictoriaMetricsAPI().query(query)
             for metric_info in metrics.get("data", {}).get("result", []):
                 instance_id = tuple([metric_info["metric"].get(i) for i in monitor_info["instance_id_keys"]])
+                instance_name = "__".join([str(i) for i in instance_id])
                 if not instance_id:
                     continue
                 instance_id = str(instance_id)
                 instances_map[instance_id] = {
                     "id": instance_id,
-                    "name": instance_id,
+                    "name": instance_name,
                     "monitor_object_id": self.monitor_map[monitor_info["name"]],
                     "auto": True,
                 }

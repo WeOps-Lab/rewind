@@ -188,6 +188,11 @@ class NodeUtils:
 
     @staticmethod
     def batch_setting_node_child_config(data: dict):
+
+        # 格式化实例id,将实例id统一为字符串元祖（支持多维度组成的实例id）
+        for instance in data["instances"]:
+            instance["instance_id"] = str(tuple([instance["instance_id"]]))
+
         # 实例更新
         instance_map = {
             instance["instance_id"]: {
