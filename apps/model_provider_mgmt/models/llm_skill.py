@@ -58,3 +58,4 @@ class SkillRequestLog(models.Model):
     state = models.BooleanField(default=True)
     request_detail = models.JSONField(default=dict)
     response_detail = models.JSONField(default=dict)
+    user_message = models.TextField(default="")

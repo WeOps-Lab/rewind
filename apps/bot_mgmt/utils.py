@@ -156,11 +156,12 @@ def get_client_ip(request):
     return ip
 
 
-def insert_skill_log(current_ip, skill_id, response_detail, request_detail):
+def insert_skill_log(current_ip, skill_id, response_detail, request_detail, state=True, user_message=""):
     SkillRequestLog.objects.create(
         skill_id=skill_id,
         response_detail=response_detail,
         request_detail=request_detail,
-        state=request_detail,
+        state=state,
         current_ip=current_ip,
+        user_message=user_message,
     )

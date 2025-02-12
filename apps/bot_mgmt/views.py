@@ -121,6 +121,8 @@ def format_knowledge_sources(content, skill_obj, doc_map=None, title_map=None):
 @api_exempt
 def openai_completions(request):
     """Main entry point for OpenAI completions"""
+    kwargs = json.loads(request.body)
+    current_ip = get_client_ip(request)
 
     def generate_stream_error(message):
         def generator():
@@ -134,10 +136,8 @@ def openai_completions(request):
 
         return StreamingHttpResponse(generator(), content_type="text/event-stream")
 
-    kwargs = json.loads(request.body)
     stream_mode = kwargs.get("stream", False)
     token = request.META.get("HTTP_AUTHORIZATION") or request.META.get(settings.API_TOKEN_HEADER_NAME)
-    current_ip = get_client_ip(request)
 
     is_valid, error_response = validate_openai_token(token)
     if not is_valid:
@@ -147,7 +147,9 @@ def openai_completions(request):
             return JsonResponse(error_response)
 
     skill_obj, params, error = get_skill_and_params(kwargs)
+    user_message = params.get("user_message")
     if error:
+        insert_skill_log(current_ip, skill_obj.id, error, kwargs, False, user_message)
         if stream_mode:
             return generate_stream_error(error["choices"][0]["message"]["content"])
         else:
@@ -175,8 +177,8 @@ def openai_completions(request):
             {"message": {"role": "user", "content": content}, "logprobs": None, "finish_reason": "stop", "index": 0}
         ],
     }
+    insert_skill_log(current_ip, skill_obj.id, return_data, kwargs, user_message=user_message)
     if not kwargs.get("stream", False):
-        insert_skill_log(current_ip, skill_obj.id, return_data, kwargs)
         return JsonResponse(return_data)
 
     # Updated streaming logic: yield valid JSON chunks
@@ -198,7 +200,6 @@ def openai_completions(request):
             "object": "chat.completion.chunk",
             "created": int(time.time()),
         }
-        insert_skill_log(current_ip, skill_obj.id, final_chunk, kwargs)
         yield f"data: {json.dumps(final_chunk)}\n\n"
 
     return StreamingHttpResponse(generate_stream(), content_type="text/event-stream")
@@ -237,7 +238,7 @@ def get_skill_execute_result(bot_id, channel, chat_history, kwargs, request, sen
         result = {"content": str(e)}
     if getattr(request, "api_pass", False):
         current_ip = get_client_ip(request)
-        insert_skill_log(current_ip, bot.llm_skills.first().id, result, kwargs)
+        insert_skill_log(current_ip, bot.llm_skills.first().id, result, kwargs, user_message=user_message)
     return result
 
 
