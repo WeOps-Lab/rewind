@@ -117,6 +117,25 @@ class MonitorObjectService:
             return instance_id
 
     @staticmethod
+    def create_monitor_instance(monitor_object_id, instances):
+        """创建监控对象实例"""
+        create_objs, update_objs = [], []
+        old_instances = MonitorInstance.objects.filter(monitor_object_id=monitor_object_id)
+        old_instances_map = {i.id: i for i in old_instances}
+        for instance in instances:
+            instance_id = str(tuple(instance["instance_id"]))
+            if instance_id in old_instances_map:
+                instance_obj = old_instances_map[instance_id]
+                instance_obj.name = instance["name"]
+                update_objs.append(instance_obj)
+                continue
+            create_objs.append(MonitorInstance(id=instance_id, name=instance["name"], monitor_object_id=monitor_object_id))
+        if create_objs:
+            MonitorInstance.objects.bulk_create(create_objs, batch_size=100)
+        if update_objs:
+            MonitorInstance.objects.bulk_update(update_objs, ["name"], batch_size=100)
+
+    @staticmethod
     def autodiscover_monitor_instance():
         """同步监控实例数据"""
         sync_instance_and_group.delay()

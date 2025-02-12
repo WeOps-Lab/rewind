@@ -61,6 +61,29 @@ class MonitorInstanceVieSet(viewsets.ViewSet):
         return WebUtils.response_success(result)
 
     @swagger_auto_schema(
+        operation_id="create_monitor_instance",
+        operation_description="创建监控实例",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_ARRAY,
+            items=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    "instance_id": openapi.Schema(type=openapi.TYPE_STRING, description="监控实例id"),
+                    "instance_name": openapi.Schema(type=openapi.TYPE_INTEGER, description="监控实例名称"),
+                },
+                required=["instance_id", "instance_name"]
+            )
+        )
+    )
+    @action(methods=['post'], detail=False, url_path='(?P<monitor_object_id>[^/.]+)/create_monitor_instance')
+    def create_monitor_instance(self, request, monitor_object_id):
+        MonitorObjectService.create_monitor_instance(
+            int(monitor_object_id),
+            request.data
+        )
+        return WebUtils.response_success()
+
+    @swagger_auto_schema(
         operation_id="autodiscover_monitor_instance",
         operation_description="自动发现监控实例",
     )
