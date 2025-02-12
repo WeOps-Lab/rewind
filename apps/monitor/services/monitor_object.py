@@ -125,7 +125,7 @@ class MonitorObjectService:
         if objs:
             raise Exception(f"实例已存在：{instance_info['instance_name']}")
         # if "interval" not in instance_info:
-        #     instance_info["interval"] = "10s"
+        #     instance_info["interval"] = 10
         # MonitorInstance.objects.create(
         #     id=instance_id,
         #     name=instance_info["instance_name"],

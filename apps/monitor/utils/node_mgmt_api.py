@@ -30,7 +30,7 @@ class FormatChildConfig:
 
         for instance in instances:
             instance_id, instance_type = instance["instance_id"], instance["instance_type"]
-            interval = instance.get("interval", "10s")
+            interval = instance.get("interval", 10)
             for node_id in instance["node_ids"]:
                 node_info = {"id": node_id, "configs": []}
 
@@ -52,7 +52,7 @@ class FormatChildConfig:
 
         for instance in instances:
             instance_id, instance_type = instance["instance_id"], instance["instance_type"]
-            interval = instance.get("interval", "10s")
+            interval = instance.get("interval", 10)
             url = instance["url"]
 
             for node_id in instance["node_ids"]:
@@ -77,7 +77,7 @@ class FormatChildConfig:
 
         for instance in instances:
             instance_id, instance_type = instance["instance_id"], instance["instance_type"]
-            interval = instance.get("interval", "10s")
+            interval = instance.get("interval", 10)
             url = instance["url"]
 
             for node_id in instance["node_ids"]:
@@ -102,7 +102,7 @@ class FormatChildConfig:
 
         for instance in instances:
             instance_id, instance_type = instance["instance_id"], instance["instance_type"]
-            interval = instance.get("interval", "10s")
+            interval = instance.get("interval", 10)
 
             for node_id in instance["node_ids"]:
                 node_info = {"id": node_id, "configs": []}
@@ -125,7 +125,7 @@ class FormatChildConfig:
 
         for instance in instances:
             instance_id, instance_type = instance["instance_id"], instance["instance_type"]
-            interval = instance.get("interval", "10s")
+            interval = instance.get("interval", 10)
             ip = instance["ip"]
 
             for node_id in instance["node_ids"]:
@@ -150,7 +150,7 @@ class FormatChildConfig:
 
         for instance in instances:
             instance_id, instance_type = instance["instance_id"], instance["instance_type"]
-            interval = instance.get("interval", "10s")
+            interval = instance.get("interval", 10)
             ip = instance["ip"]
 
             for node_id in instance["node_ids"]:

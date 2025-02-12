@@ -91,10 +91,10 @@ class InstanceConfigService:
         for instance in data["instances"]:
             instance["instance_id"] = str(tuple([instance["instance_id"]]))
             if "interval" not in instance:
-                instance["interval"] = "10s"
+                instance["interval"] = 10
 
         # 过滤已存在的实例
-        objs = MonitorInstance.objects.filter(id_in=[instance["instance_id"] for instance in data["instances"]])
+        objs = MonitorInstance.objects.filter(id__in=[instance["instance_id"] for instance in data["instances"]])
         instance_set = {obj.id for obj in objs}
 
         # 格式化实例id,将实例id统一为字符串元祖（支持多维度组成的实例id）
