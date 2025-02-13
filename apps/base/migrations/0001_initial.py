@@ -75,7 +75,7 @@ class Migration(migrations.Migration):
                 ("date_joined", models.DateTimeField(default=django.utils.timezone.now, verbose_name="date joined")),
                 ("group_list", models.JSONField(default=list)),
                 ("roles", models.JSONField(default=list)),
-                ("locale", models.CharField(default="zh-Hans", max_length=32)),
+                ("locale", models.CharField(default="zh-CN", max_length=32)),
                 (
                     "groups",
                     models.ManyToManyField(
