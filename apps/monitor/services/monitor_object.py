@@ -63,6 +63,7 @@ class MonitorObjectService:
         for obj in objs:
             result.append({
                 "instance_id": obj.id,
+                "instance_id_values": [i for i in ast.literal_eval(obj.id)],
                 "instance_name": obj.name or obj.id,
                 "agent_id": instance_map.get(obj.id, {}).get("agent_id", ""),
                 "organization": [i.organization for i in obj.organizations],
@@ -129,7 +130,6 @@ class MonitorObjectService:
         #     interval=instance_info["interval"],
         #     monitor_object_id=monitor_object_id,
         # )
-
 
     @staticmethod
     def autodiscover_monitor_instance():
