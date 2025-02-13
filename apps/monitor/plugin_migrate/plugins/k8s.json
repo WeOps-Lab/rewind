@@ -40,7 +40,7 @@
           "unit": "percent",
           "dimensions": [],
           "description": "Represents the current CPU utilization of the cluster, typically expressed as a percentage.",
-          "query": "sum(rate(prometheus_remote_write_container_cpu_usage_seconds_total{instance_type=\"k8s\", __$labels__}[5m])) / sum(prometheus_remote_write_machine_cpu_cores{instance_type=\"k8s\",__$labels__})*100"
+          "query": "100 * (\n  sum(rate(prometheus_remote_write_container_cpu_usage_seconds_total{instance_type=\"k8s\", __$labels__}[5m])) by (instance_id)\n  /\n  sum(prometheus_remote_write_machine_cpu_cores{instance_type=\"k8s\", __$labels__}) by (instance_id)\n)\n"
         },
         {
           "metric_group": "Utilization",
@@ -51,7 +51,7 @@
           "unit": "percent",
           "dimensions": [],
           "description": "Shows the current memory utilization of the cluster, expressed as a percentage.",
-          "query": "(sum(prometheus_remote_write_container_memory_usage_bytes{instance_type=\"k8s\", __$labels__}) - sum(prometheus_remote_write_container_memory_cache{instance_type=\"k8s\", __$labels__})) / sum(prometheus_remote_write_machine_memory_bytes{instance_type=\"k8s\", __$labels__})*100"
+          "query": "100*(sum(prometheus_remote_write_container_memory_usage_bytes{instance_type=\"k8s\", __$labels__}) by(instance_id) - sum(prometheus_remote_write_container_memory_cache{instance_type=\"k8s\", __$labels__}) by(instance_id)) / sum(prometheus_remote_write_machine_memory_bytes{instance_type=\"k8s\", __$labels__}) by(instance_id)"
         }
       ]
     },
@@ -86,9 +86,9 @@
         {
           "metric_group": "CPU",
           "name": "pod_cpu_utilization",
-          "query": "100 * (sum(rate(prometheus_remote_write_container_cpu_usage_seconds_total{instance_type=\"k8s\",__$labels__}[1m])) by (instance_id, container_label_io_kubernetes_pod_name) / (sum(prometheus_remote_write_kube_pod_container_resource_limits{instance_type=\"k8s\", resource=\"cpu\",__$labels__}) by (instance_id, container_label_io_kubernetes_pod_name) * 60))",
+          "query": "100 * (\n  sum(\n    rate(\n      label_replace(\n        prometheus_remote_write_container_cpu_usage_seconds_total{instance_type=\"k8s\", __$labels_}[1m],\n        \"pod\", \"$1\", \"container_label_io_kubernetes_pod_name\", \"(.*)\"\n      )\n    )\n  ) by (instance_id, pod)\n  /\n  (sum(\n      prometheus_remote_write_kube_pod_container_resource_limits{instance_type=\"k8s\", resource=\"cpu\", __$labels_}\n    ) by (instance_id, pod) * 60)\n)",
           "display_name": "CPU Utilization",
-          "instance_id_keys": ["instance_id","container_label_io_kubernetes_pod_name"],
+          "instance_id_keys": ["instance_id","pod"],
           "data_type": "Number",
           "unit": "percent",
           "dimensions": [],
@@ -97,9 +97,9 @@
         {
           "metric_group": "Memory",
           "name": "pod_memory_utilization",
-          "query": "100 * (sum(prometheus_remote_write_container_memory_usage_bytes{instance_type=\"k8s\",__$labels__}) by (instance_id, container_label_io_kubernetes_pod_name) / sum(prometheus_remote_write_kube_pod_container_resource_limits{instance_type=\"k8s\", resource=\"memory\",__$labels__}) by (instance_id, container_label_io_kubernetes_pod_name))",
+          "query": "100 * (\n  sum(\n    label_replace(\n      prometheus_remote_write_container_memory_usage_bytes{instance_type=\"k8s\", __$labels__},\n      \"pod\",\n      \"$1\",\n      \"container_label_io_kubernetes_pod_name\",\n      \"(.*)\"\n    )\n  ) by (instance_id, pod)\n  /\n  sum(prometheus_remote_write_kube_pod_container_resource_limits{instance_type=\"k8s\", resource=\"memory\", __$labels__}) by (instance_id, pod)\n)\n",
           "display_name": "Memory Utilization",
-          "instance_id_keys": ["instance_id","container_label_io_kubernetes_pod_name"],
+          "instance_id_keys": ["instance_id","pod"],
           "data_type": "Number",
           "unit": "percent",
           "dimensions": [],
@@ -108,7 +108,7 @@
         {
           "metric_group": "Disk",
           "name": "pod_io_writes",
-          "query": "sum(rate(prometheus_remote_write_container_fs_writes_total{__$labels__}))",
+          "query": "sum(rate(prometheus_remote_write_container_fs_writes_total{__$labels__})) by (instance_id, container_label_io_kubernetes_pod_name)",
           "display_name": "I/O Read/Write Rate",
           "instance_id_keys": ["instance_id","container_label_io_kubernetes_pod_name"],
           "data_type": "Number",
@@ -119,7 +119,7 @@
         {
           "metric_group": "Disk",
           "name": "pod_io_read",
-          "query": "sum(rate(prometheus_remote_write_container_fs_reads_total{__$labels__}))",
+          "query": "sum(rate(prometheus_remote_write_container_fs_reads_total{__$labels__})) by (instance_id, container_label_io_kubernetes_pod_name)",
           "display_name": "I/O Read/Write Rate",
           "instance_id_keys": ["instance_id","container_label_io_kubernetes_pod_name"],
           "data_type": "Number",
@@ -130,7 +130,7 @@
         {
           "metric_group": "Network",
           "name": "pod_network_in",
-          "query": "sum(rate(prometheus_remote_write_container_network_receive_bytes_total{instance_type=\"k8s\",__$labels__}[1m])) / 1024 / 1024",
+          "query": "sum(rate(prometheus_remote_write_container_network_receive_bytes_total{instance_type=\"k8s\",__$labels__}[1m])) by (instance_id, container_label_io_kubernetes_pod_name) / 1024 / 1024",
           "display_name": "Network In",
           "instance_id_keys": ["instance_id","container_label_io_kubernetes_pod_name"],
           "data_type": "Number",
@@ -141,7 +141,7 @@
         {
           "metric_group": "Network",
           "name": "pod_network_out",
-          "query": "sum(rate(prometheus_remote_write_container_network_transmit_bytes_total{instance_type=\"k8s\",__$labels__}[1m])) / 1024 / 1024",
+          "query": "sum(rate(prometheus_remote_write_container_network_transmit_bytes_total{instance_type=\"k8s\",__$labels__}[1m])) by (instance_id, container_label_io_kubernetes_pod_name) / 1024 / 1024",
           "display_name": "Network Out",
           "instance_id_keys": ["instance_id","container_label_io_kubernetes_pod_name"],
           "data_type": "Number",
@@ -182,7 +182,7 @@
         {
           "metric_group": "Memory",
           "name": "node_memory_usage",
-          "query": "avg(mem_used{instance_type=\"k8s\", __$labels__})/ 1024 / 1024 / 1024",
+          "query": "avg(mem_used{instance_type=\"k8s\", __$labels__}) by (instance_id, instance_name) / 1024 / 1024 / 1024",
           "display_name": "Application Memory Usage",
           "instance_id_keys": ["instance_id", "instance_name"],
           "data_type": "Number",
@@ -193,7 +193,7 @@
         {
           "metric_group": "Memory",
           "name": "node_memory_utilization",
-          "query": "avg(mem_used_percent{instance_type=\"k8s\", __$labels__})",
+          "query": "avg(mem_used_percent{instance_type=\"k8s\", __$labels__}) by (instance_id, instance_name)",
           "display_name": "Application Memory Utilization Rate",
           "instance_id_keys": ["instance_id", "instance_name"],
           "data_type": "Number",
@@ -241,28 +241,18 @@
           "instance_id_keys": ["instance_id", "instance_name"],
           "data_type": "Number",
           "unit": "MBs",
-          "dimensions": [
-            {
-              "name": "name",
-              "description": "name"
-            }
-          ],
+          "dimensions": [],
           "description": "Network In refers to the volume of data traffic received through the network interface. Monitoring this metric helps analyze if network bandwidth is sufficient and the overall network performance."
         },
         {
           "metric_group": "Net",
           "name": "node_network_transmit",
-          "query": "rate(net_bytes_sent{instance_type=\"k8s\", __$labels__}[5m])/1024/1024",
+          "query": "rate(net_bytes_sent{instance_type=\"k8s\", __$labels__}[5m]) /1024/1024",
           "display_name": "Outgoing Bytes on NIC",
           "instance_id_keys": ["instance_id", "instance_name"],
           "data_type": "Number",
           "unit": "MBs",
-          "dimensions": [
-            {
-              "name": "name",
-              "description": "name"
-            }
-          ],
+          "dimensions": [],
           "description": "Network Out refers to the volume of data traffic sent through the network interface. This metric helps understand the node's network egress demands and potential bottlenecks."
         },
         {
