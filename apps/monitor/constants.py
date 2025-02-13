@@ -102,14 +102,14 @@ MONITOR_OBJS = [
         "type": "K8S",
         "name": "Pod",
         "default_metric": 'prometheus_remote_write_kube_pod_container_info',
-        "instance_id_keys": ["pod"],
+        "instance_id_keys": ["instance_id", "pod"],
         "supplementary_indicators": ["pod_status", "pod_cpu_utilization","pod_memory_utilization"],
     },
     {
         "type": "K8S",
         "name": "Node",
         "default_metric": 'prometheus_remote_write_kube_node_info',
-        "instance_id_keys": ["node"],
+        "instance_id_keys": ["instance_id", "node"],
         "supplementary_indicators": ["node_status_condition", "node_cpu_utilization", "node_memory_utilization"],
     },
     {
