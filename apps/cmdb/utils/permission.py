@@ -2,12 +2,14 @@ from apps.cmdb.constants import ORGANIZATION
 from apps.cmdb.graph.format_type import FORMAT_TYPE
 from apps.core.utils.user_group import Group
 from apps.core.utils.keycloak_client import KeyCloakClient
+from apps.rpc.system_mgmt import SystemMgmt
 
 
 class PermissionManage:
     def __init__(self, token):
         self.token = token
         self.keycloak_client = KeyCloakClient()
+        # self.keycloak_client = SystemMgmt()
 
     def get_group_params(self):
         """获取组织条件，用于列表页查询"""

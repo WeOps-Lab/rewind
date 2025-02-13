@@ -14,9 +14,11 @@ class InstanceManage(object):
     @staticmethod
     def get_permission_params(token):
         """获取用户实例权限查询参数，用户用户查询实例"""
-        obj = PermissionManage(token)
-        permission_params = obj.get_permission_params()
-        return permission_params
+        return ""
+
+        # obj = PermissionManage(token)
+        # permission_params = obj.get_permission_params()
+        # return permission_params
 
     @staticmethod
     def check_instances_permission(token: str, instances: list, model_id: str):

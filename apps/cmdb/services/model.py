@@ -57,6 +57,7 @@ class ModelManage(object):
     def update_model(id: int, data: dict):
         """
         更新模型
+        TODO 不能单独更新一个字段，如只更新icon，传递全部字段会导致其他字段校验不通过 model_name 后续考虑优化
         """
         model_id = data.pop("model_id", "")  # 不能更新model_id
         with Neo4jClient() as ag:

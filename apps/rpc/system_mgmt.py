@@ -46,3 +46,7 @@ class SystemMgmt(object):
     def get_all_users(self):
         return_data = self.client.run("get_all_users")
         return return_data
+
+    def get_all_groups(self, params):
+        return_data = self.client.run("get_groups")
+        return return_data

@@ -6,7 +6,7 @@ from rest_framework.decorators import action
 
 from apps.cmdb.services.instance import InstanceManage
 from apps.core.utils.web_utils import WebUtils
-from config.default import AUTH_TOKEN_HEADER_NAME
+from config.components.drf import AUTH_TOKEN_HEADER_NAME
 
 
 class InstanceViewSet(viewsets.ViewSet):

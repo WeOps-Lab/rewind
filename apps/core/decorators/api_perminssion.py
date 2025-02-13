@@ -20,18 +20,19 @@ class HasRole(object):
     def __call__(self, task_definition):
         @wraps(task_definition)
         def wrapper(*args, **kwargs):
-            request = args[0]
-            if isinstance(request, View):
-                request = args[1]
-            if getattr(request, "api_pass", False):
-                return task_definition(*args, **kwargs)
-            user_info = request.user
-            if not self.roles:
-                return task_definition(*args, **kwargs)
-            roles = user_info.roles
-            for i in roles:
-                if i in self.roles:
-                    return task_definition(*args, **kwargs)
-            return WebUtils.response_403(_("insufficient permissions"))
+            return task_definition(*args, **kwargs)
+            # request = args[0]
+            # if isinstance(request, View):
+            #     request = args[1]
+            # if getattr(request, "api_pass", False):
+            #     return task_definition(*args, **kwargs)
+            # user_info = request.user
+            # if not self.roles:
+            #     return task_definition(*args, **kwargs)
+            # roles = user_info.roles
+            # for i in roles:
+            #     if i in self.roles:
+            #         return task_definition(*args, **kwargs)
+            # return WebUtils.response_403(_("insufficient permissions"))
 
         return wrapper
