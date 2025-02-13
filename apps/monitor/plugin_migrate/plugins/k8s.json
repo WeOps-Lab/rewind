@@ -86,7 +86,7 @@
         {
           "metric_group": "CPU",
           "name": "pod_cpu_utilization",
-          "query": "100 * (\n  sum(\n    rate(\n      label_replace(\n        prometheus_remote_write_container_cpu_usage_seconds_total{instance_type=\"k8s\", __$labels_}[1m],\n        \"pod\", \"$1\", \"container_label_io_kubernetes_pod_name\", \"(.*)\"\n      )\n    )\n  ) by (instance_id, pod)\n  /\n  (sum(\n      prometheus_remote_write_kube_pod_container_resource_limits{instance_type=\"k8s\", resource=\"cpu\", __$labels_}\n    ) by (instance_id, pod) * 60)\n)",
+          "query": "100 * (\n  sum(\n    rate(\n      label_replace(\n        prometheus_remote_write_container_cpu_usage_seconds_total{instance_type=\"k8s\", __$labels__}[1m],\n        \"pod\", \"$1\", \"container_label_io_kubernetes_pod_name\", \"(.*)\"\n      )\n    )\n  ) by (instance_id, pod)\n  /\n  (sum(\n      prometheus_remote_write_kube_pod_container_resource_limits{instance_type=\"k8s\", resource=\"cpu\", __$labels__}\n    ) by (instance_id, pod) * 60)\n)",
           "display_name": "CPU Utilization",
           "instance_id_keys": ["instance_id","pod"],
           "data_type": "Number",
