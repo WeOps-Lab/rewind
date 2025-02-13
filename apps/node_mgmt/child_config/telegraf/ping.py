@@ -1,3 +1,4 @@
+import ast
 from string import Template
 
 from apps.node_mgmt.models.sidecar import CollectorConfiguration, ChildConfig
@@ -27,8 +28,9 @@ class PingConfig:
 
                 content = CONFIG_MAP[node_config["type"]]
                 template = Template(content)
-                content = template.safe_substitute(node_config)
-
+                _node_config = node_config.copy()
+                _node_config["instance_id"] = ast.literal_eval(_node_config["instance_id"])[0]
+                content = template.safe_substitute(_node_config)
                 node_objs.append(ChildConfig(
                     collect_type="ping",
                     config_type=node_config["type"],
