@@ -215,7 +215,7 @@ def skill_execute(request):
     chat_history = kwargs.get("chat_history", [])
     bot_id = kwargs.get("bot_id")
     channel = kwargs.get("channel", "socketio")
-    if channel == "socketio":
+    if channel in ["socketio", "rest"]:
         channel = "web"
     return_data = get_skill_execute_result(
         bot_id, channel, chat_history, kwargs, request, sender_id, skill_id, user_message
