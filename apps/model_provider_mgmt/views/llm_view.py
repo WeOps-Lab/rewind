@@ -111,12 +111,15 @@ class LLMModelViewSet(viewsets.ModelViewSet):
 class LogFilter(FilterSet):
     skill_id = filters.NumberFilter(field_name="skill_id", lookup_expr="exact")
     current_ip = filters.CharFilter(field_name="current_ip", lookup_expr="icontains")
+    start_time = filters.DateTimeFilter(field_name="created_at", lookup_expr="gte")
+    end_time = filters.DateTimeFilter(field_name="created_at", lookup_expr="lte")
 
 
 class SkillRequestLogViewSet(viewsets.ModelViewSet):
     serializer_class = SkillRequestLogSerializer
     queryset = SkillRequestLog.objects.all()
     filterset_class = LogFilter
+    ordering = ("-created_at",)
 
     def list(self, request, *args, **kwargs):
         if not request.GET.get("skill_id"):
