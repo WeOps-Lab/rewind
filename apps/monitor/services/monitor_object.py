@@ -70,23 +70,20 @@ class MonitorObjectService:
             })
 
         if add_metrics and page_size != -1:
-            # 补充实例指标
-            instance_id_keys = obj_metric_map["instance_id_keys"]
+
             instance_ids = []
             for instance_info in result:
                 instance_id = ast.literal_eval(instance_info["instance_id"])
-                if len(instance_id) != len(instance_id_keys):
-                    continue
                 instance_ids.append(instance_id)
-
-            query_parts = []
-            for i, key in enumerate(instance_id_keys):
-                values = "|".join(set(item[i] for item in instance_ids))  # 去重并拼接
-                query_parts.append(f'{key}=~"{values}"')
 
             metrics_obj = Metric.objects.filter(
                 monitor_object_id=monitor_object_id, name__in=obj_metric_map.get("supplementary_indicators", []))
             for metric_obj in metrics_obj:
+                query_parts = []
+                for i, key in enumerate(metric_obj.instance_id_keys):
+                    values = "|".join(set(item[i] for item in instance_ids))  # 去重并拼接
+                    query_parts.append(f'{key}=~"{values}"')
+
                 query = metric_obj.query
                 query = query.replace("__$labels__", f"{', '.join(query_parts)}")
                 metrics = VictoriaMetricsAPI().query(query)
