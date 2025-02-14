@@ -22,11 +22,12 @@ class UserGroup:
         groups = self.system_mgmt_client.get_all_groups(query_params)
         return groups
 
-    def user_goups_list(self, token):
+    def user_goups_list(self, token, request):
         """用户组列表"""
         # 查询用户角色
-        is_super_admin = self.keycloak_client.is_super_admin(token)
+        is_super_admin = request.user.is_superuser
+        user_groups = request.user.group_list
         if is_super_admin:
             return dict(is_all=True, group_ids=[])
-        group_ids = Group(token).get_user_group_and_subgroup_ids()
+        group_ids = Group(token).get_user_group_and_subgroup_ids(user_group_list=user_groups)
         return dict(is_all=False, group_ids=group_ids)

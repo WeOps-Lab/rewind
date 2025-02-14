@@ -49,5 +49,5 @@ class UserGroupViewSet(viewsets.ViewSet):
     )
     @action(methods=["get"], detail=False)
     def user_groups(self, request):
-        data = UserGroup().user_goups_list(request.META.get(AUTH_TOKEN_HEADER_NAME).split("Bearer ")[-1])
+        data = UserGroup().user_goups_list(request.META.get(AUTH_TOKEN_HEADER_NAME).split("Bearer ")[-1], request)
         return WebUtils.response_success(data)

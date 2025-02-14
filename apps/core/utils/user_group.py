@@ -65,12 +65,13 @@ class Group:
         user_group_list = self.keycloak_client.realm_client.get_user_groups(userinfo["sub"])
         return user_group_list
 
-    def get_user_group_and_subgroup_ids(self):
+    def get_user_group_and_subgroup_ids(self, user_group_list=[]):
         """获取用户组织ID与子组ID的列表"""
         # 获取所有组织列表
         all_groups = self.get_group_list()
         # 获取用户组织列表
-        user_group_list = self.get_user_group_list()
+        if not user_group_list:
+            user_group_list = self.get_user_group_list()
 
         # 获取用户组织ID与子组ID的列表
         user_group_and_subgroup_ids = []
