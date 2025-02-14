@@ -38,7 +38,7 @@ class KeycloakAuthBackend(ModelBackend):
             return None
         user_info = result["data"]
         if user_info.get("locale"):
-            if user_info["locale"] != "zh-CN":
+            if user_info["locale"] == "zh-CN":
                 user_info["locale"] = "zh-Hans"
             translation.activate(user_info["locale"])
         return self.set_user_info(user_info)
