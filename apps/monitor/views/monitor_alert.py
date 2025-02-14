@@ -1,3 +1,4 @@
+import ast
 from datetime import datetime, timezone
 
 from drf_yasg import openapi
@@ -77,6 +78,11 @@ class MonitorAlertVieSet(
 
         # 补充策略和实例到每个 alert 中
         for alert in results:
+            # 补充instance_id_values
+            try:
+                alert["instance_id_values"] = [i for i in ast.literal_eval(alert["monitor_instance_id"])]
+            except Exception as e:
+                alert["instance_id_values"] = [alert["monitor_instance_id"]]
             # 在 results 字典中添加完整的 policy 和 monitor_instance 信息
             alert["policy"] = MonitorPolicySerializer(policy_dict.get(alert["policy_id"])).data if alert["policy_id"] else None
 
