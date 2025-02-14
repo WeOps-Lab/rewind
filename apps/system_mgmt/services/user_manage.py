@@ -82,17 +82,18 @@ class UserManage(object):
         result = self.keycloak_client.realm_client.get_realm_role_members(role_name)
         return result
 
+    def reset_pwd(self, data):
+        res = self.keycloak_client.realm_client.set_user_password(data["id"], data["password"], data["temporary"])
+        return res
+
     def user_create(self, data):
         """创建用户"""
-        user_info = dict(
-            username=data["username"],
-            email=data.get("email"),
-            lastName=data.get("lastName"),
-            enabled=True,
-        )
-        user_id = self.keycloak_client.realm_client.create_user(user_info)
-        self.keycloak_client.realm_client.assign_realm_roles(user_id, data["roles"])
-        for group_id in data["groups"]:
+        roles = data.pop("roles", [])
+        groups = data.pop("groups", [])
+        data["enabled"] = True
+        user_id = self.keycloak_client.realm_client.create_user(data)
+        self.keycloak_client.realm_client.assign_realm_roles(user_id, roles)
+        for group_id in groups:
             self.keycloak_client.realm_client.group_user_add(user_id, group_id)
         user_info = self.keycloak_client.realm_client.get_user(user_id)
         return user_info

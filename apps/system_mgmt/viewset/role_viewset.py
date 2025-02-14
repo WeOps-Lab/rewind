@@ -15,6 +15,12 @@ class RoleViewSet(viewsets.ViewSet):
         data = RoleManage().get_role_list(client_id)
         return JsonResponse({"result": True, "data": data})
 
+    @action(detail=False, methods=["POST"])
+    def get_role_tree(self, request):
+        client_list = request.data.get("client_list", [])
+        data = RoleManage().get_role_tree(client_list)
+        return JsonResponse({"result": True, "data": data})
+
     @action(detail=False, methods=["GET"])
     def search_role_users(self, request):
         _first, _max = UserManage.get_first_and_max(request.query_params)

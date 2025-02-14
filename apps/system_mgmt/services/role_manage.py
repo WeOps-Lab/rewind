@@ -33,6 +33,25 @@ class RoleManage(object):
         ]
         return roles
 
+    def get_role_tree(self, client_list):
+        all_roles = self.keycloak_client.get_realm_roles()
+        role_map = {i["id"]: i["name"] for i in all_roles}
+        return_data = []
+        for client_obj in client_list:
+            policies = self.keycloak_client.realm_client.get_client_authz_policies(client_obj["id"])
+            roles = [
+                {
+                    "policy_id": i["id"],
+                    "display_name": i["name"],
+                    "role_id": json.loads(i["config"]["roles"])[0]["id"],
+                    "role_name": role_map.get(json.loads(i["config"]["roles"])[0]["id"], ""),
+                }
+                for i in policies
+                if i["type"] == "role"
+            ]
+            return_data.append({"id": client_obj["id"], "display_name": client_obj["name"], "children": roles})
+        return return_data
+
     def role_users(self, query, role_name):
         """获取角色关联的用户"""
         result = self.keycloak_client.realm_client.get_realm_role_members(role_name, query)

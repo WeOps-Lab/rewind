@@ -45,6 +45,15 @@ class UserViewSet(viewsets.ViewSet):
             return JsonResponse({"result": False, "message": str(e)})
 
     @action(detail=False, methods=["POST"])
+    def reset_password(self, request):
+        try:
+            UserManage().reset_pwd(request.data)
+            return JsonResponse({"result": True})
+        except Exception as e:
+            logger.exception(e)
+            return JsonResponse({"result": False, "message": str(e)})
+
+    @action(detail=False, methods=["POST"])
     def delete_user(self, request):
         user_ids = request.data.get("user_ids")
         UserManage().user_delete(user_ids)

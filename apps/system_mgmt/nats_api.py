@@ -3,6 +3,7 @@ from django.utils.translation import gettext_lazy as _
 import nats_client
 from apps.core.backends import cache
 from apps.core.utils.keycloak_client import KeyCloakClient
+from apps.system_mgmt.services.group_manage import GroupManage
 from apps.system_mgmt.services.role_manage import RoleManage
 from apps.system_mgmt.services.user_manage import UserManage
 
@@ -93,4 +94,36 @@ def get_group_users(group):
 def get_all_users():
     client = UserManage()
     res = client.user_all()
+    return {"result": True, "data": res}
+
+
+@nats_client.register
+def search_groups(query_params):
+    _first, _max = UserManage.get_first_and_max(query_params)
+    kwargs = {
+        "first": _first,
+        "max": _max,
+        "search": query_params.get("search", ""),
+    }
+    client = GroupManage()
+    if query_params.get("page"):
+        res = client.group_list(kwargs)
+    else:
+        res = client.group_list(query_params)
+    return {"result": True, "data": res}
+
+
+@nats_client.register
+def search_users(query_params):
+    _first, _max = UserManage.get_first_and_max(query_params)
+    kwargs = {
+        "first": _first,
+        "max": _max,
+        "search": query_params.get("search", ""),
+    }
+    client = UserManage()
+    if query_params.get("page"):
+        res = client.user_list(kwargs)
+    else:
+        res = client.user_list(query_params)
     return {"result": True, "data": res}
