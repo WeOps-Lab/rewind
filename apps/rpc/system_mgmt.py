@@ -46,3 +46,17 @@ class SystemMgmt(object):
     def get_all_users(self):
         return_data = self.client.run("get_all_users")
         return return_data
+
+    def search_groups(self, query_params):
+        """
+        :param query_params: {"page_size": 10, "page": 1, "search": ""}
+        """
+        return_data = self.client.run("search_groups", query_params=query_params)
+        return return_data
+
+    def search_users(self, query_params):
+        """
+        :param query_params: {"page_size": 10, "page": 1, "search": ""}
+        """
+        return_data = self.client.run("search_users", query_params=query_params)
+        return return_data
