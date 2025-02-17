@@ -1,0 +1,126 @@
+{
+  "client_id": "cmdb",
+  "name": "CMDB",
+  "url": "",
+  "description": "Create roles for the cmdb app to manage data permissions, menu permissions, and feature permissions.",
+  "menus": [
+    {
+      "name": "Search",
+      "children": [
+        {
+          "id": "search",
+          "name": "Search",
+          "operation": [
+            "View"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "View",
+      "children": [
+        {
+          "id": "view_list",
+          "name": "List",
+          "operation": [
+            "View"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Asset",
+      "children": [
+        {
+          "id": "asset_list",
+          "name": "Asset—List",
+          "operation": [
+            "View",
+            "Add",
+            "Associate",
+            "Edit",
+            "Delete"
+          ]
+        },
+        {
+          "id": "asset_basic_information",
+          "name": "Asset-Basic information",
+          "operation": [
+            "View",
+            "Edit"
+          ]
+        },
+        {
+          "id": "asset_relationships",
+          "name": "Asset-Relationships",
+          "operation": [
+            "View",
+            "Add",
+            "Delete"
+          ]
+        },
+        {
+          "id": "asset_change_records",
+          "name": "Asset-Change Records",
+          "operation": [
+            "View"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Model",
+      "children": [
+        {
+          "id": "model_list",
+          "name": "Model-list",
+          "operation": [
+            "View",
+            "Add Model",
+            "Add Group",
+            "Edit Model",
+            "Edit Group",
+            "Delete Group",
+            "Delete Model"
+          ]
+        },
+        {
+          "id": "model_attributes",
+          "name": "Model-Attributes",
+          "operation": [
+            "View",
+            "Add",
+            "Edit",
+            "Delete"
+          ]
+        },
+        {
+          "id": "model_relationships",
+          "name": "Model-Relationships",
+          "operation": [
+            "View",
+            "Add",
+            "Edit",
+            "Delete"
+          ]
+        }
+      ]
+    }
+  ],
+  "roles": [
+    {
+      "name": "admin",
+      "role_name": "cmdb_admin",
+      "menus": []
+    },
+    {
+      "name": "normal",
+      "role_name": "cmdb_normal",
+      "menus": [
+        "search-View",
+        "view_list-View",
+        "asset_list-View"
+      ]
+    }
+  ]
+}
