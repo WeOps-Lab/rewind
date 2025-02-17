@@ -5,20 +5,20 @@ from apps.monitor.constants import THRESHOLD_METHODS
 
 
 def vm_to_dataframe(vm_data, instance_id_keys=None):
-    """将 VM 数据转换为 DataFrame，支持多维度组合 _instance_id"""
+    """将 VM 数据转换为 DataFrame，支持多维度组合 instance_id"""
     df = pd.json_normalize(vm_data, sep="_")  # 展开 metric 字段
 
     # 获取所有 metric 维度
-    metric_cols = [col for col in df.columns if col.startswith("metric.")]
+    metric_cols = [col for col in df.columns if col.startswith("metric_")]
 
-    # 选择用于拼接 _instance_id 的维度字段
+    # 选择用于拼接 instance_id 的维度字段
     if instance_id_keys:
-        selected_cols = [f"metric.{key}" for key in instance_id_keys if f"metric.{key}" in metric_cols]
+        selected_cols = [f"metric_{key}" for key in instance_id_keys if f"metric_{key}" in metric_cols]
     else:
-        selected_cols = ["metric.instance_id"]  # 默认使用 instance_id
+        selected_cols = ["metric_instance_id"]  # 默认使用 instance_id
 
-    # 生成 _instance_id（拼接选定的维度字段）
-    df["_instance_id"] = df[selected_cols].astype(str).agg("_".join, axis=1)
+    # 生成instance_id（拼接选定的维度字段）
+    df["instance_id"] = df[selected_cols].astype(str).agg("_".join, axis=1)
 
     return df
 
@@ -27,9 +27,9 @@ def calculate_alerts(alert_name, df, thresholds, n=1):
     """计算告警事件"""
     alert_events, info_events = [], []
 
-    # 遍历每一行数据（每个 _instance_id）
+    # 遍历每一行数据（每个 instance_id）
     for _, row in df.iterrows():
-        _instance_id = row["_instance_id"]
+        instance_id = row["instance_id"]
 
         # 取最近 n 个数据点，保证窗口长度为 n
         values = row["values"][-n:]
@@ -52,7 +52,7 @@ def calculate_alerts(alert_name, df, thresholds, n=1):
                 content = template.safe_substitute(raw_data)
 
                 event = {
-                    "instance_id": _instance_id,
+                    "instance_id": instance_id,
                     "value": values[-1][1],  # 最后一个时间点的值
                     "timestamp": values[-1][0],  # 最后一个时间点的时间戳
                     "level": threshold_info["level"],
@@ -66,7 +66,7 @@ def calculate_alerts(alert_name, df, thresholds, n=1):
         if not alert_triggered:
             # 记录 info 事件
             info_events.append({
-                "instance_id": _instance_id,
+                "instance_id": instance_id,
                 "value": values[-1][1],
                 "timestamp": values[-1][0],
                 "level": "info",
