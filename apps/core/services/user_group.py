@@ -1,28 +1,31 @@
 from apps.core.utils.user_group import Group
-from apps.core.utils.keycloak_client import KeyCloakClient
 from apps.rpc.system_mgmt import SystemMgmt
 
 
 class UserGroup:
-    def __init__(self):
-        self.keycloak_client = KeyCloakClient()
-        self.system_mgmt_client = SystemMgmt()
 
-    def user_list(self, query_params):
+    @staticmethod
+    def get_system_mgmt_client():
+        system_mgmt_client = SystemMgmt()
+        return system_mgmt_client
+
+    @classmethod
+    def user_list(cls, system_mgmt_client, query_params):
         """用户列表"""
-        # users = self.keycloak_client.realm_client.get_users(query_params)
-        # return {"count": len(users), "users": users}
-        return self.system_mgmt_client.get_all_users()
+        result = system_mgmt_client.search_users(query_params)
+        data = result["data"]
+        return {"count": data["count"], "users": data["users"]}
 
-    def goups_list(self, query_params):
+    @classmethod
+    def groups_list(cls, system_mgmt_client, query_params):
         """用户组列表"""
         if query_params is None:
             query_params = {"search": ""}
-        # groups = self.keycloak_client.realm_client.get_groups(query_params)
-        groups = self.system_mgmt_client.get_all_groups(query_params)
-        return groups
+        groups = system_mgmt_client.search_groups(query_params)
+        return groups["data"]
 
-    def user_goups_list(self, token, request):
+    @classmethod
+    def user_groups_list(cls, token, request):
         """用户组列表"""
         # 查询用户角色
         is_super_admin = request.user.is_superuser
