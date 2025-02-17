@@ -83,6 +83,8 @@ class KnowledgeBaseViewSet(AuthViewSet):
         instance.enable_rerank = kwargs["enable_rerank"]
         instance.rerank_model_id = kwargs["rerank_model"]
         instance.text_search_mode = kwargs["text_search_mode"]
+        instance.rag_k = kwargs["rag_k"]
+        instance.rag_num_candidates = kwargs["rag_num_candidates"]
         instance.save()
         return JsonResponse({"result": True})
 
