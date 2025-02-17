@@ -16,7 +16,8 @@ from apps.cmdb.graph.neo4j import Neo4jClient
 from apps.cmdb.language.service import SettingLanguage
 from apps.cmdb.services.classification import ClassificationManage
 from apps.core.exceptions.base_app_exception import BaseAppException
-from apps.core.utils.keycloak_client import KeyCloakClient
+from apps.core.services.user_group import UserGroup
+from apps.rpc.system_mgmt import SystemMgmt
 
 
 class ModelManage(object):
@@ -39,7 +40,8 @@ class ModelManage(object):
                 result["_id"],
                 MODEL,
                 dict(
-                    classification_model_asst_id=f"{result['classification_id']}_{SUBORDINATE_MODEL}_{result['model_id']}"  # noqa
+                    classification_model_asst_id=f"{result['classification_id']}_{SUBORDINATE_MODEL}_{result['model_id']}"
+                    # noqa
                 ),
                 "classification_model_asst_id",
             )
@@ -223,9 +225,10 @@ class ModelManage(object):
         model_info = ModelManage.search_model_info(model_id)
         attrs = ModelManage.parse_attrs(model_info.get("attrs", "[]"))
         attr_types = {attr["attr_type"] for attr in attrs}
+        system_mgmt_client = SystemMgmt()
 
         if ORGANIZATION in attr_types:
-            groups = KeyCloakClient().realm_client.get_groups({"search": ""})
+            groups = UserGroup.groups_list(system_mgmt_client, {"search": ""})
             # 获取默认的第一个根组织
             groups = groups if groups else []
             option = []
@@ -235,7 +238,7 @@ class ModelManage(object):
                     attr.update(option=option)
 
         if USER in attr_types:
-            users = KeyCloakClient().realm_client.get_users()
+            users = UserGroup.user_list(system_mgmt_client, {"search": ""})
             option = [
                 dict(
                     id=user["username"],
@@ -243,7 +246,7 @@ class ModelManage(object):
                     is_default=False,
                     type="str",
                 )
-                for user in users
+                for user in users["users"]
             ]
             for attr in attrs:
                 if attr["attr_type"] == USER:
