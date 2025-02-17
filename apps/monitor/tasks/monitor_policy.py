@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 from django.conf.global_settings import DEFAULT_FROM_EMAIL
 from django.core.mail import send_mail
 from django.db.models import F
-from apps.monitor.constants import LEVEL_WEIGHT, MONITOR_OBJS
+from apps.monitor.constants import LEVEL_WEIGHT
 from apps.monitor.models import MonitorPolicy, MonitorInstanceOrganization, MonitorAlert, MonitorEvent, MonitorInstance, \
     Metric, MonitorEventRawData
 from apps.monitor.tasks.task_utils.policy_calculate import vm_to_dataframe, calculate_alerts
@@ -30,6 +30,10 @@ def scan_policy_task(policy_id):
         if not policy_obj.last_run_time:
             policy_obj.last_run_time = datetime.now(timezone.utc)
         policy_obj.last_run_time = datetime.fromtimestamp(policy_obj.last_run_time.timestamp() + period_to_seconds(policy_obj.period), tz=timezone.utc)
+
+        # 如果最后执行时间大于当前时间，将最后执行时间设置为当前时间
+        if policy_obj.last_run_time > datetime.now(timezone.utc):
+            policy_obj.last_run_time = datetime.now(timezone.utc)
         policy_obj.save()
         MonitorPolicyScan(policy_obj).run()                        # 执行监控策略
 

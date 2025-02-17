@@ -20,8 +20,7 @@ def vm_to_dataframe(vm_data, instance_id_keys=None):
     # 生成 _instance_id（拼接选定的维度字段）
     df["_instance_id"] = df[selected_cols].astype(str).agg("_".join, axis=1)
 
-    return df[["_instance_id", "values"]]  # 只保留关键信息
-
+    return df
 
 
 def calculate_alerts(alert_name, df, thresholds, n=1):
