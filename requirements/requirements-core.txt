@@ -61,3 +61,5 @@ nats-py==2.9.0
 
 adrf==0.1.9
 pyarmor==9.0.7
+
+neo4j==5.23.1
