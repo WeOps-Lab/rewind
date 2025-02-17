@@ -22,7 +22,7 @@ class UserGroup:
         if query_params is None:
             query_params = {"search": ""}
         groups = system_mgmt_client.search_groups(query_params)
-        return groups
+        return groups["data"]
 
     @classmethod
     def user_groups_list(cls, token, request):

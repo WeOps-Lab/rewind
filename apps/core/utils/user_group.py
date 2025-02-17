@@ -59,7 +59,7 @@ class Group:
     def get_group_list(self):
         """获取组织列表"""
         groups = self.system_mgmt_client.search_groups({"search": ""})
-        return groups if groups else []
+        return groups["data"] if groups else []
 
     def get_user_group_list(self):
         """获取用户组织列表"""
@@ -71,9 +71,6 @@ class Group:
         """获取用户组织ID与子组ID的列表"""
         # 获取所有组织列表
         all_groups = self.get_group_list()
-        # 获取用户组织列表
-        # if not user_group_list:
-        #     user_group_list = self.get_user_group_list()
 
         # 获取用户组织ID与子组ID的列表
         user_group_and_subgroup_ids = []

@@ -11,8 +11,8 @@ from config.components.drf import AUTH_TOKEN_HEADER_NAME
 
 class UserGroupViewSet(viewsets.ViewSet):
 
-    def __init__(self):
-        super(UserGroupViewSet, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(UserGroupViewSet, self).__init__(*args, **kwargs)
         self.system_mgmt_client = SystemMgmt()
 
     def get_first_and_max(self, params):
