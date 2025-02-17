@@ -6,7 +6,7 @@ from apps.monitor.constants import THRESHOLD_METHODS
 
 def vm_to_dataframe(vm_data, instance_id_keys=None):
     """将 VM 数据转换为 DataFrame，支持多维度组合 _instance_id"""
-    df = pd.json_normalize(vm_data)  # 展开 metric 字段
+    df = pd.json_normalize(vm_data, sep="_")  # 展开 metric 字段
 
     # 获取所有 metric 维度
     metric_cols = [col for col in df.columns if col.startswith("metric.")]
