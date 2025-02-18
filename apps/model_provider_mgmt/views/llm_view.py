@@ -113,7 +113,7 @@ class LLMModelViewSet(AuthViewSet):
 
     def create(self, request, *args, **kwargs):
         params = request.data
-        if not params.get("teams"):
+        if not params.get("team"):
             return JsonResponse({"result": False, "message": _("The team is empty.")})
         LLMModel.objects.create(
             name=params["name"],
