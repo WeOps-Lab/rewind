@@ -102,10 +102,34 @@ class LLMViewSet(AuthViewSet):
         return JsonResponse({"result": True, "data": return_data})
 
 
-class LLMModelViewSet(viewsets.ModelViewSet):
+class LLMModelViewSet(AuthViewSet):
     serializer_class = LLMModelSerializer
     queryset = LLMModel.objects.all()
     search_fields = ["name"]
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        return self.query_by_groups(request, queryset)
+
+    def create(self, request, *args, **kwargs):
+        params = request.data
+        if not params.get("teams"):
+            return JsonResponse({"result": False, "message": _("The team is empty.")})
+        LLMModel.objects.create(
+            name=params["name"],
+            llm_model_type=params["llm_model_type"],
+            llm_config=params["llm_config"],
+            enabled=params.get("enabled", True),
+            team=params.get("team"),
+            is_build_in=False,
+        )
+        return JsonResponse({"result": True})
+
+    def destroy(self, request, *args, **kwargs):
+        obj = self.get_object()
+        if obj.is_build_in:
+            return JsonResponse({"result": False, "message": _("Built-in model is not allowed to be deleted")})
+        return super().destroy(request, *args, **kwargs)
 
 
 class LogFilter(FilterSet):

@@ -40,6 +40,8 @@ class KnowledgeBaseViewSet(AuthViewSet):
         params["created_by"] = request.user.username
         params["rerank_model"] = rerank_model.id
         params["enable_rerank"] = False
+        params["rag_k"] = 10
+        params["rag_num_candidates"] = 50
         serializer = self.get_serializer(data=params)
         serializer.is_valid(raise_exception=True)
         es_client = get_es_client()
