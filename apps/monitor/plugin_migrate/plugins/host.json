@@ -19,7 +19,7 @@
     {
       "metric_group": "CPU",
       "name": "cpu_summary.idle",
-      "query": "avg(cpu_usage_idle{cpu=\"cpu-total\", instance_type=\"os\", __$labels__})",
+      "query": "avg(cpu_usage_idle{cpu=\"cpu-total\", instance_type=\"os\", __$labels__}) by (instance_id)",
       "display_name": "CPU Idle Rate",
       "data_type": "Number",
       "unit": "percent",
@@ -30,7 +30,7 @@
     {
       "metric_group": "CPU",
       "name": "cpu_summary.iowait",
-      "query": "avg(cpu_usage_iowait{cpu=\"cpu-total\", instance_type=\"os\", __$labels__})",
+      "query": "avg(cpu_usage_iowait{cpu=\"cpu-total\", instance_type=\"os\", __$labels__}) by (instance_id)",
       "display_name": "Percentage of Time Waiting for IO",
       "data_type": "Number",
       "unit": "percent",
@@ -41,7 +41,7 @@
     {
       "metric_group": "CPU",
       "name": "cpu_summary.system",
-      "query": "avg(cpu_usage_system{cpu=\"cpu-total\", instance_type=\"os\", __$labels__})",
+      "query": "avg(cpu_usage_system{cpu=\"cpu-total\", instance_type=\"os\", __$labels__}) by (instance_id)",
       "display_name": "System Usage Rate",
       "data_type": "Number",
       "unit": "percent",
@@ -52,7 +52,7 @@
     {
       "metric_group": "CPU",
       "name": "cpu_summary.user",
-      "query": "avg(cpu_usage_user{cpu=\"cpu-total\", instance_type=\"os\", __$labels__})",
+      "query": "avg(cpu_usage_user{cpu=\"cpu-total\", instance_type=\"os\", __$labels__}) by (instance_id)",
       "display_name": "User Usage Rate",
       "data_type": "Number",
       "unit": "percent",
@@ -192,7 +192,7 @@
     {
       "metric_group": "Disk",
       "name": "disk.is_use",
-      "query": "avg(disk_used_percent{instance_type=\"os\", __$labels__})",
+      "query": "avg(disk_used_percent{instance_type=\"os\", __$labels__}) by (instance_id)",
       "display_name": "Disk Usage Rate",
       "data_type": "Number",
       "unit": "percent",
@@ -203,7 +203,7 @@
     {
       "metric_group": "Disk",
       "name": "disk.used",
-      "query": "sum(disk_used{instance_type=\"os\", __$labels__}) / 1024 / 1024 / 1024",
+      "query": "sum(disk_used{instance_type=\"os\", __$labels__}) by (instance_id) / 1024 / 1024 / 1024",
       "display_name": "Disk Used Size",
       "data_type": "Number",
       "unit": "gbytes",
@@ -214,7 +214,7 @@
     {
       "metric_group": "Process",
       "name": "env.procs",
-      "query": "sum(processes_total{instance_type=\"os\", __$labels__})",
+      "query": "sum(processes_total{instance_type=\"os\", __$labels__}) by (instance_id)",
       "display_name": "Total Number of Processes",
       "data_type": "Number",
       "unit": "short",
@@ -225,7 +225,7 @@
     {
       "metric_group": "Process",
       "name": "env.proc_running_current",
-      "query": "sum(processes_running{instance_type=\"os\", __$labels__})",
+      "query": "sum(processes_running{instance_type=\"os\", __$labels__}) by (instance_id)",
       "display_name": "Number of Running Processes",
       "data_type": "Number",
       "unit": "short",
@@ -236,7 +236,7 @@
     {
       "metric_group": "Process",
       "name": "env.procs_blocked_current",
-      "query": "sum(processes_blocked{instance_type=\"os\", __$labels__})",
+      "query": "sum(processes_blocked{instance_type=\"os\", __$labels__}) by (instance_id)",
       "display_name": "Number of IO Blocked Processes",
       "data_type": "Number",
       "unit": "short",
@@ -247,7 +247,7 @@
     {
       "metric_group": "Memory",
       "name": "mem.total",
-      "query": "avg(mem_total{instance_type=\"os\", __$labels__}) / 1024 / 1024 / 1024",
+      "query": "avg(mem_total{instance_type=\"os\", __$labels__}) by (instance_id) / 1024 / 1024 / 1024",
       "display_name": "Total Physical Memory Size",
       "data_type": "Number",
       "unit": "gbytes",
@@ -258,7 +258,7 @@
     {
       "metric_group": "Memory",
       "name": "mem.free",
-      "query": "avg(mem_free{instance_type=\"os\", __$labels__}) / 1024 / 1024 / 1024",
+      "query": "avg(mem_free{instance_type=\"os\", __$labels__}) by (instance_id) / 1024 / 1024 / 1024",
       "display_name": "Free Physical Memory Amount",
       "data_type": "Number",
       "unit": "gbytes",
@@ -269,7 +269,7 @@
     {
       "metric_group": "Memory",
       "name": "mem.cached",
-      "query": "avg(mem_cached{instance_type=\"os\", __$labels__}) / 1024 / 1024 / 1024",
+      "query": "avg(mem_cached{instance_type=\"os\", __$labels__}) by (instance_id) / 1024 / 1024 / 1024",
       "display_name": "Cache Memory Size",
       "data_type": "Number",
       "unit": "gbytes",
@@ -280,7 +280,7 @@
     {
       "metric_group": "Memory",
       "name": "mem.buffer",
-      "query": "avg(mem_buffered{instance_type=\"os\", __$labels__}) / 1024 / 1024 / 1024",
+      "query": "avg(mem_buffered{instance_type=\"os\", __$labels__}) by (instance_id) / 1024 / 1024 / 1024",
       "display_name": "Buffer Memory Size",
       "data_type": "Number",
       "unit": "gbytes",
@@ -291,7 +291,7 @@
     {
       "metric_group": "Memory",
       "name": "mem.usable",
-      "query": "avg(mem_available{instance_type=\"os\", __$labels__}) / 1024 / 1024 / 1024",
+      "query": "avg(mem_available{instance_type=\"os\", __$labels__}) by (instance_id) / 1024 / 1024 / 1024",
       "display_name": "Available Memory for Applications",
       "data_type": "Number",
       "unit": "gbytes",
@@ -313,7 +313,7 @@
     {
       "metric_group": "Memory",
       "name": "mem.used",
-      "query": "avg(mem_used{instance_type=\"os\", __$labels__}) / 1024 / 1024 / 1024",
+      "query": "avg(mem_used{instance_type=\"os\", __$labels__}) by (instance_id) / 1024 / 1024 / 1024",
       "display_name": "Memory Used by Applications",
       "data_type": "Number",
       "unit": "gbytes",
@@ -335,7 +335,7 @@
     {
       "metric_group": "Memory",
       "name": "mem.psc_used",
-      "query": "avg((mem_total{instance_type=\"os\", __$labels__} - mem_free{instance_type=\"os\", __$labels__} - mem_buffered{instance_type=\"os\", __$labels__} - mem_cached{instance_type=\"os\", __$labels__}) / 1024 / 1024 / 1024)",
+      "query": "avg((mem_total{instance_type=\"os\", __$labels__} - mem_free{instance_type=\"os\", __$labels__} - mem_buffered{instance_type=\"os\", __$labels__} - mem_cached{instance_type=\"os\", __$labels__}) / 1024 / 1024 / 1024) by (instance_id)",
       "display_name": "Used Physical Memory Amount",
       "data_type": "Number",
       "unit": "gbytes",
@@ -346,7 +346,7 @@
     {
       "metric_group": "Memory",
       "name": "mem.shared",
-      "query": "avg(mem_shared{instance_type=\"os\", __$labels__}) / 1024 / 1024 / 1024",
+      "query": "avg(mem_shared{instance_type=\"os\", __$labels__}) by(instance_id) / 1024 / 1024 / 1024",
       "display_name": "Shared Memory Usage",
       "data_type": "Number",
       "unit": "gbytes",

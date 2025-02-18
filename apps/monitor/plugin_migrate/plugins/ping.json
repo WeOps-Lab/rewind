@@ -8,7 +8,7 @@
     {
       "metric_group": "Ping",
       "name": "ping_ttl",
-      "query": "avg(ping_ttl{__$labels__})",
+      "query": "avg(ping_ttl{__$labels__}) by (instance_id)",
       "display_name": "Average TTL",
       "data_type": "Number",
       "unit": "short",
@@ -40,7 +40,7 @@
     {
       "metric_group": "Ping",
       "name": "ping_packet_transmission_rate",
-      "query": "sum(ping_packets_received{__$labels__})/sum(ping_packets_transmitted{__$labels__})*100",
+      "query": "100* sum(ping_packets_received{__$labels__}) by (instance_id) / sum(ping_packets_transmitted{__$labels__}) by (instance_id)",
       "display_name": "Packet Transmission Rate",
       "data_type": "Number",
       "unit": "percent",
@@ -56,7 +56,7 @@
     {
       "metric_group": "Ping",
       "name": "ping_packet_loss_rate",
-      "query": "100 - avg(ping_percent_packet_loss{__$labels__})",
+      "query": "100 - avg(ping_percent_packet_loss{__$labels__}) by (instance_id)",
       "display_name": "Packet Loss Rate",
       "data_type": "Number",
       "unit": "percent",
