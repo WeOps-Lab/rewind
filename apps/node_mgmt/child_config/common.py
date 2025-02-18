@@ -1,6 +1,7 @@
 
 from apps.node_mgmt.child_config.telegraf.host import HostConfig
 from apps.node_mgmt.child_config.telegraf.ipmi import IpmiConfig
+from apps.node_mgmt.child_config.telegraf.middleware import MiddlewareConfig
 from apps.node_mgmt.child_config.telegraf.ping import PingConfig
 from apps.node_mgmt.child_config.telegraf.snmp import SnmpConfig
 from apps.node_mgmt.child_config.telegraf.trap import TrapConfig
@@ -14,6 +15,7 @@ OBJECT_TYPE_MAP = {
     "ipmi": IpmiConfig.patch_set_node_config,
     "trap": TrapConfig.patch_set_node_config,
     "snmp": SnmpConfig.patch_set_node_config,
+    "middleware": MiddlewareConfig.patch_set_node_config,
 }
 
 
