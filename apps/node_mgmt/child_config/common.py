@@ -1,4 +1,4 @@
-
+from apps.node_mgmt.child_config.telegraf.docker import DockerConfig
 from apps.node_mgmt.child_config.telegraf.host import HostConfig
 from apps.node_mgmt.child_config.telegraf.ipmi import IpmiConfig
 from apps.node_mgmt.child_config.telegraf.middleware import MiddlewareConfig
@@ -16,6 +16,7 @@ OBJECT_TYPE_MAP = {
     "trap": TrapConfig.patch_set_node_config,
     "snmp": SnmpConfig.patch_set_node_config,
     "middleware": MiddlewareConfig.patch_set_node_config,
+    "docker": DockerConfig.patch_set_node_config,
 }
 
 
