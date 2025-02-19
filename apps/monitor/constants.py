@@ -119,6 +119,27 @@ MONITOR_OBJS = [
         "instance_id_keys": ["instance_id"],
         "supplementary_indicators": [],
     },
+    {
+        "type": "Middleware",
+        "name": "RabbitMQ",
+        "default_metric": 'any({instance_type="rabbitmq"}) by (instance_id)',
+        "instance_id_keys": ["instance_id"],
+        "supplementary_indicators": [],
+    },
+    {
+        "type": "Container Management",
+        "name": "Docker",
+        "default_metric": 'any({instance_type="docker"}) by (instance_id)',
+        "instance_id_keys": ["instance_id"],
+        "supplementary_indicators": [],
+    },
+    {
+        "type": "Container Management",
+        "name": "Docker Container",
+        "default_metric": 'docker_container_mem_usage',
+        "instance_id_keys": ["instance_id", "container_name"],
+        "supplementary_indicators": [],
+    },
 ]
 
 # 阀值对比方法

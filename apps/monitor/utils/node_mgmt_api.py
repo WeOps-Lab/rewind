@@ -20,8 +20,63 @@ class FormatChildConfig:
             return FormatChildConfig.format_ipmi(instances, configs)
         elif object_type == "snmp":
             return FormatChildConfig.format_snmp(instances, configs)
+        elif object_type == "middleware":
+            return FormatChildConfig.format_middleware(configs, instances)
+        elif object_type == "docker":
+            return FormatChildConfig.format_docker(instances, configs)
         else:
             raise ValueError(f"Unsupported object type: {object_type}")
+
+    @staticmethod
+    def format_docker(instances, configs):
+        result = {"object_type": "docker", "nodes": []}
+
+        for instance in instances:
+            instance_id, instance_type = instance["instance_id"], instance["instance_type"]
+            interval = instance.get("interval", 10)
+            url = instance["url"]
+
+            for node_id in instance["node_ids"]:
+                node_info = {"id": node_id, "configs": []}
+
+                for config in configs:
+                    node_info["configs"].append({
+                        "type": config["type"],
+                        "instance_id": instance_id,
+                        "instance_type": instance_type,
+                        "interval": interval,
+                        "url": url,
+                    })
+
+                result["nodes"].append(node_info)
+
+        return result
+
+    @staticmethod
+    def format_middleware(configs, instances):
+        result = {"object_type": "middleware", "nodes": []}
+
+        for instance in instances:
+            instance_id, instance_type = instance["instance_id"], instance["instance_type"]
+            interval = instance.get("interval", 10)
+            url = instance["url"]
+            for node_id in instance["node_ids"]:
+                node_info = {"id": node_id, "configs": []}
+                for config in configs:
+                    username, password = config["username"], config["password"]
+                    node_info["configs"].append({
+                        "type": config["type"],
+                        "instance_id": instance_id,
+                        "instance_type": instance_type,
+                        "interval": interval,
+                        "url": url,
+                        "username": username,
+                        "password": password,
+                    })
+
+                result["nodes"].append(node_info)
+
+        return result
 
     @staticmethod
     def format_host(configs, instances):
