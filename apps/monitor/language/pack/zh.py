@@ -4,7 +4,7 @@ MONITOR_OBJECT_TYPE = {
     "K8S": "K8S",
     "Network Device": "网络设备",
     "Hardware Device": "硬件设备",
-    "Other": "其他数据源备",
+    "Other": "其他",
 }
 
 MONITOR_OBJECT = {
