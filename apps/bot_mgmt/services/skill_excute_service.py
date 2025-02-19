@@ -1,3 +1,5 @@
+import re
+
 from apps.bot_mgmt.utils import get_user_info
 from apps.core.logger import logger
 from apps.model_provider_mgmt.models import LLMSkill, SkillRule
@@ -29,6 +31,8 @@ class SkillExecuteService:
         }
         result = llm_service.chat(params)
         content = result["content"]
+        if not llm_skill.show_think:
+            content = re.sub(r"<think>.*?</think>", "", content, flags=re.DOTALL).strip()
         if llm_skill.enable_rag_knowledge_source:
             knowledge_titles = {x["knowledge_title"] for x in result["citing_knowledge"]}
             last_content = content.strip().split("\n")[-1]

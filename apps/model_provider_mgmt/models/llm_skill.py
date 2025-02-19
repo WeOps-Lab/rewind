@@ -30,6 +30,8 @@ class LLMSkill(MaintainerInfo):
     introduction = models.TextField(blank=True, null=True, default="", verbose_name="介绍")
     team = models.JSONField(default=list, verbose_name="分组")
 
+    show_think = models.BooleanField(default=True)
+
     temperature = models.FloatField(default=0.7, verbose_name="温度")
 
     def __str__(self):
