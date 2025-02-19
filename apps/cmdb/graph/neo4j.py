@@ -83,7 +83,8 @@ class Neo4jClient:
         result = self._create_entity(label, properties, check_attr_map, exist_items, operator)
         return result
 
-    def check_unique_attr(self, item, check_attr_map, exist_items, is_update=False):
+    @staticmethod
+    def check_unique_attr(item, check_attr_map, exist_items, is_update=False):
         """校验唯一属性"""
         not_only_attr = set()
 
