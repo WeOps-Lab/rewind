@@ -36,6 +36,7 @@ class KnowledgeBase(MaintainerInfo, TimeInfo):
     rag_k = models.IntegerField(default=50, verbose_name=_("Number of Results"))
     rag_num_candidates = models.IntegerField(default=1000, verbose_name=_("Number of Candidates"))
     text_search_mode = models.CharField(default="match", max_length=20, verbose_name=_("Text search mode"))
+    result_count = models.IntegerField(default=50)
 
     def knowledge_index_name(self):
         return f"knowledge_base_{self.id}"

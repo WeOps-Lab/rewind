@@ -23,6 +23,7 @@ class KubernetesClient:
         kwargs = {
             "pilot_id": bot.id,
             "api_key": bot.api_token,
+            "replicas": bot.replica_count,
             "munchkin_url": settings.MUNCHKIN_BASE_URL,
             "rabbitmq_host": settings.CONVERSATION_MQ_HOST,
             "rabbitmq_port": settings.CONVERSATION_MQ_PORT,

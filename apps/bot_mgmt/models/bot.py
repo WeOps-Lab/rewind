@@ -28,6 +28,7 @@ class Bot(MaintainerInfo):
     online = models.BooleanField(verbose_name="是否上线", default=False)
     enable_ssl = models.BooleanField(verbose_name="启用SSL", default=False)
     api_token = models.CharField(max_length=64, default="", blank=True, null=True, verbose_name="API Token")
+    replica_count = models.IntegerField(verbose_name="端口映射", default=1)
 
     def __str__(self):
         return self.name
