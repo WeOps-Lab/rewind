@@ -34,7 +34,7 @@ collect-static:
 	python manage.py collectstatic --noinput
 
 dev:
-	daphne -b 0.0.0.0 -p 8001 core.asgi:application
+	python ./manage.py runserver 0.0.0.0:8000
 
 run:
 	gunicorn -w 4 -b 0.0.0.0:8001 asgi:application -k uvicorn.workers.UvicornWorker
