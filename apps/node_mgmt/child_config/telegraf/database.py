@@ -9,42 +9,42 @@ CONFIG_MAP = {
     username = "${username}"
     password = "${password}" 
     interval = "${interval}s"
-    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="elasticsearch" }""",
+    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="database" }""",
 
     "mongodb": """[[inputs.mongodb]]
     servers = ["${server}"]
     username = "${username}"
     password = "${password}" 
     interval = "${interval}s"
-    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="mongodb" }""",
+    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="database" }""",
 
     "mysql": """[[inputs.mysql]]
     servers = ["${server}"]
     username = "${username}"
     password = "${password}" 
     interval = "${interval}s"
-    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="mysql" }""",
+    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="database" }""",
 
     "postgres": """[[inputs.postgres]]
     servers = ["${server}"]
     username = "${username}"
     password = "${password}" 
     interval = "${interval}s"
-    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="postgres" }""",
+    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="database" }""",
 
     "redis": """[[inputs.redis]]
     servers = ["${server}"]
     username = "${username}"
     password = "${password}" 
     interval = "${interval}s"
-    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="redis" }""",
+    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="database" }""",
 
     "sqlserver": """[[inputs.sqlserver]]
     servers = ["${server}"]
     username = "${username}"
     password = "${password}" 
     interval = "${interval}s"
-    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="sqlserver" }""",
+    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="database" }""",
 }
 
 
