@@ -1,3 +1,4 @@
+from apps.node_mgmt.child_config.telegraf.database import ElasticSearchConfig
 from apps.node_mgmt.child_config.telegraf.docker import DockerConfig
 from apps.node_mgmt.child_config.telegraf.host import HostConfig
 from apps.node_mgmt.child_config.telegraf.ipmi import IpmiConfig
@@ -17,6 +18,7 @@ OBJECT_TYPE_MAP = {
     "snmp": SnmpConfig.patch_set_node_config,
     "middleware": MiddlewareConfig.patch_set_node_config,
     "docker": DockerConfig.patch_set_node_config,
+    "database": ElasticSearchConfig.patch_set_node_config,
 }
 
 
