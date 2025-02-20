@@ -59,9 +59,8 @@ CONFIG_MAP = {
     tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="tomcat" }""",
 
     "zookeeper": """[[inputs.zookeeper]]
-    url = "${url}"
-    username = "${username}"
-    password = "${password}" 
+    servers = ["${url}"]
+    timeout = "${timeout}s"
     interval = "${interval}s"
     tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="zookeeper" }""",
 
