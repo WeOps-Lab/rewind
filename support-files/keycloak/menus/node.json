@@ -1,0 +1,89 @@
+{
+  "client_id": "node",
+  "name": "Node",
+  "url": "",
+  "description": "Create roles for the Node app to manage data permissions, menu permissions, and feature permissions.",
+  "menus": [
+    {
+      "name": "Cloud Region",
+      "children": [
+        {
+          "id": "cloud_region_list",
+          "name": "Cloud Region-List",
+          "operation": [
+            "View",
+            "Edit"
+          ]
+        },
+        {
+          "id": "cloud_region_node",
+          "name": "Cloud Region-Node",
+          "operation": [
+            "View",
+            "Operate Sidecar",
+            "Operate Collector"
+          ]
+        },
+        {
+          "id": "cloud_region_configuration",
+          "name": "Cloud Region-Configuration",
+          "operation": [
+            "View",
+            "Add",
+            "Apply",
+            "Edit",
+            "Delete"
+          ]
+        },
+        {
+          "id": "cloud_region_variable",
+          "name": "Cloud Region-Variable",
+          "operation": [
+            "View",
+            "Add",
+            "Edit",
+            "Delete"
+          ]
+        }
+      ]
+      },
+    {
+      "name": "Collector",
+      "children": [
+        {
+          "id": "collector_list",
+          "name": "Collector-List",
+          "operation": [
+            "View"
+          ]
+        },
+        {
+          "id": "collector_overview",
+          "name": "Collector-Overview",
+          "operation": [
+            "View"
+          ]
+        }
+      ]
+    }
+  ],
+  "roles": [
+    {
+      "name": "admin",
+      "role_name": "node_admin",
+      "menus": []
+    },
+    {
+      "name": "normal",
+      "role_name": "node_normal",
+      "menus": [
+        "cloud_region_list-View",
+        "cloud_region_node-View",
+        "cloud_region_configuration-View",
+        "cloud_region_variable-View",
+        "collector_list-View",
+        "collector_overview-View"
+      ]
+    }
+  ]
+}
