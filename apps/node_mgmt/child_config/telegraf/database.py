@@ -10,6 +10,41 @@ CONFIG_MAP = {
     password = "${password}" 
     interval = "${interval}s"
     tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="elasticsearch" }""",
+
+    "mongodb": """[[inputs.mongodb]]
+    servers = ["${server}"]
+    username = "${username}"
+    password = "${password}" 
+    interval = "${interval}s"
+    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="mongodb" }""",
+
+    "mysql": """[[inputs.mysql]]
+    servers = ["${server}"]
+    username = "${username}"
+    password = "${password}" 
+    interval = "${interval}s"
+    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="mysql" }""",
+
+    "postgres": """[[inputs.postgres]]
+    servers = ["${server}"]
+    username = "${username}"
+    password = "${password}" 
+    interval = "${interval}s"
+    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="postgres" }""",
+
+    "redis": """[[inputs.redis]]
+    servers = ["${server}"]
+    username = "${username}"
+    password = "${password}" 
+    interval = "${interval}s"
+    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="redis" }""",
+
+    "sqlserver": """[[inputs.sqlserver]]
+    servers = ["${server}"]
+    username = "${username}"
+    password = "${password}" 
+    interval = "${interval}s"
+    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="sqlserver" }""",
 }
 
 

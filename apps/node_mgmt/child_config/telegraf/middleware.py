@@ -10,6 +10,61 @@ CONFIG_MAP = {
     password = "${password}" 
     interval = "${interval}s"
     tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="middleware" }""",
+
+    "activemq": """[[inputs.activemq]]
+    url = "${url}"
+    username = "${username}"
+    password = "${password}" 
+    interval = "${interval}s"
+    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="activemq" }""",
+
+    "apache": """[[inputs.apache]]
+    url = "${url}"
+    username = "${username}"
+    password = "${password}" 
+    interval = "${interval}s"
+    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="apache" }""",
+
+    "clickhouse": """[[inputs.clickhouse]]
+    url = "${url}"
+    username = "${username}"
+    password = "${password}" 
+    interval = "${interval}s"
+    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="clickhouse" }""",
+
+    "consul": """[[inputs.consul]]
+    url = "${url}"
+    username = "${username}"
+    password = "${password}" 
+    interval = "${interval}s"
+    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="consul" }""",
+
+    "nginx": """[[inputs.nginx]]
+    urls = ["${url}"]
+    interval = "${interval}s"
+    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="nginx" }""",
+
+    "net": """[[inputs.net]]
+    url = "${url}"
+    username = "${username}"
+    password = "${password}" 
+    interval = "${interval}s"
+    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="net" }""",
+
+    "tomcat": """[[inputs.tomcat]]
+    url = "${url}"
+    username = "${username}"
+    password = "${password}" 
+    interval = "${interval}s"
+    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="tomcat" }""",
+
+    "zookeeper": """[[inputs.zookeeper]]
+    url = "${url}"
+    username = "${username}"
+    password = "${password}" 
+    interval = "${interval}s"
+    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="zookeeper" }""",
+
 }
 
 
