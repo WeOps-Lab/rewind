@@ -73,10 +73,10 @@ def model_download(request):
 def validate_openai_token(token):
     """Validate the OpenAI API token"""
     if not token:
-        return False, {"choices": [{"message": {"role": "user", "content": "No authorization"}}]}
+        return False, {"choices": [{"message": {"role": "assistant", "content": "No authorization"}}]}
     token = token.split("Bearer ")[-1]
     if not UserAPISecret.objects.filter(api_secret=token).exists():
-        return False, {"choices": [{"message": {"role": "user", "content": "No authorization"}}]}
+        return False, {"choices": [{"message": {"role": "assistant", "content": "No authorization"}}]}
     return True, None
 
 
@@ -86,7 +86,7 @@ def get_skill_and_params(kwargs):
     skill_obj = LLMSkill.objects.filter(name=skill_id).first()
 
     if not skill_obj:
-        return None, None, {"choices": [{"message": {"role": "user", "content": "No skill"}}]}
+        return None, None, {"choices": [{"message": {"role": "assistant", "content": "No skill"}}]}
     num = kwargs.get("conversation_window_size") or skill_obj.conversation_window_size
     chat_history = [{"text": i["content"], "event": i["role"]} for i in kwargs.get("messages", [])[-1 * num :]]
 
@@ -174,7 +174,12 @@ def openai_completions(request):
             },
         },
         "choices": [
-            {"message": {"role": "user", "content": content}, "logprobs": None, "finish_reason": "stop", "index": 0}
+            {
+                "message": {"role": "assistant", "content": content},
+                "logprobs": None,
+                "finish_reason": "stop",
+                "index": 0,
+            }
         ],
     }
     insert_skill_log(current_ip, skill_obj.id, return_data, kwargs, user_message=user_message)
