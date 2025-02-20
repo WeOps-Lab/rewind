@@ -5,7 +5,7 @@ from apps.node_mgmt.models.sidecar import CollectorConfiguration, ChildConfig
 
 CONFIG_MAP = {
     "elasticsearch": """[[inputs.elasticsearch]]
-    servers = ["${servers}"]
+    servers = ["${server}"]
     username = "${username}"
     password = "${password}" 
     interval = "${interval}s"
