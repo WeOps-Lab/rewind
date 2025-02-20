@@ -35,8 +35,19 @@ class LLMViewSet(AuthViewSet):
         skill_count, used_skill_count, __ = client.get_skill_quota()
         if skill_count != -1 and skill_count <= used_skill_count:
             return JsonResponse({"result": False, "message": _("Skill count exceeds quota limit.")})
-        if LLMSkill.objects.filter(name=params["name"]).exists():
-            return JsonResponse({"result": False, "message": _("The name already exists.")})
+        skill_list = list(LLMSkill.objects.filter(name=params["name"]).values_list("team", flat=True))
+        exist_teams = []
+        for i in skill_list:
+            exist_teams.extend(i)
+        team_name_map = {i["id"]: i["name"] for i in request.user.group_list}
+        for i in params["team"]:
+            if i in exist_teams:
+                return JsonResponse(
+                    {
+                        "result": False,
+                        "message": _(f"A skill with the same name already exists in group {team_name_map.get(i)}."),
+                    }
+                )
         params["enable_conversation_history"] = True
         serializer = self.get_serializer(data=params)
         serializer.is_valid(raise_exception=True)

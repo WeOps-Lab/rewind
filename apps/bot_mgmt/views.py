@@ -75,15 +75,16 @@ def validate_openai_token(token):
     if not token:
         return False, {"choices": [{"message": {"role": "assistant", "content": "No authorization"}}]}
     token = token.split("Bearer ")[-1]
-    if not UserAPISecret.objects.filter(api_secret=token).exists():
+    user = UserAPISecret.objects.filter(api_secret=token).first()
+    if not user:
         return False, {"choices": [{"message": {"role": "assistant", "content": "No authorization"}}]}
-    return True, None
+    return True, user.team
 
 
-def get_skill_and_params(kwargs):
+def get_skill_and_params(kwargs, team):
     """Get skill object and prepare parameters for LLM invocation"""
     skill_id = kwargs.get("model")
-    skill_obj = LLMSkill.objects.filter(name=skill_id).first()
+    skill_obj = LLMSkill.objects.filter(name=skill_id, team__contains=team).first()
 
     if not skill_obj:
         return None, None, {"choices": [{"message": {"role": "assistant", "content": "No skill"}}]}
@@ -139,14 +140,14 @@ def openai_completions(request):
     stream_mode = kwargs.get("stream", False)
     token = request.META.get("HTTP_AUTHORIZATION") or request.META.get(settings.API_TOKEN_HEADER_NAME)
 
-    is_valid, error_response = validate_openai_token(token)
+    is_valid, msg = validate_openai_token(token)
     if not is_valid:
         if stream_mode:
-            return generate_stream_error(error_response["choices"][0]["message"]["content"])
+            return generate_stream_error(msg["choices"][0]["message"]["content"])
         else:
-            return JsonResponse(error_response)
-
-    skill_obj, params, error = get_skill_and_params(kwargs)
+            return JsonResponse(msg)
+    team = msg
+    skill_obj, params, error = get_skill_and_params(kwargs, team)
     user_message = params.get("user_message")
     if error:
         insert_skill_log(current_ip, skill_obj.id, error, kwargs, False, user_message)
