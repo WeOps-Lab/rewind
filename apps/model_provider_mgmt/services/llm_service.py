@@ -1,4 +1,5 @@
 import json
+import re
 
 from django.conf import settings
 from django.utils.translation import gettext as _
@@ -14,6 +15,7 @@ class LLMService:
         self.knowledge_search_service = KnowledgeSearchService()
 
     def chat(self, kwargs: dict):
+        show_think = kwargs.pop("show_think", True)
         citing_knowledge = []
         data, doc_map, title_map = self.invoke_chat(kwargs)
         if "bot_id" in kwargs:
@@ -36,7 +38,10 @@ class LLMService:
                 }
                 for k, v in title_map.items()
             ]
-        return {"content": data["content"], "citing_knowledge": citing_knowledge}
+        content = data["content"]
+        if not show_think:
+            content = re.sub(r"<think>.*?</think>", "", content, flags=re.DOTALL).strip()
+        return {"content": content, "citing_knowledge": citing_knowledge}
 
     def invoke_chat(self, kwargs):
         llm_model = LLMModel.objects.get(id=kwargs["llm_model"])

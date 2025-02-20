@@ -103,7 +103,8 @@ class LLMViewSet(AuthViewSet):
             "enable_rag_knowledge_source": True, # 是否显示RAG知识来源
             "rag_score_threshold": [{"knowledge_base": 1, "score": 0.7}], # RAG分数阈值
             "chat_history": "abc", # 对话历史
-            "conversation_window_size": 10 # 对话窗口大小
+            "conversation_window_size": 10, # 对话窗口大小
+            "show_think": True # 是否展示think的内容
         }
         """
         params = request.data
