@@ -34,7 +34,7 @@ class FormatChildConfig:
         for instance in instances:
             instance_id, instance_type = instance["instance_id"], instance["instance_type"]
             interval = instance.get("interval", 10)
-            url = instance["url"]
+            endpoint = instance["endpoint"]
 
             for node_id in instance["node_ids"]:
                 node_info = {"id": node_id, "configs": []}
@@ -45,7 +45,7 @@ class FormatChildConfig:
                         "instance_id": instance_id,
                         "instance_type": instance_type,
                         "interval": interval,
-                        "url": url,
+                        "url": endpoint,
                     })
 
                 result["nodes"].append(node_info)
