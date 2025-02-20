@@ -30,7 +30,7 @@ class BotViewSet(AuthViewSet):
             team=[current_team],
             channels=[],
             created_by=request.user.username,
-            replica_count=data.get("replica_count"),
+            replica_count=data.get("replica_count") or 1,
         )
         channel_list = Channel.objects.all()
         BotChannel.objects.bulk_create(
