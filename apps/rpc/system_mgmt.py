@@ -5,8 +5,8 @@ class SystemMgmt(object):
     def __init__(self):
         self.client = RpcClient("system_mgmt")
 
-    def get_client(self):
-        return_data = self.client.run("get_client")
+    def get_client(self, client_id):
+        return_data = self.client.run("get_client", client_id)
         return return_data
 
     def get_client_detail(self, client_id):
@@ -16,13 +16,16 @@ class SystemMgmt(object):
         return_data = self.client.run("get_client_detail", client_id)
         return return_data
 
-    def get_user_menus(self, client_id, roles, username):
+    def get_user_menus(self, client_id, roles, username, is_superuser):
         """
         :param client_id: 客户端的ID
         :param roles: 查询用户的角色ID列表
         :param username: 查询用户的用户名
+        :param is_superuser: 是否超管
         """
-        return_data = self.client.run("get_user_menus", client_id=client_id, roles=roles, username=username)
+        return_data = self.client.run(
+            "get_user_menus", client_id=client_id, roles=roles, username=username, is_superuser=is_superuser
+        )
         return return_data
 
     def verify_token(self, token, client_id):
@@ -42,4 +45,18 @@ class SystemMgmt(object):
 
     def get_all_users(self):
         return_data = self.client.run("get_all_users")
+        return return_data
+
+    def search_groups(self, query_params):
+        """
+        :param query_params: {"page_size": 10, "page": 1, "search": ""}
+        """
+        return_data = self.client.run("search_groups", query_params=query_params)
+        return return_data
+
+    def search_users(self, query_params):
+        """
+        :param query_params: {"page_size": 10, "page": 1, "search": ""}
+        """
+        return_data = self.client.run("search_users", query_params=query_params)
         return return_data

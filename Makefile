@@ -34,7 +34,7 @@ collect-static:
 	python manage.py collectstatic --noinput
 
 dev:
-	daphne -b 0.0.0.0 -p 8001 core.asgi:application
+	python ./manage.py runserver 0.0.0.0:8000
 
 run:
 	gunicorn -w 4 -b 0.0.0.0:8001 asgi:application -k uvicorn.workers.UvicornWorker
@@ -58,3 +58,25 @@ celery-flower:
 
 start-nats:
 	python manage.py nats_listener
+
+release:
+	rm -Rf ./dist
+	pyarmor gen \
+		--platform linux.x86_64 \
+		--platform darwin.x86_64 \
+		--platform darwin.aarch64 \
+		--platform windows.x86_64 \
+		--enable-jit \
+		--mix-str -O ./dist -r --exclude "*.venv"  .
+		
+	# pyarmor gen --outer \
+	# 	--platform windows.x86_64 \
+	# 	--platform linux.x86_64 \
+	# 	--platform darwin.x86_64 \
+	# 	--mix-str -O ./dist -r --exclude "*.venv"  . 
+
+hdinfo:
+	python -m pyarmor.cli.hdinfo 
+
+gen-license:
+	pyarmor gen key -e 1
