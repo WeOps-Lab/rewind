@@ -25,13 +25,12 @@ CONFIG_MAP = {
 
     "clickhouse": """[[inputs.clickhouse]]
     servers = ["${url}"]
+    username = "default"
     interval = "${interval}s"
     tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="middleware" }""",
 
     "consul": """[[inputs.consul]]
-    url = "${url}"
-    username = "${username}"
-    password = "${password}" 
+    address = "${url}"
     interval = "${interval}s"
     tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="middleware" }""",
 

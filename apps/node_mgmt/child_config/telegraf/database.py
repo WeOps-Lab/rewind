@@ -13,36 +13,32 @@ CONFIG_MAP = {
 
     "mongodb": """[[inputs.mongodb]]
     servers = ["${server}"]
-    username = "${username}"
-    password = "${password}" 
     interval = "${interval}s"
     tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="database" }""",
 
     "mysql": """[[inputs.mysql]]
-    servers = ["${server}"]
-    username = "${username}"
-    password = "${password}" 
+    servers = ["${username}:${password}@tcp(${host}:${port})/?tls=false"]
+    metric_version = 2
     interval = "${interval}s"
     tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="database" }""",
 
-    "postgres": """[[inputs.postgres]]
-    servers = ["${server}"]
-    username = "${username}"
-    password = "${password}" 
+    "postgres": """[[inputs.postgresql]]
+    address = "host=${host} user=${username} password=${password} sslmode=disable"
+    ignored_databases = ["template0", "template1"]
     interval = "${interval}s"
     tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="database" }""",
 
     "redis": """[[inputs.redis]]
-    servers = ["${server}"]
+    servers = ["tcp://${host}:${port}"]
     username = "${username}"
     password = "${password}" 
     interval = "${interval}s"
     tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="database" }""",
 
     "sqlserver": """[[inputs.sqlserver]]
-    servers = ["${server}"]
-    username = "${username}"
-    password = "${password}" 
+    servers = ["Server=${host};Port=${port};User Id=${username};Password=${password};app name=telegraf;log=1;"]
+    database_type = "SQLServer"
+    exclude_query = ["SQLServerAvailabilityReplicaStates", "SQLServerDatabaseReplicaStates"]
     interval = "${interval}s"
     tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="database" }""",
 }
