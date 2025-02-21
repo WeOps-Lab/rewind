@@ -150,7 +150,8 @@ def openai_completions(request):
     skill_obj, params, error = get_skill_and_params(kwargs, team)
     user_message = params.get("user_message")
     if error:
-        insert_skill_log(current_ip, skill_obj.id, error, kwargs, False, user_message)
+        if skill_obj:
+            insert_skill_log(current_ip, skill_obj.id, error, kwargs, False, user_message)
         if stream_mode:
             return generate_stream_error(error["choices"][0]["message"]["content"])
         else:

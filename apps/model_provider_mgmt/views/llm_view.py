@@ -29,6 +29,16 @@ class LLMViewSet(AuthViewSet):
     queryset = LLMSkill.objects.all()
     filterset_class = LLMFilter
 
+    def _validate_name(self, skill_list, group_list, team):
+        exist_teams = []
+        for i in skill_list:
+            exist_teams.extend(i)
+        team_name_map = {i["id"]: i["name"] for i in group_list}
+        for i in team:
+            if i in exist_teams:
+                return _(f"A skill with the same name already exists in group {team_name_map.get(i)}.")
+        return ""
+
     def create(self, request, *args, **kwargs):
         params = request.data
         client = get_quota_client(request)
@@ -36,18 +46,9 @@ class LLMViewSet(AuthViewSet):
         if skill_count != -1 and skill_count <= used_skill_count:
             return JsonResponse({"result": False, "message": _("Skill count exceeds quota limit.")})
         skill_list = list(LLMSkill.objects.filter(name=params["name"]).values_list("team", flat=True))
-        exist_teams = []
-        for i in skill_list:
-            exist_teams.extend(i)
-        team_name_map = {i["id"]: i["name"] for i in request.user.group_list}
-        for i in params["team"]:
-            if i in exist_teams:
-                return JsonResponse(
-                    {
-                        "result": False,
-                        "message": _(f"A skill with the same name already exists in group {team_name_map.get(i)}."),
-                    }
-                )
+        validate_msg = self._validate_name(skill_list, request.user.group_list, params["team"])
+        if validate_msg:
+            return JsonResponse({"result": False, "message": validate_msg})
         params["enable_conversation_history"] = True
         serializer = self.get_serializer(data=params)
         serializer.is_valid(raise_exception=True)
@@ -65,23 +66,17 @@ class LLMViewSet(AuthViewSet):
     def update(self, request, *args, **kwargs):
         instance: LLMSkill = self.get_object()
         params = request.data
-        if LLMSkill.objects.filter(name=params["name"]).exclude(id=instance.id).exists():
-            return JsonResponse({"result": False, "message": "The name already exists."})
+        skill_list = list(
+            LLMSkill.objects.filter(name=params["name"]).exclude(id=instance.id).values_list("team", flat=True)
+        )
+        validate_msg = self._validate_name(skill_list, request.user.group_list, params["team"])
+        if validate_msg:
+            return JsonResponse({"result": False, "message": validate_msg})
         if "llm_model" in params:
             params["llm_model_id"] = params.pop("llm_model")
         for key in params.keys():
             if hasattr(instance, key):
                 setattr(instance, key, params[key])
-        # instance.name = params["name"]
-        # instance.team = params["team"]
-        # instance.introduction = params["introduction"]
-        # instance.llm_model_id = params.get("llm_model", instance.llm_model_id)
-        # instance.skill_prompt = params["skill_prompt"]
-        # instance.enable_conversation_history = params["enable_conversation_history"]
-        # instance.conversation_window_size = params.get("conversation_window_size", 10)
-        # instance.enable_rag = params["enable_rag"]
-        # instance.temperature = params["temperature"]
-        # instance.enable_rag_knowledge_source = params["enable_rag_knowledge_source"]
         instance.updated_by = request.user.username
         if "rag_score_threshold" in params:
             score_threshold_map = {i["knowledge_base"]: i["score"] for i in params["rag_score_threshold"]}
@@ -136,6 +131,9 @@ class LLMModelViewSet(AuthViewSet):
             is_build_in=False,
         )
         return JsonResponse({"result": True})
+
+    def update(self, request, *args, **kwargs):
+        return super().update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
         obj = self.get_object()

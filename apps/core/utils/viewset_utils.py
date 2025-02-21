@@ -27,6 +27,7 @@ class AuthViewSet(viewsets.ModelViewSet):
         username = getattr(user, "username", "guest")
         if hasattr(serializer.Meta.model, "created_by"):
             serializer.save(created_by=username, updated_by=username)
+        return super().perform_create(serializer)
 
     def perform_update(self, serializer):
         """更新时补充基础Model中的字段"""
@@ -34,3 +35,4 @@ class AuthViewSet(viewsets.ModelViewSet):
         username = getattr(user, "username", "guest")
         if hasattr(serializer.Meta.model, "updated_by"):
             serializer.save(updated_by=username)
+        return super().perform_update(serializer)
