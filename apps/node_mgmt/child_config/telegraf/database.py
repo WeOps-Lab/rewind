@@ -12,7 +12,7 @@ CONFIG_MAP = {
     tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="database" }""",
 
     "mongodb": """[[inputs.mongodb]]
-    servers = ["${server}"]
+    servers = [""mongodb://${host}:${port}/?connect=direct""]
     interval = "${interval}s"
     tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="database" }""",
 
