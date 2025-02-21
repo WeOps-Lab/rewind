@@ -35,7 +35,6 @@ class FormatChildConfig:
 
         for instance in instances:
             instance_id, instance_type = instance["instance_id"], instance["instance_type"]
-            interval = instance.get("interval", 10)
             server = instance.get("server", "")
             host = instance.get("host", "")
             port = instance.get("port", "")
@@ -43,6 +42,7 @@ class FormatChildConfig:
                 node_info = {"id": node_id, "configs": []}
                 for config in configs:
                     username, password = config.get("username", ""), config.get("password", "")
+                    interval = config.get("interval", 10)
                     config_info = {
                         "type": config["type"],
                         "instance_id": instance_id,
@@ -66,13 +66,14 @@ class FormatChildConfig:
 
         for instance in instances:
             instance_id, instance_type = instance["instance_id"], instance["instance_type"]
-            interval = instance.get("interval", 10)
+
             endpoint = instance["endpoint"]
 
             for node_id in instance["node_ids"]:
                 node_info = {"id": node_id, "configs": []}
 
                 for config in configs:
+                    interval = config.get("interval", 10)
                     node_info["configs"].append({
                         "type": config["type"],
                         "instance_id": instance_id,
@@ -91,12 +92,12 @@ class FormatChildConfig:
 
         for instance in instances:
             instance_id, instance_type = instance["instance_id"], instance["instance_type"]
-            interval = instance.get("interval", 10)
             url = instance["url"]
             for node_id in instance["node_ids"]:
                 node_info = {"id": node_id, "configs": []}
                 for config in configs:
                     username, password, timeout = config.get("username"), config.get("password"), config.get("timeout")
+                    interval = config.get("interval", 10)
                     config_info = {
                         "type": config["type"],
                         "instance_id": instance_id,
@@ -122,11 +123,11 @@ class FormatChildConfig:
 
         for instance in instances:
             instance_id, instance_type = instance["instance_id"], instance["instance_type"]
-            interval = instance.get("interval", 10)
             for node_id in instance["node_ids"]:
                 node_info = {"id": node_id, "configs": []}
 
                 for config in configs:
+                    interval = config.get("interval", 10)
                     node_info["configs"].append({
                         "type": config["type"],
                         "instance_id": instance_id,
@@ -144,13 +145,14 @@ class FormatChildConfig:
 
         for instance in instances:
             instance_id, instance_type = instance["instance_id"], instance["instance_type"]
-            interval = instance.get("interval", 10)
             url = instance["url"]
 
             for node_id in instance["node_ids"]:
                 node_info = {"id": node_id, "configs": []}
 
                 for config in configs:
+                    interval = config.get("interval", 10)
+
                     node_info["configs"].append({
                         "type": config["type"],
                         "instance_id": instance_id,
@@ -169,13 +171,14 @@ class FormatChildConfig:
 
         for instance in instances:
             instance_id, instance_type = instance["instance_id"], instance["instance_type"]
-            interval = instance.get("interval", 10)
             url = instance["url"]
 
             for node_id in instance["node_ids"]:
                 node_info = {"id": node_id, "configs": []}
 
                 for config in configs:
+                    interval = config.get("interval", 10)
+
                     node_info["configs"].append({
                         "type": config["type"],
                         "instance_id": instance_id,
@@ -194,12 +197,13 @@ class FormatChildConfig:
 
         for instance in instances:
             instance_id, instance_type = instance["instance_id"], instance["instance_type"]
-            interval = instance.get("interval", 10)
 
             for node_id in instance["node_ids"]:
                 node_info = {"id": node_id, "configs": []}
 
                 for config in configs:
+                    interval = config.get("interval", 10)
+
                     node_info["configs"].append({
                         "type": config["type"],
                         "instance_id": instance_id,
@@ -217,13 +221,14 @@ class FormatChildConfig:
 
         for instance in instances:
             instance_id, instance_type = instance["instance_id"], instance["instance_type"]
-            interval = instance.get("interval", 10)
             ip = instance["ip"]
 
             for node_id in instance["node_ids"]:
                 node_info = {"id": node_id, "configs": []}
 
                 for config in configs:
+                    interval = config.get("interval", 10)
+
                     node_info["configs"].append({
                         "type": config["type"],
                         "instance_id": instance_id,
@@ -242,12 +247,13 @@ class FormatChildConfig:
 
         for instance in instances:
             instance_id, instance_type = instance["instance_id"], instance["instance_type"]
-            interval = instance.get("interval", 10)
             ip = instance["ip"]
 
             for node_id in instance["node_ids"]:
                 node_info = {"id": node_id, "configs": []}
                 for config in configs:
+                    interval = config.get("interval", 10)
+
                     snmp_config = FormatChildConfig.format_snmp_config(dict(ip=ip, **config))
                     node_info["configs"].append({
                         "type": config["type"],
