@@ -24,8 +24,41 @@ class FormatChildConfig:
             return FormatChildConfig.format_middleware(configs, instances)
         elif object_type == "docker":
             return FormatChildConfig.format_docker(instances, configs)
+        elif object_type == "database":
+            return FormatChildConfig.format_database(configs, instances)
         else:
             raise ValueError(f"Unsupported object type: {object_type}")
+
+    @staticmethod
+    def format_database(configs, instances):
+        result = {"object_type": "database", "nodes": []}
+
+        for instance in instances:
+            instance_id, instance_type = instance["instance_id"], instance["instance_type"]
+            interval = instance.get("interval", 10)
+            server = instance.get("server", "")
+            host = instance.get("host", "")
+            port = instance.get("port", "")
+            for node_id in instance["node_ids"]:
+                node_info = {"id": node_id, "configs": []}
+                for config in configs:
+                    username, password = config.get("username", ""), config.get("password", "")
+                    config_info = {
+                        "type": config["type"],
+                        "instance_id": instance_id,
+                        "instance_type": instance_type,
+                        "interval": interval,
+                        "server": server,
+                        "host": host,
+                        "port": port,
+                        "username": username,
+                        "password": password,
+                    }
+                    node_info["configs"].append(config_info)
+
+                result["nodes"].append(node_info)
+
+        return result
 
     @staticmethod
     def format_docker(instances, configs):
@@ -63,16 +96,21 @@ class FormatChildConfig:
             for node_id in instance["node_ids"]:
                 node_info = {"id": node_id, "configs": []}
                 for config in configs:
-                    username, password = config["username"], config["password"]
-                    node_info["configs"].append({
+                    username, password, timeout = config.get("username"), config.get("password"), config.get("timeout")
+                    config_info = {
                         "type": config["type"],
                         "instance_id": instance_id,
                         "instance_type": instance_type,
                         "interval": interval,
                         "url": url,
-                        "username": username,
-                        "password": password,
-                    })
+                    }
+                    if username:
+                        config_info["username"] = username
+                    if password:
+                        config_info["password"] = password
+                    if timeout:
+                        config_info["timeout"] = timeout
+                    node_info["configs"].append(config_info)
 
                 result["nodes"].append(node_info)
 
