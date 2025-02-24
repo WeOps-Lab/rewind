@@ -23,7 +23,7 @@ CONFIG_MAP = {
     tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="database" }""",
 
     "postgres": """[[inputs.postgresql]]
-    address = "host=${host} user=${username} password=${password} sslmode=disable"
+    address = "host=${host} port=${port} user=${username} password=${password} sslmode=disable"
     ignored_databases = ["template0", "template1"]
     interval = "${interval}s"
     tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="database" }""",
