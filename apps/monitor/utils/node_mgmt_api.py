@@ -96,7 +96,7 @@ class FormatChildConfig:
             for node_id in instance["node_ids"]:
                 node_info = {"id": node_id, "configs": []}
                 for config in configs:
-                    username, password, timeout = config.get("username"), config.get("password"), config.get("timeout")
+                    username, password, timeout = config.get("username", ""), config.get("password", ""), config.get("timeout")
                     interval = config.get("interval", 10)
                     config_info = {
                         "type": config["type"],
@@ -104,11 +104,9 @@ class FormatChildConfig:
                         "instance_type": instance_type,
                         "interval": interval,
                         "url": url,
+                        "username": username,
+                        "password": password,
                     }
-                    if username:
-                        config_info["username"] = username
-                    if password:
-                        config_info["password"] = password
                     if timeout:
                         config_info["timeout"] = timeout
                     node_info["configs"].append(config_info)

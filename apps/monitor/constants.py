@@ -169,6 +169,13 @@ MONITOR_OBJS = [
         "supplementary_indicators": [],
     },
     {
+        "type": "Middleware",
+        "name": "Tomcat",
+        "default_metric": 'any({instance_type="tomcat"}) by (instance_id)',
+        "instance_id_keys": ["instance_id"],
+        "supplementary_indicators": [],
+    },
+    {
         "type": "Container Management",
         "name": "Docker",
         "default_metric": 'any({instance_type="docker"}) by (instance_id)',
