@@ -49,6 +49,11 @@
             "Edit",
             "Delete"
           ]
+        },
+        {
+          "id": "template_list",
+          "name": "Template",
+          "operation": ["View"]
         }
       ]
     },

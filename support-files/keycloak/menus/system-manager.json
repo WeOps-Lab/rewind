@@ -57,6 +57,30 @@
           ]
         }
       ]
+    },
+     {
+      "name": "Channel",
+      "children": [
+        {
+          "id": "application_list",
+          "name": "Application-list",
+          "operation": [
+            "View"
+          ]
+        },
+        {
+          "id": "applicaiton_role",
+          "name": "Application-role",
+          "operation": [
+            "View",
+            "Edit",
+            "Add",
+            "Add user",
+            "Edit Permission",
+            "Delete"
+          ]
+        }
+      ]
     }
   ],
   "roles": [

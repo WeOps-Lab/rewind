@@ -52,9 +52,9 @@ class RoleManage(object):
             return_data.append({"id": client_obj["id"], "display_name": client_obj["name"], "children": roles})
         return return_data
 
-    def role_users(self, query, role_name):
+    def role_users(self, query, role_id):
         """获取角色关联的用户"""
-        result = self.keycloak_client.realm_client.get_realm_role_members(role_name, query)
+        result = self.keycloak_client.get_role_users(role_id, query)
         return result
 
     def get_all_menus(self, client_id, user_menus=None, username="", is_superuser=False):

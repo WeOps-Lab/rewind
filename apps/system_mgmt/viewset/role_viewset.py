@@ -29,7 +29,7 @@ class RoleViewSet(viewsets.ViewSet):
             "max": _max,
             "search": request.GET.get("search", ""),
         }
-        data = RoleManage().role_users(kwargs, request.GET.get("role_name"))
+        data = RoleManage().role_users(kwargs, request.GET.get("role_id"))
         return JsonResponse({"result": True, "data": data})
 
     @action(detail=False, methods=["GET"])

@@ -1,6 +1,8 @@
 import json
 
+from apps.core.backends import cache
 from apps.core.utils.keycloak_client import KeyCloakClient
+from apps.system_mgmt.services.role_manage import RoleManage
 
 
 class UserManage(object):
@@ -23,7 +25,8 @@ class UserManage(object):
     def user_list(self, query_params, group_id=None):
         """用户列表"""
         if group_id:
-            users = self.keycloak_client.realm_client.get_group_members(group_id, query_params)
+            # users = self.keycloak_client.realm_client.get_group_members(group_id, query_params)
+            users = self.keycloak_client.get_group_users(group_id, query_params)
             user_count = self.keycloak_client.get_group_user_count(group_id, query_params["search"])
         else:
             users = self.keycloak_client.realm_client.get_users(query_params)
@@ -101,6 +104,7 @@ class UserManage(object):
     def user_delete(self, user_ids):
         """删除用户"""
         for user_id in user_ids:
+            self.delete_user_cache(user_id)
             self.keycloak_client.realm_client.delete_user(user_id)
 
     def user_update(self, data, user_id):
@@ -111,14 +115,19 @@ class UserManage(object):
         old_roles = self.keycloak_client.get_realm_roles_of_user(user_id)
         for i in old_groups:
             self.keycloak_client.realm_client.group_user_remove(user_id, i["id"])
-        delete_roles = []
         for i in old_roles:
             i.pop("role_type", "")
-        self.keycloak_client.realm_client.delete_realm_roles_of_user(user_id, delete_roles)
+        self.keycloak_client.realm_client.delete_realm_roles_of_user(user_id, old_roles)
         self.keycloak_client.realm_client.update_user(user_id, data)
         self.keycloak_client.realm_client.assign_realm_roles(user_id, roles)
         for group_id in groups:
             self.keycloak_client.realm_client.group_user_add(user_id, group_id)
+        self.delete_user_cache(user_id)
+
+    def delete_user_cache(self, user_id):
+        userinfo = self.keycloak_client.realm_client.get_user(user_id)
+        keys = RoleManage.get_cache_keys(userinfo["username"])
+        cache.delete_many(keys)
 
     def user_reset_password(self, data, user_id):
         """重置用户密码"""

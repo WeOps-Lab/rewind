@@ -158,8 +158,23 @@
           "id": "provide_list",
           "name": "Provide-list",
           "operation": [
+            "Add",
             "View",
-            "Setting"
+            "Setting",
+            "Delete"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tools",
+      "children": [
+        {
+          "id": "tool_list",
+          "name": "Tool-list",
+          "operation": [
+            "View",
+            "Edit"
           ]
         }
       ]

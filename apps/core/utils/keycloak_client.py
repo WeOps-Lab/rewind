@@ -191,3 +191,47 @@ WHERE
 and userobj.username like %(username)s"""
         return_data = SQLExecute.execute_sql(sql, {"group_id": group_id, "username": f"%{search}%"})
         return return_data[0].get("count", 0) if return_data else 0
+
+    def get_group_users(self, group_id, query_params):
+        sql = """SELECT
+  ue.id, ue.email, ue.first_name as firstName, ue.last_name as lastName, ue.username
+FROM
+  user_entity ue
+  JOIN user_group_membership ugm ON ue.ID = ugm.user_id
+WHERE
+  ugm.group_id = %(group_id)s
+and
+  ue.username like %(username)s
+  order by created_timestamp
+"""
+        params = {
+            "group_id": group_id,
+            "username": f"%{query_params['search']}%",
+        }
+        if "first" in query_params:
+            sql += " OFFSET %(offset)s LIMIT %(limit)s"
+            params.update({"offset": query_params["first"], "limit": query_params["max"]})
+        return_data = SQLExecute.execute_sql(sql, params)
+        return return_data
+
+    def get_role_users(self, role_id, query_params):
+        sql = """SELECT
+  ue.id, ue.email, ue.first_name as firstName, ue.last_name as lastName, ue.username
+FROM
+  user_entity ue
+  JOIN user_role_mapping ugm ON ue.ID = ugm.user_id
+WHERE
+  ugm.role_id = %(role_id)s
+and
+  ue.username like %(username)s
+  order by created_timestamp
+"""
+        params = {
+            "role_id": role_id,
+            "username": f"%{query_params['search']}%",
+        }
+        if "first" in query_params:
+            sql += " OFFSET %(offset)s LIMIT %(limit)s"
+            params.update({"offset": query_params["first"], "limit": query_params["max"]})
+        return_data = SQLExecute.execute_sql(sql, params)
+        return return_data
