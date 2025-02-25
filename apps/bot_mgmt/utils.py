@@ -84,14 +84,14 @@ def get_user_info(bot_id, input_channel, sender_id):
         fun = "update_or_create"
 
     user, _ = getattr(ChannelUser.objects, fun)(
-        user_id=sender_id, channel_type=channel_type_map[input_channel], defaults={"name": name}
+        user_id=sender_id, channel_type=channel_type_map.get(input_channel, ChannelChoices.WEB), defaults={"name": name}
     )
     UserGroup.objects.filter(user_id=user.id).delete()
     user_groups = []
     for group in groups:
         channel_group, _ = ChannelGroup.objects.update_or_create(
             group_id=group["id"],
-            channel_type=channel_type_map[input_channel],
+            channel_type=channel_type_map.get(input_channel, ChannelChoices.WEB),
             defaults={
                 "name": group["name"],
             },

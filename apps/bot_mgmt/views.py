@@ -148,15 +148,15 @@ def openai_completions(request):
             return JsonResponse(msg)
     team = msg
     skill_obj, params, error = get_skill_and_params(kwargs, team)
-    user_message = params.get("user_message")
     if error:
         if skill_obj:
+            user_message = params.get("user_message")
             insert_skill_log(current_ip, skill_obj.id, error, kwargs, False, user_message)
         if stream_mode:
             return generate_stream_error(error["choices"][0]["message"]["content"])
         else:
             return JsonResponse(error)
-
+    user_message = params.get("user_message")
     data, doc_map, title_map = llm_service.invoke_chat(params)
     content = format_knowledge_sources(data["content"], skill_obj, doc_map, title_map)
 

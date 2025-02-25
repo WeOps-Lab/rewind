@@ -9,6 +9,7 @@ from apps.model_provider_mgmt.models import (
     RerankModelChoices,
     RerankProvider,
 )
+from apps.model_provider_mgmt.models.llm_skill import SkillTools
 from apps.model_provider_mgmt.models.ocr_provider import OCRProvider
 
 
@@ -116,4 +117,9 @@ class ModelProviderInitService:
                     "base_url": "http://ocr-server/azure_ocr",
                 },
             },
+        )
+
+        SkillTools.objects.get_or_create(
+            name="duckduckgo-search",
+            defaults={"display_name": "DuckDuckGo", "params": {}, "description": "使用DuckDuckGo搜索引擎进行搜索"},
         )

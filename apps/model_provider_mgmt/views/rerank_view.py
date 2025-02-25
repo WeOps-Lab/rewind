@@ -3,6 +3,7 @@ from langchain_core.documents import Document
 from rest_framework import viewsets
 from rest_framework.decorators import action
 
+from apps.core.utils.viewset_utils import AuthViewSet
 from apps.model_provider_mgmt.models import RerankProvider
 from apps.model_provider_mgmt.serializers.rerank_serializer import RerankProviderSerializer
 from apps.model_provider_mgmt.services.rerank_service import RerankService
@@ -29,6 +30,10 @@ class RerankViewSet(viewsets.ViewSet):
         return JsonResponse({"rerank_result": response})
 
 
-class RerankProviderViewSet(viewsets.ModelViewSet):
+class RerankProviderViewSet(AuthViewSet):
     queryset = RerankProvider.objects.all()
     serializer_class = RerankProviderSerializer
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        return self.query_by_groups(request, queryset)

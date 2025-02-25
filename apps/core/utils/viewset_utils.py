@@ -4,6 +4,10 @@ from rest_framework.response import Response
 
 
 class AuthViewSet(viewsets.ModelViewSet):
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        return self.query_by_groups(request, queryset)
+
     def query_by_groups(self, request, queryset):
         if not request.user.is_superuser:
             teams = [i["id"] for i in request.user.group_list]

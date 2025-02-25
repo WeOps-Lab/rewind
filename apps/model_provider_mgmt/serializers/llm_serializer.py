@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from apps.model_provider_mgmt.models import LLMModel, LLMSkill
-from apps.model_provider_mgmt.models.llm_skill import SkillRequestLog
+from apps.model_provider_mgmt.models.llm_skill import SkillRequestLog, SkillTools
 from config.drf.serializers import TeamSerializer
 
 
@@ -26,4 +26,10 @@ class LLMSerializer(TeamSerializer):
 class SkillRequestLogSerializer(serializers.ModelSerializer):
     class Meta:
         model = SkillRequestLog
+        fields = "__all__"
+
+
+class SkillToolsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SkillTools
         fields = "__all__"

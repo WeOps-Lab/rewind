@@ -62,8 +62,10 @@ class LLMService:
             "chat_history": kwargs["chat_history"][num:],
             "conversation_window_size": kwargs["conversation_window_size"],
             "rag_context": context,
+            "tools": kwargs.get("tools", []),
         }
         # TODO 需要在chat server增加图片支持
+        # 添加 tools
         result = chat_server.invoke(chat_kwargs)
         if isinstance(result, str):
             result = json.loads(result)

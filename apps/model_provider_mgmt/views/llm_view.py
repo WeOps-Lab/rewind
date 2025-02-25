@@ -11,11 +11,12 @@ from apps.core.decorators.api_perminssion import HasRole
 from apps.core.utils.viewset_utils import AuthViewSet
 from apps.knowledge_mgmt.models import KnowledgeBase
 from apps.model_provider_mgmt.models import LLMModel, LLMSkill
-from apps.model_provider_mgmt.models.llm_skill import SkillRequestLog
+from apps.model_provider_mgmt.models.llm_skill import SkillRequestLog, SkillTools
 from apps.model_provider_mgmt.serializers.llm_serializer import (
     LLMModelSerializer,
     LLMSerializer,
     SkillRequestLogSerializer,
+    SkillToolsSerializer,
 )
 from apps.model_provider_mgmt.services.llm_service import llm_service
 
@@ -55,13 +56,6 @@ class LLMViewSet(AuthViewSet):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-
-    @HasRole()
-    def list(self, request, *args, **kwargs):
-        # name = request.GET.get("name", "")
-        # queryset = LLMSkill.objects.filter(name__icontains=name)
-        queryset = self.filter_queryset(self.get_queryset())
-        return self.query_by_groups(request, queryset)
 
     def update(self, request, *args, **kwargs):
         instance: LLMSkill = self.get_object()
@@ -114,10 +108,6 @@ class LLMModelViewSet(AuthViewSet):
     queryset = LLMModel.objects.all()
     search_fields = ["name"]
 
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-        return self.query_by_groups(request, queryset)
-
     def create(self, request, *args, **kwargs):
         params = request.data
         if not params.get("team"):
@@ -159,3 +149,13 @@ class SkillRequestLogViewSet(viewsets.ModelViewSet):
         if not request.GET.get("skill_id"):
             return JsonResponse({"result": False, "message": _("Skill id not found")})
         return super().list(request, *args, **kwargs)
+
+
+class ToolsFilter(FilterSet):
+    display_name = filters.CharFilter(field_name="display_name", lookup_expr="icontains")
+
+
+class SkillToolsViewSet(AuthViewSet):
+    serializer_class = SkillToolsSerializer
+    queryset = SkillTools.objects.all()
+    filterset_class = ToolsFilter

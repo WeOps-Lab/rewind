@@ -2,15 +2,20 @@ from django.http import JsonResponse
 from rest_framework import viewsets
 from rest_framework.decorators import action
 
+from apps.core.utils.viewset_utils import AuthViewSet
 from apps.model_provider_mgmt.models import EmbedProvider
 from apps.model_provider_mgmt.serializers.embed_serializer import EmbedProviderSerializer
 from apps.model_provider_mgmt.services.remote_embeddings import RemoteEmbeddings
 
 
-class EmbedProviderViewSet(viewsets.ModelViewSet):
+class EmbedProviderViewSet(AuthViewSet):
     serializer_class = EmbedProviderSerializer
     queryset = EmbedProvider.objects.all()
     search_fields = ["name"]
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        return self.query_by_groups(request, queryset)
 
 
 class EmbedViewSet(viewsets.ViewSet):

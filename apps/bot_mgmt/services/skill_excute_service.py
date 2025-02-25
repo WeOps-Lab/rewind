@@ -27,6 +27,7 @@ class SkillExecuteService:
             "user_id": user.user_id if user else sender_id,
             "bot_id": bot.id,
             "show_think": llm_skill.show_think,
+            "tools": llm_skill.tools,
         }
         result = llm_service.chat(params)
         content = result["content"]

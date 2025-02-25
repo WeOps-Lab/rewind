@@ -31,6 +31,7 @@ class LLMSkill(MaintainerInfo):
     team = models.JSONField(default=list, verbose_name="分组")
 
     show_think = models.BooleanField(default=True)
+    tools = models.JSONField(default=list)
 
     temperature = models.FloatField(default=0.7, verbose_name="温度")
 
@@ -61,3 +62,11 @@ class SkillRequestLog(models.Model):
     request_detail = models.JSONField(default=dict)
     response_detail = models.JSONField(default=dict)
     user_message = models.TextField(default="")
+
+
+class SkillTools(MaintainerInfo, TimeInfo):
+    name = models.CharField(max_length=100, unique=True)
+    display_name = models.CharField(max_length=100)
+    params = models.JSONField(default=dict)
+    team = models.JSONField(default=list)
+    description = models.TextField()
