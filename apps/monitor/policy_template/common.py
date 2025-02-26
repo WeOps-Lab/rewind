@@ -7,5 +7,5 @@ def load_json(monitor_object_name, encoding="utf-8"):
     try:
         with open(file_path, "r", encoding=encoding) as f:
             return json.load(f)
-    except Exception as e:
-        raise ValueError(f"read json err: {e}")
+    except Exception:
+        return []
