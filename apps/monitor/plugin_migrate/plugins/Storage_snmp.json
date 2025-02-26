@@ -8,7 +8,7 @@
     {
       "metric_group": "Base",
       "name": "sysUpTime",
-      "query": "sum(snmp_uptime{__$labels__}) by (instance_id) / 6000 / 60 / 24",
+      "query": "sum(snmp_uptime{instance_type=\"storage\",__$labels__}) by (instance_id) / 6000 / 60 / 24",
       "display_name": "System Uptime",
       "data_type": "Number",
       "unit": "d",
@@ -19,7 +19,7 @@
     {
       "metric_group": "Status",
       "name": "ifAdminStatus",
-      "query": "interface_ifAdminStatus{__$labels__}",
+      "query": "interface_ifAdminStatus{instance_type=\"storage\",__$labels__}",
       "display_name": "Interface Admin Status",
       "data_type": "Enum",
       "unit": "[{\"name\":\"up\",\"id\":1},{\"name\":\"down\",\"id\":2},{\"name\":\"testing\",\"id\":3}]",
@@ -35,7 +35,7 @@
     {
       "metric_group": "Status",
       "name": "ifOperStatus",
-      "query": "interface_ifOperStatus{__$labels__}",
+      "query": "interface_ifOperStatus{instance_type=\"storage\",__$labels__}",
       "display_name": "Interface Oper Status",
       "data_type": "Enum",
       "unit": "[{\"name\":\"up\",\"id\":1},{\"name\":\"down\",\"id\":2},{\"name\":\"testing\",\"id\":3}]",
@@ -51,7 +51,7 @@
     {
       "metric_group": "Bandwidth",
       "name": "ifHighSpeed",
-      "query": "interface_ifSpeed{__$labels__}/1000000",
+      "query": "interface_ifSpeed{instance_type=\"storage\",__$labels__}/1000000",
       "display_name": "Interface Bandwidth",
       "data_type": "Number",
       "unit": "decmbytes",
@@ -67,7 +67,7 @@
     {
       "metric_group": "Packet Error",
       "name": "ifInErrors",
-      "query": "rate(interface_ifInErrors{__$labels__}[5m])",
+      "query": "rate(interface_ifInErrors{instance_type=\"storage\",__$labels__}[5m])",
       "display_name": "Incoming Errors Rate (per second)",
       "data_type": "Number",
       "unit": "pps",
@@ -83,7 +83,7 @@
     {
       "metric_group": "Packet Error",
       "name": "ifOutErrors",
-      "query": "rate(interface_ifOutErrors{__$labels__}[5m])",
+      "query": "rate(interface_ifOutErrors{instance_type=\"storage\",__$labels__}[5m])",
       "display_name": "Outgoing Errors Rate (per second)",
       "data_type": "Number",
       "unit": "pps",
@@ -99,7 +99,7 @@
     {
       "metric_group": "Packet Loss",
       "name": "ifInDiscards",
-      "query": "rate(interface_ifInDiscards{__$labels__}[5m])",
+      "query": "rate(interface_ifInDiscards{instance_type=\"storage\",__$labels__}[5m])",
       "display_name": "Incoming Discards Rate (per second)",
       "data_type": "Number",
       "unit": "pps",
@@ -115,7 +115,7 @@
     {
       "metric_group": "Packet Loss",
       "name": "ifOutDiscards",
-      "query": "rate(interface_ifOutDiscards{__$labels__}[5m])",
+      "query": "rate(interface_ifOutDiscards{instance_type=\"storage\",__$labels__}[5m])",
       "display_name": "Outgoing Discards Rate (per second)",
       "data_type": "Number",
       "unit": "pps",
@@ -131,7 +131,7 @@
     {
       "metric_group": "Packet",
       "name": "ifInUcastPkts",
-      "query": "rate(interface_ifInUcastPkts{__$labels__}[5m])",
+      "query": "rate(interface_ifInUcastPkts{instance_type=\"storage\",__$labels__}[5m])",
       "display_name": "Incoming Unicast Packets Rate (per second)",
       "data_type": "Number",
       "unit": "pps",
@@ -147,7 +147,7 @@
     {
       "metric_group": "Packet",
       "name": "ifOutUcastPkts",
-      "query": "rate(interface_ifOutUcastPkts{__$labels__}[5m])",
+      "query": "rate(interface_ifOutUcastPkts{instance_type=\"storage\",__$labels__}[5m])",
       "display_name": "Outgoing Unicast Packets Rate (per second)",
       "data_type": "Number",
       "unit": "pps",
@@ -163,7 +163,7 @@
     {
       "metric_group": "Traffic",
       "name": "ifInOctets",
-      "query": "rate(interface_ifInOctets{__$labels__}[5m]) / 1024/1024",
+      "query": "rate(interface_ifInOctets{instance_type=\"storage\",__$labels__}[5m]) / 1024/1024",
       "display_name": "Interface Incoming Traffic Rate (per second)",
       "data_type": "Number",
       "unit": "MBs",
@@ -179,7 +179,7 @@
     {
       "metric_group": "Traffic",
       "name": "ifOutOctets",
-      "query": "rate(interface_ifInOctets{__$labels__}[5m]) / 1024/1024",
+      "query": "rate(interface_ifInOctets{instance_type=\"storage\",__$labels__}[5m]) / 1024/1024",
       "display_name": "Interface Outgoing Traffic Rate (per second)",
       "data_type": "Number",
       "unit": "MBs",
@@ -195,7 +195,7 @@
     {
       "metric_group": "Traffic",
       "name": "iftotalInOctets",
-      "query": "sum(rate(interface_ifInOctets{__$labels__}[5m]) / 1024 / 1024)by (instance_id)",
+      "query": "sum(rate(interface_ifInOctets{instance_type=\"storage\",__$labels__}[5m]) / 1024 / 1024)by (instance_id)",
       "display_name": "Device Total Incoming Traffic (per second)",
       "data_type": "Number",
       "unit": "MBs",
@@ -206,7 +206,7 @@
     {
       "metric_group": "Traffic",
       "name": "iftotalOutOctets",
-      "query": "sum(rate(interface_ifInOctets{__$labels__}[5m]) / 1024 / 1024) by (instance_id)",
+      "query": "sum(rate(interface_ifInOctets{instance_type=\"storage\",__$labels__}[5m]) / 1024 / 1024) by (instance_id)",
       "display_name": "Device Total Outgoing Traffic (per second)",
       "data_type": "Number",
       "unit": "MBs",

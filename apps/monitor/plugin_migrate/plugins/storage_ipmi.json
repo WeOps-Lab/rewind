@@ -8,7 +8,7 @@
     {
       "metric_group": "Power",
       "name": "ipmi_chassis_power_state",
-      "query": "ipmi_sensor_status{name=~\"host_power\", __$labels__}",
+      "query": "ipmi_sensor_status{name=~\"host_power\", instance_type=\"storage\",__$labels__}",
       "display_name": "Power State",
       "data_type": "Enum",
       "unit": "[{\"name\":\"Normal\",\"id\":1},{\"name\":\"Abnormal\",\"id\":2}]",
@@ -19,7 +19,7 @@
     {
       "metric_group": "Power",
       "name": "ipmi_power_watts",
-      "query": "ipmi_sensor_value{unit=\"watts\", __$labels__}",
+      "query": "ipmi_sensor_value{unit=\"watts\", instance_type=\"storage\",__$labels__}",
       "display_name": "Power",
       "data_type": "Number",
       "unit": "watts",
@@ -35,7 +35,7 @@
     {
       "metric_group": "Power",
       "name": "ipmi_voltage_volts",
-      "query": "ipmi_sensor_value{unit=\"volts\", __$labels__}",
+      "query": "ipmi_sensor_value{unit=\"volts\", instance_type=\"storage\",__$labels__}",
       "display_name": "Voltage",
       "data_type": "Number",
       "unit": "volts",
@@ -51,7 +51,7 @@
     {
       "metric_group": "Environment",
       "name": "ipmi_fan_speed_rpm",
-      "query": "ipmi_sensor_value{unit=\"rpm\", __$labels__}",
+      "query": "ipmi_sensor_value{unit=\"rpm\", instance_type=\"storage\",__$labels__}",
       "display_name": "Fan Speed",
       "data_type": "Number",
       "unit": "rpm",
@@ -67,7 +67,7 @@
     {
       "metric_group": "Environment",
       "name": "ipmi_temperature_celsius",
-      "query": "ipmi_sensor_value{unit=\"degrees_c\", __$labels__}",
+      "query": "ipmi_sensor_value{unit=\"degrees_c\", instance_type=\"storage\",__$labels__}",
       "display_name": "Temperature",
       "data_type": "Number",
       "unit": "degrees_c",

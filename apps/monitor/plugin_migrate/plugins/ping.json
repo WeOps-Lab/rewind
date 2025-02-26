@@ -8,7 +8,7 @@
     {
       "metric_group": "Ping",
       "name": "ping_ttl",
-      "query": "avg(ping_ttl{__$labels__}) by (instance_id)",
+      "query": "avg(ping_ttl{instance_type=\"ping\",__$labels__}) by (instance_id)",
       "display_name": "Average TTL",
       "data_type": "Number",
       "unit": "short",
@@ -24,7 +24,7 @@
     {
       "metric_group": "Ping",
       "name": "ping_response_time",
-      "query": "avg(ping_average_response_ms{__$labels__})by (instance_id)",
+      "query": "avg(ping_average_response_ms{instance_type=\"ping\",__$labels__})by (instance_id)",
       "display_name": "Average Response Time",
       "data_type": "Number",
       "unit": "ms",
@@ -40,7 +40,7 @@
     {
       "metric_group": "Ping",
       "name": "ping_packet_transmission_rate",
-      "query": "100* sum(ping_packets_received{__$labels__}) by (instance_id) / sum(ping_packets_transmitted{__$labels__}) by (instance_id)",
+      "query": "100* sum(ping_packets_received{instance_type=\"ping\",__$labels__}) by (instance_id) / sum(ping_packets_transmitted{__$labels__}) by (instance_id)",
       "display_name": "Packet Transmission Rate",
       "data_type": "Number",
       "unit": "percent",
@@ -56,7 +56,7 @@
     {
       "metric_group": "Ping",
       "name": "ping_packet_loss_rate",
-      "query": "100 - avg(ping_percent_packet_loss{__$labels__}) by (instance_id)",
+      "query": "100 - avg(ping_percent_packet_loss{instance_type=\"ping\",__$labels__}) by (instance_id)",
       "display_name": "Packet Loss Rate",
       "data_type": "Number",
       "unit": "percent",
@@ -72,7 +72,7 @@
     {
       "metric_group": "Ping",
       "name": "ping_error_response_code",
-      "query": "avg(ping_result_code{__$labels__}) by (instance_id)",
+      "query": "avg(ping_result_code{instance_type=\"ping\",__$labels__}) by (instance_id)",
       "display_name": "Ping State",
       "data_type": "Enum",
       "unit": "[{\"name\":\"Failure\",\"id\":1},{\"name\":\"Success\",\"id\":0}]",

@@ -8,7 +8,7 @@
     {
       "metric_group": "HTTP",
       "name": "http_success.rate",
-      "query": "count(http_response_result_type{result=\"success\",__$labels__}) by (instance_id) / count(http_response_result_type{__$labels__}) by (instance_id)*100",
+      "query": "count(http_response_result_type{instance_type=\"web\",result=\"success\",__$labels__}) by (instance_id) / count(http_response_result_type{instance_type=\"web\",__$labels__}) by (instance_id)*100",
       "display_name": "Success Rate",
       "data_type": "Number",
       "unit": "percent",
@@ -24,7 +24,7 @@
     {
       "metric_group": "HTTP",
       "name": "http_duration",
-      "query": "avg(http_response_response_time{})by (instance_id)",
+      "query": "avg(http_response_response_time{instance_type=\"web\",__$labels__})by (instance_id)",
       "display_name": "Response Time",
       "data_type": "Number",
       "unit": "s",
@@ -40,7 +40,7 @@
     {
       "metric_group": "HTTP",
       "name": "http_code",
-      "query": "http_response_http_response_code{__$labels__}",
+      "query": "http_response_http_response_code{instance_type=\"web\",__$labels__}",
       "display_name": "HTTP Code",
       "data_type": "Number",
       "unit": "short",
@@ -56,7 +56,7 @@
     {
       "metric_group": "HTTP",
       "name": "http_content.length",
-      "query": "http_response_content_length{__$labels__}/1024",
+      "query": "http_response_content_length{instance_type=\"web\",__$labels__}/1024",
       "display_name": "HTTP Content Length",
       "data_type": "Number",
       "unit": "kibibytes",
