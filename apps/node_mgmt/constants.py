@@ -62,3 +62,13 @@ password = "${NATS_PASSWORD}"
 subject = "metrics.${node.ip_filter}"
 data_format = "influx"
 """
+
+if default_sidecar_mode == "vm":
+    TELEGRAF_CONFIG += """
+[[outputs.influxdb]]
+  urls = ["${VM_SERVERS}"]
+  database = "victoriametrics"
+  skip_database_creation = true
+  exclude_retention_policy_tag = true
+  content_encoding = "gzip"
+"""  
