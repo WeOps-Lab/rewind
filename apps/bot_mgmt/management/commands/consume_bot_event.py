@@ -58,31 +58,47 @@ def on_message(channel, method_frame, header_frame, body):
 class Command(BaseCommand):
     help = "获取对话历史"
 
+    @staticmethod
+    def create_connection():
+        """创建RabbitMQ连接"""
+        return pika.BlockingConnection(
+            pika.ConnectionParameters(
+                host=settings.CONVERSATION_MQ_HOST,
+                port=settings.CONVERSATION_MQ_PORT,
+                credentials=pika.PlainCredentials(settings.CONVERSATION_MQ_USER, settings.CONVERSATION_MQ_PASSWORD),
+                heartbeat=600,  # 添加心跳检测，默认600秒
+                blocked_connection_timeout=300,  # 添加阻塞连接超时
+                connection_attempts=3,  # 连接重试次数
+                retry_delay=5,  # 重试延迟时间
+            )
+        )
+
     def handle(self, *args, **options):
-        logger.info(f"初始化消息队列连接:[{settings.CONVERSATION_MQ_HOST}:{settings.CONVERSATION_MQ_PORT}]")
-        connection = None
         while True:
+            connection = None
             try:
-                connection = pika.BlockingConnection(
-                    pika.ConnectionParameters(
-                        host=settings.CONVERSATION_MQ_HOST,
-                        port=settings.CONVERSATION_MQ_PORT,
-                        credentials=pika.PlainCredentials(
-                            settings.CONVERSATION_MQ_USER, settings.CONVERSATION_MQ_PASSWORD
-                        ),
-                    )
-                )
+                logger.info(f"初始化消息队列连接:[{settings.CONVERSATION_MQ_HOST}:{settings.CONVERSATION_MQ_PORT}]")
+                connection = self.create_connection()
                 channel = connection.channel()
+
+                # 声明队列，确保队列存在
                 channel.queue_declare(queue="pilot", durable=True)
-                channel.basic_consume("pilot", on_message)
-                try:
-                    channel.start_consuming()
-                except KeyboardInterrupt:
-                    channel.stop_consuming()
-                connection.close()
+
+                # 设置QoS，限制未确认消息数量
+                channel.basic_qos(prefetch_count=1)
+
+                # 设置消费者
+                channel.basic_consume(queue="pilot", on_message_callback=on_message)
+
+                logger.info("开始消费消息...")
+                channel.start_consuming()
             except Exception as e:
-                logger.exception(f"消息队列连接失败:{e}")
+                logger.exception(f"未预期的错误: {e}")
+                time.sleep(5)
             finally:
-                if connection is not None and getattr(connection, "is_open", False):
-                    connection.close()
-                time.sleep(60)
+                try:
+                    if connection and not connection.is_closed:
+                        connection.close()
+                except Exception as e:
+                    logger.error(f"关闭连接时发生错误: {e}")
+                time.sleep(5)  # 重试前等待
