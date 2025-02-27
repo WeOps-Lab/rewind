@@ -3,12 +3,12 @@ from django.http import JsonResponse
 from django.utils.translation import gettext as _
 from django_filters import filters
 from django_filters.rest_framework import FilterSet
+from rest_framework import viewsets
 from rest_framework.decorators import action
 
 from apps.bot_mgmt.models import ConversationTag
 from apps.core.logger import logger
 from apps.core.utils.elasticsearch_utils import get_es_client
-from apps.core.utils.viewset_utils import AuthViewSet
 from apps.knowledge_mgmt.knowledge_document_mgmt.serializers import KnowledgeDocumentSerializer
 from apps.knowledge_mgmt.models import KnowledgeBase, KnowledgeDocument, ManualKnowledge, WebPageKnowledge
 from apps.knowledge_mgmt.models.knowledge_document import DocumentStatus
@@ -23,7 +23,7 @@ class ObjFilter(FilterSet):
     train_status = filters.NumberFilter(field_name="train_status", lookup_expr="exact")
 
 
-class KnowledgeDocumentViewSet(AuthViewSet):
+class KnowledgeDocumentViewSet(viewsets.ModelViewSet):
     queryset = KnowledgeDocument.objects.all()
     serializer_class = KnowledgeDocumentSerializer
     filterset_class = ObjFilter
