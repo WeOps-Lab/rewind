@@ -38,16 +38,19 @@ def on_message(channel, method_frame, header_frame, body):
             user, _ = get_user_info(bot_id, input_channel, sender_id)
             bot = Bot.objects.get(id=bot_id)
             msg = message.get("metadata", {}).get("other_data", {}).get("citing_knowledge", [])
-            msg_str = json.dumps(msg).replace("\u0000", " ")
-            BotConversationHistory.objects.get_or_create(
-                bot_id=bot_id,
-                channel_user_id=user.id,
-                created_at=created_at,
-                created_by=bot.created_by,
-                conversation_role=message["event"],
-                conversation=message["text"] or "",
-                citing_knowledge=json.loads(msg_str),
-            )
+            msg_str = json.dumps(msg).replace("\u0000", " ").replace(r"\u0000", " ")
+            try:
+                BotConversationHistory.objects.get_or_create(
+                    bot_id=bot_id,
+                    channel_user_id=user.id,
+                    created_at=created_at,
+                    created_by=bot.created_by,
+                    conversation_role=message["event"],
+                    conversation=message["text"] or "",
+                    citing_knowledge=json.loads(msg_str),
+                )
+            except Exception as e:
+                logger.exception(f"对话保存失败，对话内容： {msg_str}, error: {e}")
     except Exception as e:
         logger.exception(f"对话历史保存失败: {e}")
     else:
