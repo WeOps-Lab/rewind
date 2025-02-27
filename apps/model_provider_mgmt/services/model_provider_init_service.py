@@ -123,3 +123,11 @@ class ModelProviderInitService:
             name="duckduckgo-search",
             defaults={"display_name": "DuckDuckGo", "params": {}, "description": "使用DuckDuckGo搜索引擎进行搜索"},
         )
+        SkillTools.objects.get_or_create(
+            name="general_current_time",
+            defaults={"display_name": "CurrentTime", "params": {}, "description": " 获取当前时间"},
+        )
+        SkillTools.objects.get_or_create(
+            name="general_chinese_holiday_lookup",
+            defaults={"display_name": "ChineseHolidayLookup", "params": {}, "description": "获取中国节假日"},
+        )
