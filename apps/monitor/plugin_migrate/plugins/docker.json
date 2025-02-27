@@ -1,0 +1,83 @@
+{
+  "plugin": "Docker",
+  "plugin_desc": "...",
+  "is_compound_object": true,
+  "objects": [
+    {
+      "name": "Docker",
+      "type": "Container Management",
+      "level": "base",
+      "description": "",
+      "metrics": [
+        {
+          "metric_group": "Docker Count",
+          "name": "docker_n_containers",
+          "display_name": "Containers Count",
+          "instance_id_keys": ["instance_id"],
+          "data_type": "Number",
+          "unit": "short",
+          "dimensions": [],
+          "description": "This metric indicates the total number of containers on the Docker host, reflecting the host's load.",
+          "query": "sum(docker_n_containers{__$labels__}) by (instance_id)"
+        },
+        {
+          "metric_group": "Docker Count",
+          "name": "docker_n_containers_running",
+          "display_name": "Running Containers",
+          "instance_id_keys": ["instance_id"],
+          "data_type": "Number",
+          "unit": "short",
+          "dimensions": [],
+          "description": "This metric indicates the number of containers running on the Docker host, reflecting the host's load.",
+          "query": "docker_n_containers_running{__$labels__}"
+        },
+        {
+          "metric_group": "Docker Count",
+          "name": "docker_n_containers_stopped",
+          "display_name": "Stopped Containers",
+          "instance_id_keys": ["instance_id"],
+          "data_type": "Number",
+          "unit": "short",
+          "dimensions": [],
+          "description": "This metric indicates the number of stopped containers on the Docker host, helping to understand container status.",
+          "query": "docker_n_containers_stopped{__$labels__}"
+        }
+      ]
+    },
+    {
+      "name": "Docker Container",
+      "type": "Container Management",
+      "level": "derivative",
+      "description": "",
+      "metrics": [
+        {
+          "metric_group": "Status",
+          "name": "docker_container_status",
+          "display_name": "Status",
+          "instance_id_keys": ["instance_id"],
+          "data_type": "Enum",
+          "unit": "[{\"name\":\"正常\",\"id\":0},{\"name\":\"异常\",\"id\":1}]",
+          "dimensions": [],
+          "description": "This metric indicates the state of the container, where 0 means the container is normal",
+          "query": "max(docker_container_status_container_id{container_status=\"running\",__$labels__}) by (instance_id)"
+        },
+        {
+          "metric_group": "Status",
+          "name": "docker_container_status_restart_count",
+          "display_name": "Restart Count",
+          "instance_id_keys": ["instance_id", "container_name"],
+          "data_type": "Number",
+          "unit": "short",
+          "dimensions": [
+            {
+              "name": "container_name",
+              "description": "container_name"
+            }
+          ],
+          "description": "This metric indicates the number of container restarts, helping monitor if the container is frequently restarting",
+          "query": "docker_container_status_restart_count{__$labels__}"
+        }
+      ]
+    }
+  ]
+}
