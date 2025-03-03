@@ -44,7 +44,7 @@ CONFIG_MAP = {
 }
 
 
-class ElasticSearchConfig:
+class DataBaseConfig:
     @staticmethod
     def patch_set_node_config(nodes: list):
         """批量添加节点配置"""
@@ -65,14 +65,14 @@ class ElasticSearchConfig:
                 _node_config["instance_id"] = ast.literal_eval(_node_config["instance_id"])[0]
                 content = template.safe_substitute(_node_config)
                 node_objs.append(ChildConfig(
-                    collect_type="elasticsearch",
+                    collect_type="database",
                     config_type=node_config["type"],
                     content=content,
                     collector_config_id=base_config_id,
                     collect_instance_id=node_config["instance_id"],
                 ))
 
-        old_child_configs = ChildConfig.objects.filter(collector_config_id__in=base_config_ids, collect_type="elasticsearch")
+        old_child_configs = ChildConfig.objects.filter(collector_config_id__in=base_config_ids, collect_type="database")
         old_child_map = {(i.collect_type, i.config_type, i.collect_instance_id): i for i in old_child_configs}
         creates, updates = [], []
         for node_obj in node_objs:
