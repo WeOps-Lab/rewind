@@ -58,14 +58,33 @@
         }
       ]
     },
-     {
+    {
       "name": "Channel",
       "children": [
         {
-          "id": "application_list",
-          "name": "Application-list",
+          "id": "channel_list",
+          "name": "Channel-list",
           "operation": [
+            "View",
+            "Edit",
+            "Delete",
+            "Add"
+          ]
+        },
+        {
+          "id": "channel_setting",
+          "name": "Channel-setting",
+          "operation": [
+            "Save",
             "View"
+          ]
+        },
+        {
+          "id": "channel_template",
+          "name": "Channel-template",
+          "operation": [
+            "View",
+            "Detail"
           ]
         },
         {
