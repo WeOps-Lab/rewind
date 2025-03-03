@@ -112,10 +112,12 @@ class UserManage(object):
         """更新用户"""
         roles = data.pop("roles", [])
         groups = data.pop("groups", [])
+        data["firstName"] = data["lastName"]
         old_groups = self.keycloak_client.realm_client.get_user_groups(user_id)
         old_roles = self.keycloak_client.get_realm_roles_of_user(user_id)
         for i in old_groups:
             self.keycloak_client.realm_client.group_user_remove(user_id, i["id"])
+        old_roles = [i for i in old_roles if i["name"] != "admin"]
         for i in old_roles:
             i.pop("role_type", "")
         self.keycloak_client.realm_client.delete_realm_roles_of_user(user_id, old_roles)
