@@ -60,3 +60,7 @@ class SystemMgmt(object):
         """
         return_data = self.client.run("search_users", query_params=query_params)
         return return_data
+
+    def get_all_groups(self):
+        return_data = self.client.run("get_all_groups")
+        return return_data
