@@ -127,3 +127,10 @@ def search_users(query_params):
     else:
         res = client.user_list(query_params)
     return {"result": True, "data": res}
+
+
+@nats_client.register
+def get_all_groups():
+    client = KeyCloakClient()
+    return_data = client.get_user_groups("", True)
+    return {"result": True, "data": return_data}
