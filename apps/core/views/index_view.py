@@ -2,6 +2,7 @@ import os
 
 from django.http import JsonResponse
 from django.shortcuts import render
+from django.utils.translation import gettext as _
 from rest_framework.decorators import api_view
 
 from apps.rpc.system_mgmt import SystemMgmt
@@ -57,4 +58,12 @@ def get_user_menus(request):
         username=request.user.username,
         is_superuser=request.user.is_superuser,
     )
+    return JsonResponse(return_data)
+
+
+def get_all_groups(request):
+    if not request.user.is_superuser:
+        return JsonResponse({"result": False, "message": _("Not Authorized")})
+    client = SystemMgmt()
+    return_data = client.get_all_groups()
     return JsonResponse(return_data)
