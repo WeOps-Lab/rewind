@@ -20,9 +20,12 @@ def on_message(channel, method_frame, header_frame, body):
     try:
         message = json.loads(body.decode())
         logger.info(f"开始处理消息: {message}")
-        if "text" in message:
+        if "text" in message and message["text"].strip():
             close_old_connections()
             sender_id = message["sender_id"]
+            if not sender_id.strip():
+                channel.basic_ack(delivery_tag=method_frame.delivery_tag)
+                return
             bot_id = int(message.get("bot_id", 7))
             created_at = datetime.datetime.fromtimestamp(message["timestamp"], tz=datetime.timezone.utc)
             if "input_channel" in message:

@@ -33,7 +33,3 @@ class RerankViewSet(viewsets.ViewSet):
 class RerankProviderViewSet(AuthViewSet):
     queryset = RerankProvider.objects.all()
     serializer_class = RerankProviderSerializer
-
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-        return self.query_by_groups(request, queryset)

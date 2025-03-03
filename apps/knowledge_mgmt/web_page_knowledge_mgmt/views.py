@@ -1,14 +1,14 @@
 from django.http import JsonResponse
 from django.utils.translation import gettext as _
+from rest_framework import viewsets
 from rest_framework.decorators import action
 
-from apps.core.utils.viewset_utils import AuthViewSet
 from apps.knowledge_mgmt.knowledge_document_mgmt.utils import KnowledgeDocumentUtils
 from apps.knowledge_mgmt.models import WebPageKnowledge
 from apps.knowledge_mgmt.web_page_knowledge_mgmt.serializers import WebPageKnowledgeSerializer
 
 
-class WebPageKnowledgeViewSet(AuthViewSet):
+class WebPageKnowledgeViewSet(viewsets.ModelViewSet):
     queryset = WebPageKnowledge.objects.all()
     serializer_class = WebPageKnowledgeSerializer
     ordering = ("-id",)

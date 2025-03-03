@@ -66,6 +66,8 @@ class LLMViewSet(AuthViewSet):
         validate_msg = self._validate_name(skill_list, request.user.group_list, params["team"])
         if validate_msg:
             return JsonResponse({"result": False, "message": validate_msg})
+        if (not request.user.is_superuser) and (instance.created_by != request.user.username):
+            params.pop("team", [])
         if "llm_model" in params:
             params["llm_model_id"] = params.pop("llm_model")
         for key in params.keys():
@@ -121,9 +123,6 @@ class LLMModelViewSet(AuthViewSet):
             is_build_in=False,
         )
         return JsonResponse({"result": True})
-
-    def update(self, request, *args, **kwargs):
-        return super().update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
         obj = self.get_object()

@@ -3,7 +3,25 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 
 
-class AuthViewSet(viewsets.ModelViewSet):
+class MaintainerViewSet(viewsets.ModelViewSet):
+    def perform_create(self, serializer):
+        """创建时补充基础Model中的字段"""
+        user = serializer.context.get("request").user
+        username = getattr(user, "username", "guest")
+        if hasattr(serializer.Meta.model, "created_by"):
+            serializer.save(created_by=username, updated_by=username)
+        return super().perform_create(serializer)
+
+    def perform_update(self, serializer):
+        """更新时补充基础Model中的字段"""
+        user = serializer.context.get("request").user
+        username = getattr(user, "username", "guest")
+        if hasattr(serializer.Meta.model, "updated_by"):
+            serializer.save(updated_by=username)
+        return super().perform_update(serializer)
+
+
+class AuthViewSet(MaintainerViewSet):
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         return self.query_by_groups(request, queryset)
@@ -25,18 +43,15 @@ class AuthViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
-    def perform_create(self, serializer):
-        """创建时补充基础Model中的字段"""
-        user = serializer.context.get("request").user
-        username = getattr(user, "username", "guest")
-        if hasattr(serializer.Meta.model, "created_by"):
-            serializer.save(created_by=username, updated_by=username)
-        return super().perform_create(serializer)
-
-    def perform_update(self, serializer):
-        """更新时补充基础Model中的字段"""
-        user = serializer.context.get("request").user
-        username = getattr(user, "username", "guest")
-        if hasattr(serializer.Meta.model, "updated_by"):
-            serializer.save(updated_by=username)
-        return super().perform_update(serializer)
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop("partial", False)
+        data = request.data
+        instance = self.get_object()
+        if (not request.user.is_superuser) and (instance.created_by != request.user.username):
+            data.pop("team", [])
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        if getattr(instance, "_prefetched_objects_cache", None):
+            instance._prefetched_objects_cache = {}
+        return Response(serializer.data)

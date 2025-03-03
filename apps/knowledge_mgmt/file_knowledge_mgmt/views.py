@@ -1,18 +1,18 @@
 from django.core.files.base import ContentFile
 from django.http import JsonResponse
 from django.utils.translation import gettext as _
+from rest_framework import viewsets
 from rest_framework.decorators import action
 
 from apps.base.quota_rule_mgmt.quota_utils import get_quota_client
 from apps.core.logger import logger
-from apps.core.utils.viewset_utils import AuthViewSet
 from apps.knowledge_mgmt.file_knowledge_mgmt.serializers import FileKnowledgeSerializer
 from apps.knowledge_mgmt.knowledge_document_mgmt.utils import KnowledgeDocumentUtils
 from apps.knowledge_mgmt.models import FileKnowledge
 from apps.model_provider_mgmt.models import OCRProvider
 
 
-class FileKnowledgeViewSet(AuthViewSet):
+class FileKnowledgeViewSet(viewsets.ModelViewSet):
     queryset = FileKnowledge.objects.all()
     serializer_class = FileKnowledgeSerializer
     ordering = ("-id",)

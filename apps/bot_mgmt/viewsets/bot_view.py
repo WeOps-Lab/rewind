@@ -55,6 +55,8 @@ class BotViewSet(AuthViewSet):
         llm_skills = data.pop("llm_skills", [])
         rasa_model = data.pop("rasa_model", None)
         node_port = data.pop("node_port", None)
+        if (not request.user.is_superuser) and (obj.created_by != request.user.username):
+            data.pop("team", [])
         for key in data.keys():
             setattr(obj, key, data[key])
         if node_port:
