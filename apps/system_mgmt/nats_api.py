@@ -20,7 +20,7 @@ def verify_token(token, client_id):
     groups = cache.get(f"group_{user_info.get('sub')}")
     if not groups:
         groups = client.get_user_groups(user_info.get("sub"), "admin" in roles)
-        cache.set(f"group_{user_info.get('sub')}", groups, 60 * 30)
+        cache.set(f"group_{user_info.get('sub')}", groups, 60 * 5)
     return {
         "result": True,
         "data": {

@@ -94,6 +94,7 @@ class UserManage(object):
         roles = data.pop("roles", [])
         groups = data.pop("groups", [])
         data["enabled"] = True
+        data["firstName"] = data["lastName"]
         user_id = self.keycloak_client.realm_client.create_user(data)
         self.keycloak_client.realm_client.assign_realm_roles(user_id, roles)
         for group_id in groups:
