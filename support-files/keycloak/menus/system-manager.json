@@ -45,7 +45,7 @@
           ]
         },
         {
-          "id": "applicaiton_role",
+          "id": "application_role",
           "name": "Application-role",
           "operation": [
             "View",
@@ -85,18 +85,6 @@
           "operation": [
             "View",
             "Detail"
-          ]
-        },
-        {
-          "id": "applicaiton_role",
-          "name": "Application-role",
-          "operation": [
-            "View",
-            "Edit",
-            "Add",
-            "Add user",
-            "Edit Permission",
-            "Delete"
           ]
         }
       ]
