@@ -15,7 +15,6 @@ class LLMService:
         self.knowledge_search_service = KnowledgeSearchService()
 
     def chat(self, kwargs: dict):
-        show_think = kwargs.pop("show_think", True)
         citing_knowledge = []
         data, doc_map, title_map = self.invoke_chat(kwargs)
         if "bot_id" in kwargs:
@@ -38,12 +37,11 @@ class LLMService:
                 }
                 for k, v in title_map.items()
             ]
-        content = data["content"]
-        if not show_think:
-            content = re.sub(r"<think>.*?</think>", "", content, flags=re.DOTALL).strip()
-        return {"content": content, "citing_knowledge": citing_knowledge}
+
+        return {"content": data["content"], "citing_knowledge": citing_knowledge}
 
     def invoke_chat(self, kwargs):
+        show_think = kwargs.pop("show_think", True)
         llm_model = LLMModel.objects.get(id=kwargs["llm_model"])
         context = ""
         title_map = doc_map = {}
@@ -65,13 +63,16 @@ class LLMService:
             "tools": kwargs.get("tools", []),
         }
         # TODO 需要在chat server增加图片支持
-        # 添加 tools
         result = chat_server.invoke(chat_kwargs)
         if isinstance(result, str):
             result = json.loads(result)
         if not result["result"]:
             raise Exception(result["message"])
         data = result["data"]
+        content = data["content"]
+        if not show_think:
+            content = re.sub(r"<think>.*?</think>", "", content, flags=re.DOTALL).strip()
+        data["content"] = content
         return data, doc_map, title_map
 
     def search_doc(self, context, kwargs):

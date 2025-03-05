@@ -1,3 +1,5 @@
+from django.conf import settings
+from langserve import RemoteRunnable
 from rest_framework.authtoken.models import Token
 
 from apps.base.models import User
@@ -118,16 +120,19 @@ class ModelProviderInitService:
                 },
             },
         )
-
-        SkillTools.objects.get_or_create(
-            name="duckduckgo-search",
-            defaults={"display_name": "DuckDuckGo", "params": {}, "description": "使用DuckDuckGo搜索引擎进行搜索"},
-        )
-        SkillTools.objects.get_or_create(
-            name="general_current_time",
-            defaults={"display_name": "CurrentTime", "params": {}, "description": " 获取当前时间"},
-        )
-        SkillTools.objects.get_or_create(
-            name="general_chinese_holiday_lookup",
-            defaults={"display_name": "ChineseHolidayLookup", "params": {}, "description": "获取中国节假日"},
-        )
+        tools_server = RemoteRunnable(settings.TOOLS_CHAT_SERVICE_URL)
+        tools = tools_server.invoke([])
+        if not tools:
+            return
+        for key, value in tools.items():
+            tool_obj = value["tool_config"]
+            SkillTools.objects.update_or_create(
+                name=key,
+                defaults={
+                    "display_name": tool_obj["display_name"],
+                    "params": tool_obj.get("parameters", {}),
+                    "description": tool_obj["description"],
+                    "tags": [value["toolset_description"]],
+                    "icon": tool_obj["icon"],
+                },
+            )

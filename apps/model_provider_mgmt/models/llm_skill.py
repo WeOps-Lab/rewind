@@ -70,3 +70,5 @@ class SkillTools(MaintainerInfo, TimeInfo):
     params = models.JSONField(default=dict)
     team = models.JSONField(default=list)
     description = models.TextField()
+    tags = models.JSONField(default=list)
+    icon = models.CharField(max_length=100, default="")

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-12 17:11+0800\n"
+"POT-Creation-Date: 2025-03-04 16:06+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,22 +22,22 @@ msgstr ""
 msgid "This user already has an API Secret"
 msgstr "该用户已拥有 API 密钥"
 
-#: .\apps\bot_mgmt\models\bot.py:46 .\apps\channel_mgmt\models\channel.py:19
+#: .\apps\bot_mgmt\models\bot.py:47 .\apps\channel_mgmt\models\channel.py:19
 #: .\apps\knowledge_mgmt\models\knowledge_document.py:29
 msgid "name"
 msgstr "名称"
 
-#: .\apps\bot_mgmt\models\bot.py:47 .\apps\bot_mgmt\models\channel_user.py:10
+#: .\apps\bot_mgmt\models\bot.py:48 .\apps\bot_mgmt\models\channel_user.py:10
 #: .\apps\bot_mgmt\models\channel_user.py:28
 #: .\apps\channel_mgmt\models\channel.py:20
 msgid "channel type"
 msgstr "渠道类型"
 
-#: .\apps\bot_mgmt\models\bot.py:48 .\apps\channel_mgmt\models\channel.py:21
+#: .\apps\bot_mgmt\models\bot.py:49 .\apps\channel_mgmt\models\channel.py:21
 msgid "channel config"
 msgstr "渠道配置"
 
-#: .\apps\bot_mgmt\models\bot.py:49 .\apps\channel_mgmt\models\channel.py:22
+#: .\apps\bot_mgmt\models\bot.py:50 .\apps\channel_mgmt\models\channel.py:22
 msgid "enabled"
 msgstr "启用"
 
@@ -158,6 +158,10 @@ msgstr "类型"
 msgid "Text Value Type Fields"
 msgstr "文本数值类型字段"
 
+#: .\apps\core\views\index_view.py:66
+msgid "Not Authorized"
+msgstr ""
+
 #: .\apps\knowledge_mgmt\file_knowledge_mgmt\views.py:33
 #, python-brace-format
 msgid "File size exceeds quota limit. Available size: {no_used_file_size} MB"
@@ -172,15 +176,15 @@ msgid "The team field is required."
 msgstr "需要提供团队字段。"
 
 #: .\apps\knowledge_mgmt\knowledge_base_mgmt\views.py:39
-#: .\apps\knowledge_mgmt\knowledge_base_mgmt\views.py:73
+#: .\apps\knowledge_mgmt\knowledge_base_mgmt\views.py:75
 msgid "The knowledge base name already exists."
 msgstr "知识库名称已存在。"
 
-#: .\apps\knowledge_mgmt\knowledge_base_mgmt\views.py:61
+#: .\apps\knowledge_mgmt\knowledge_base_mgmt\views.py:63
 msgid "The knowledge base is training and cannot be modified."
 msgstr "知识库正在训练，无法修改。"
 
-#: .\apps\knowledge_mgmt\knowledge_base_mgmt\views.py:93
+#: .\apps\knowledge_mgmt\knowledge_base_mgmt\views.py:98
 msgid "This knowledge base contains documents and cannot be deleted."
 msgstr "该知识库包含文档，无法删除。"
 
@@ -378,7 +382,7 @@ msgstr "网址为必填项"
 msgid "Use specified knowledge base"
 msgstr "使用指定的知识库"
 
-#: .\apps\model_provider_mgmt\services\llm_service.py:99
+#: .\apps\model_provider_mgmt\services\llm_service.py:106
 msgid ""
 "\n"
 "The following is the background knowledge provided to you. The format of the "
@@ -389,24 +393,55 @@ msgid ""
 "--------\n"
 "\n"
 "             "
-msgstr "\n以下是为您提供的背景知识。背景知识的格式如下：\n--------\n知识标题：[Title]\n知识内容：[Content]\n--------\n\n             "
+msgstr ""
+"\n"
+"以下是为您提供的背景知识。背景知识的格式如下：\n"
+"--------\n"
+"知识标题：[Title]\n"
+"知识内容：[Content]\n"
+"--------\n"
+"\n"
+"             "
 
-#: .\apps\model_provider_mgmt\services\llm_service.py:110
+#: .\apps\model_provider_mgmt\services\llm_service.py:117
 msgid "Knowledge Title:[{}]\n"
 msgstr "知识标题：[{}]\n"
 
-#: .\apps\model_provider_mgmt\services\llm_service.py:111
+#: .\apps\model_provider_mgmt\services\llm_service.py:118
 msgid "Knowledge Content:[{}]\n"
 msgstr "知识内容：[{}]\n"
 
-#: .\apps\model_provider_mgmt\views\llm_view.py:37
+#: .\apps\model_provider_mgmt\services\model_provider_init_service.py:128
+msgid "Search tools"
+msgstr "检索工具"
+
+#: .\apps\model_provider_mgmt\services\model_provider_init_service.py:137
+#: .\apps\model_provider_mgmt\services\model_provider_init_service.py:146
+msgid "General tools"
+msgstr "通用工具"
+
+#: .\apps\model_provider_mgmt\views\llm_view.py:40
+msgid ""
+"A skill with the same name already exists in group {team_name_map.get(i)}."
+msgstr ""
+
+#: .\apps\model_provider_mgmt\views\llm_view.py:48
 msgid "Skill count exceeds quota limit."
 msgstr "技能数量超过配额限制。"
 
-#: .\apps\model_provider_mgmt\views\llm_view.py:39
-msgid "The name already exists."
-msgstr "名称已存在。"
+#: .\apps\model_provider_mgmt\views\llm_view.py:116
+#, fuzzy
+#| msgid "The team field is required."
+msgid "The team is empty."
+msgstr "需要提供团队字段。"
 
-#: .\apps\model_provider_mgmt\views\llm_view.py:123
+#: .\apps\model_provider_mgmt\views\llm_view.py:130
+msgid "Built-in model is not allowed to be deleted"
+msgstr ""
+
+#: .\apps\model_provider_mgmt\views\llm_view.py:149
 msgid "Skill id not found"
 msgstr "未找到技能 ID"
+
+#~ msgid "The name already exists."
+#~ msgstr "名称已存在。"

@@ -24,4 +24,4 @@ class TranslateDict(dict):
 
     def iteritems(self):
         for k, v in super(TranslateDict, self).items():
-            yield (k, self.__getitem__(k))
+            yield k, self.__getitem__(k)

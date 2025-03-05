@@ -5,6 +5,7 @@ FILE_CHUNK_SERVICE_URL = os.getenv("FILE_CHUNK_SERVICE_URL", "http://chunk-serve
 MANUAL_CHUNK_SERVICE_URL = os.getenv("MANUAL_CHUNK_SERVICE_URL", "http://chunk-server/manual_chunk")
 WEB_PAGE_CHUNK_SERVICE_URL = os.getenv("WEB_PAGE_CHUNK_SERVICE_URL", "http://chunk-server/webpage_chunk")
 OPENAI_CHAT_SERVICE_URL = os.getenv("OPENAI_CHAT_SERVICE_URL", "http://chat-server/openai")
+TOOLS_CHAT_SERVICE_URL = os.getenv("TOOLS_CHAT_SERVICE_URL", "http://chat-server/tools_info")
 REMOTE_INDEX_URL = os.getenv("REMOTE_INDEX_URL", "http://rag-server/elasticsearch_index")
 RAG_SERVER_URL = os.getenv("RAG_SERVER_URL", "http://rag-server/elasticsearch_rag")
 ONLINE_SEARCH_SERVER_URL = os.getenv("ONLINE_SEARCH_SERVER_URL", "http://rag-server/online_search")

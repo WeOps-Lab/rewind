@@ -104,6 +104,7 @@ def get_skill_and_params(kwargs, team):
             for key, value in skill_obj.rag_score_threshold_map.items()
         ],
         "enable_rag_knowledge_source": skill_obj.enable_rag_knowledge_source,
+        "show_think": skill_obj.show_think,
     }
 
     return skill_obj, params, None
