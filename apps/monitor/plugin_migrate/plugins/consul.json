@@ -10,7 +10,7 @@
       "name": "consul_health_checks_status",
       "display_name": "Health Check Status",
       "instance_id_keys": ["instance_id"],
-      "data_type": "Number",
+      "data_type": "Enum",
       "unit": "[{\"name\":\"passing\",\"id\":0},{\"name\":\"warning\",\"id\":1},{\"name\":\"critical\",\"id\":2}]",
       "dimensions": [],
       "description": "This metric represents the status of the health check in Consul, where 0=passing, 1=warning, 2=critical.",

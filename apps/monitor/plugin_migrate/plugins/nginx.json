@@ -91,7 +91,7 @@
       "unit": "percent",
       "dimensions": [],
       "description": "The percentage of handled connections out of total accepted connections over the last 5 minutes, used to analyze connection handling stability.",
-      "query": "100*(rate(nginx_handled{__$labels__}[5m]) / rate(nginx_accepts{__$labels__}[5m]))"
+      "query": "100 * (sum(rate(nginx_handled{__$labels__}[5m])) by (instance_id) /sum(rate(nginx_accepts{__$labels__}[5m])) by (instance_id))"
     },
     {
       "metric_group": "Efficiency",

@@ -36,7 +36,7 @@
       "unit": "percent",
       "dimensions": [],
       "description": "This metric represents the ratio of commits to snapshots in Zookeeper, helping to assess the read/write load distribution.",
-      "query": "rate(zookeeper_commit_count{__$labels__}[5m]) / rate(zookeeper_snap_count{__$labels__}[5m])"
+      "query": "sum(rate(zookeeper_commit_count{__$labels__}[5m])) by (instance_id) / sum(rate(zookeeper_snap_count{__$labels__}[5m])) by (instance_id)"
     },
     {
       "metric_group": "Performance",
@@ -47,7 +47,7 @@
       "unit": "percent",
       "dimensions": [],
       "description": "This metric represents the ratio of snapshot generation frequency to commit request frequency in Zookeeper, helping to monitor the relationship between persistence operations and transaction commits.",
-      "query": "rate(zookeeper_snap_count{__$labels__}[5m]) / rate(zookeeper_commit_count{__$labels__}[5m])"
+      "query": "sum(rate(zookeeper_snap_count{__$labels__}[5m])by (instance_id)  / sum(rate(zookeeper_commit_count{__$labels__}[5m])) by (instance_id)"
     },
     {
       "metric_group": "Connection",

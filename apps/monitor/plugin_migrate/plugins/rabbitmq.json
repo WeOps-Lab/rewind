@@ -131,7 +131,7 @@
         }
       ],
       "description": "This metric shows the ratio of used file descriptors to the total number of file descriptors on the RabbitMQ node.",
-      "query": "100*rabbitmq_node_fd_used{__$labels__} / rabbitmq_node_fd_total{__$labels__}"
+      "query": "100*sum(rabbitmq_node_fd_used{__$labels__} ) by (instance_id)/ sum(rabbitmq_node_fd_total{__$labels__} ) by (instance_id)"
     },
     {
       "metric_group": "Message",
@@ -164,7 +164,7 @@
       "unit": "percent",
       "dimensions": [],
       "description": "This metric shows the ratio of ready messages to acked messages in the queue, helping to identify message backlog in the system.",
-      "query": "100*rabbitmq_overview_messages_ready{__$labels__} / (rabbitmq_overview_messages_acked{__$labels__} + rabbitmq_overview_messages_ready{__$labels__})"
+      "query": "100 * sum(rate(rabbitmq_overview_messages_ready{__$labels__}[5m])) by (instance_id) /\n(sum(rate(rabbitmq_overview_messages_acked{__$labels__}[5m])) by (instance_id) + sum(rate(rabbitmq_overview_messages_ready{__$labels__}[5m])) by (instance_id))"
     },
     {
       "metric_group": "Message",
@@ -175,7 +175,7 @@
       "unit": "percent",
       "dimensions": [],
       "description": "This metric shows the ratio of unacknowledged messages to the total messages in the queue, helping to identify slow consumers.",
-      "query": "100*rabbitmq_overview_messages_unacked{__$labels__} / (rabbitmq_overview_messages_acked{__$labels__} + rabbitmq_overview_messages_unacked{__$labels__})"
+      "query": "100 * sum(rabbitmq_overview_messages_unacked{__$labels__}) by (instance_id) / (sum(rabbitmq_overview_messages_acked{__$labels__}) by (instance_id) + sum(rabbitmq_overview_messages_unacked{__$labels__}) by (instance_id))"
     }
   ]
 }
