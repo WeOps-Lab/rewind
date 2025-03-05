@@ -55,7 +55,7 @@
       "display_name": "Disk Write Throughput",
       "instance_id_keys": ["instance_id"],
       "data_type": "Number",
-      "unit": "MB/s",
+      "unit": "MBs",
       "dimensions": [],
       "description": "Monitors disk write throughput (MB/s).",
       "query": "rate(elasticsearch_fs_io_stats_total_write_kilobytes{__$labels__}[5m]) / 1024"
@@ -66,7 +66,7 @@
       "display_name": "Disk Read Throughput",
       "instance_id_keys": ["instance_id"],
       "data_type": "Number",
-      "unit": "MB/s",
+      "unit": "MBs",
       "dimensions": [],
       "description": "Tracks disk read throughput (MB/s).",
       "query": "rate(elasticsearch_fs_io_stats_total_read_kilobytes{__$labels__}[5m]) / 1024"
