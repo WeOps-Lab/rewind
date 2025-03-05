@@ -203,11 +203,20 @@
     {
       "metric_group": "Disk",
       "name": "disk.used",
-      "query": "sum(disk_used{instance_type=\"os\", __$labels__}) by (instance_id) / 1024 / 1024 / 1024",
+      "query": "sum(disk_used{instance_type=\"os\", __$labels__}) by (instance_id, device, path) / 1000 / 1000 / 1000",
       "display_name": "Disk Used Size",
       "data_type": "Number",
-      "unit": "gbytes",
-      "dimensions": [],
+      "unit": "decgbytes",
+      "dimensions": [
+        {
+          "name": "device",
+          "description": "device"
+        },
+        {
+          "name": "path",
+          "description": "path"
+        }
+      ],
       "instance_id_keys": ["instance_id"],
       "description": "Displays the actual used disk space (in GB), used to determine disk capacity usage. This metric is helpful for monitoring disk space usage."
     },
