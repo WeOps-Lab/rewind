@@ -1,6 +1,6 @@
 {
   "plugin": "Mysql",
-  "plugin_desc": "",
+  "plugin_desc": "Used to collect and monitor key metrics for MySQL database health and performance.",
   "name": "Mysql",
   "type": "Database",
   "description": "",

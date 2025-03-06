@@ -1,6 +1,6 @@
 {
   "plugin": "Docker",
-  "plugin_desc": "...",
+  "plugin_desc": "Used for collecting and analyzing the status, resource usage (CPU, memory, network, IO), and performance metrics of Docker containers, helping to identify anomalies and optimize container operational efficiency.",
   "is_compound_object": true,
   "objects": [
     {

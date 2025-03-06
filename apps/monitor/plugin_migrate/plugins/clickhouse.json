@@ -1,6 +1,6 @@
 {
   "plugin": "ClickHouse",
-  "plugin_desc": "...",
+  "plugin_desc": "Collect runtime metrics of ClickHouse instances, such as memory, disk, query events, etc., for performance monitoring, resource tracking, and fault diagnosis, ensuring stable database operation.",
   "name": "ClickHouse",
   "type": "Middleware",
   "description": "",

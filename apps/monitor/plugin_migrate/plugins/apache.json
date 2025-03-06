@@ -1,6 +1,6 @@
 {
   "plugin": "Apache",
-  "plugin_desc": "...",
+  "plugin_desc": "Real-time collection of Apache runtime data, resource utilization, request processing efficiency, and bandwidth statistics, helping users optimize performance, diagnose issues, and achieve efficient operations management.",
   "name": "Apache",
   "type": "Middleware",
   "description": "",

@@ -1,6 +1,6 @@
 {
   "plugin": "Redis",
-  "plugin_desc": "",
+  "plugin_desc": "Used to collect key indicators of Redis performance and resource utilization, helping improve system efficiency and stability.",
   "name": "Redis",
   "type": "Database",
   "description": "",

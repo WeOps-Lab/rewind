@@ -1,6 +1,6 @@
 {
   "plugin": "Zookeeper",
-  "plugin_desc": "...",
+  "plugin_desc": "By collecting runtime performance data and stability metrics of Zookeeper, such as uptime, average latency, and read-write ratios, users can monitor the cluster status in real-time and optimize performance.",
   "name": "Zookeeper",
   "type": "Middleware",
   "description": "",

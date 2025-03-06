@@ -1,6 +1,6 @@
 {
   "plugin": "Postgres",
-  "plugin_desc": "",
+  "plugin_desc": "Collecting PostgreSQL's session management, transaction metrics, and I/O performance data helps monitor resource usage, access behavior, operational efficiency, and identify potential issues within the database.",
   "name": "Postgres",
   "type": "Database",
   "description": "",
