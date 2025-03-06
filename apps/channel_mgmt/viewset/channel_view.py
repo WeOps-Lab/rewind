@@ -10,6 +10,7 @@ from apps.channel_mgmt.serializers import ChannelSerializer, ChannelTemplateSeri
 
 class ChannelFilter(FilterSet):
     name = filters.CharFilter(field_name="name", lookup_expr="lte")
+    channel_type = filters.CharFilter(field_name="channel_type", lookup_expr="exact")
 
 
 class ChannelViewSet(viewsets.ModelViewSet):
@@ -33,7 +34,7 @@ class ChannelViewSet(viewsets.ModelViewSet):
 
 
 class TemplateFilter(FilterSet):
-    channel_obj_id = filters.NumberFilter(field_name="channel_obj_id", lookup_expr="exact")
+    channel_type = filters.CharFilter(field_name="channel_type", lookup_expr="exact")
     name = filters.CharFilter(field_name="name", lookup_expr="lte")
 
 

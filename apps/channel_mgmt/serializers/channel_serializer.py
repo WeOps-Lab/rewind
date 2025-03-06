@@ -8,25 +8,23 @@ class ChannelSerializer(I18nSerializer):
         fields = "__all__"
 
     def create(self, validated_data):
-        if validated_data["channel_type"] == "email":
-            validated_data["config"] = {
-                "smtp_server": "",
-                "port": 0,
-                "smtp_user": "",
-                "smtp_pwd": "",
-                "smtp_usessl": False,
-                "smtp_usetls": False,
-                "mail_sender": "",
-            }
-        else:
-            validated_data["config"] = {
-                "corp_id": "",
-                "secret": "",
-                "token": "",
-                "aes_key": "",
-                "agent_id": "",
-            }
+        self.encode_config(validated_data)
         return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        self.encode_config(validated_data)
+        return super().update(instance, validated_data)
+
+    @staticmethod
+    def encode_config(validated_data):
+        config = validated_data["config"]
+        if validated_data["channel_type"] == "email":
+            Channel.encrypt_field("smtp_pwd", config)
+        elif validated_data["channel_type"] == "enterprise_wechat":
+            Channel.encrypt_field("secret", config)
+            Channel.encrypt_field("token", config)
+            Channel.encrypt_field("aes_key", config)
+        validated_data["config"] = config
 
 
 class ChannelTemplateSerializer(I18nSerializer):
