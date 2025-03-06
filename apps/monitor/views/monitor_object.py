@@ -1,6 +1,8 @@
 from django.db.models import Count
+from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets
+from rest_framework.decorators import action
 
 from apps.core.utils.web_utils import WebUtils
 from apps.monitor.filters.monitor_object import MonitorObjectFilter
@@ -8,6 +10,7 @@ from apps.monitor.language.service import SettingLanguage
 from apps.monitor.models import MonitorInstance, MonitorPolicy
 from apps.monitor.models.monitor_object import MonitorObject
 from apps.monitor.serializers.monitor_object import MonitorObjectSerializer
+from apps.monitor.services.monitor_object import MonitorObjectService
 from config.drf.pagination import CustomPageNumberPagination
 
 
@@ -50,7 +53,10 @@ class MonitorObjectVieSet(viewsets.ModelViewSet):
             for result in results:
                 result["policy_count"] = count_map.get(result["id"], 0)
 
-        return WebUtils.response_success(results)
+        # 排序
+        sorted_results = MonitorObjectService.sort_items(results)
+
+        return WebUtils.response_success(sorted_results)
 
     @swagger_auto_schema(
         operation_id="monitor_object_create",
@@ -86,6 +92,25 @@ class MonitorObjectVieSet(viewsets.ModelViewSet):
     )
     def destroy(self, request, *args, **kwargs):
         return super().destroy(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_id="monitor_object_order",
+        operation_description="监控对象排序",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_ARRAY,
+            items=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    "type": openapi.Schema(type=openapi.TYPE_STRING, description="对象类型"),
+                    "name_list": openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Schema(type=openapi.TYPE_STRING), description="对象名称列表"),
+                }
+            )
+        )
+    )
+    @action(methods=['post'], detail=False, url_path='order')
+    def order(self, request):
+        MonitorObjectService.set_object_order(request.data)
+        return WebUtils.response_success()
 
     # @swagger_auto_schema(
     #     operation_id="monitor_object_import",

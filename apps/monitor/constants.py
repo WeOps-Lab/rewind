@@ -243,3 +243,6 @@ LEVEL_WEIGHT = {
     "critical": 4,
     "no_data": 5,
 }
+
+# 对象顺序key
+OBJ_ORDER = "OBJ_ORDER"

@@ -1,11 +1,13 @@
 import ast
 import uuid
+from collections import defaultdict
 
 from django.db.models import Prefetch
 
-from apps.monitor.constants import MONITOR_OBJS
+from apps.monitor.constants import MONITOR_OBJS, OBJ_ORDER
 from apps.monitor.models.monitor_metrics import Metric
 from apps.monitor.models.monitor_object import MonitorInstance, MonitorObject
+from apps.monitor.models.setting import Setting
 from apps.monitor.utils.victoriametrics_api import VictoriaMetricsAPI
 from apps.monitor.tasks.grouping_rule import sync_instance_and_group
 
@@ -135,3 +137,54 @@ class MonitorObjectService:
     def autodiscover_monitor_instance():
         """同步监控实例数据"""
         sync_instance_and_group.delay()
+
+    @staticmethod
+    def set_object_order(order: list):
+        """设置监控对象排序"""
+        Setting.objects.filter(name=OBJ_ORDER).update(value=order)
+
+    @staticmethod
+    def sort_items(data):
+        """
+        :param data: list, 每个元素是 {"type": "G1", "name": "I1"}
+        :return: 排序后的数据列表
+        """
+
+        # 1. 预处理：如果 group_order 或 item_order 为空，设为默认值
+        order_obj = Setting.objects.filter(name=OBJ_ORDER).first()
+        item_order, group_order = {}, []
+        if order_obj:
+            item_order = {i["type"]: i["name_list"] for i in order_obj.value}
+            group_order = [i["type"] for i in order_obj.value]
+
+        # 2. 按 type 分组
+        grouped_data = defaultdict(list)
+        group_appearance_order = []  # 记录 type 出现顺序
+        for item in data:
+            grouped_data[item["type"]].append(item)
+            if item["type"] not in group_appearance_order:
+                group_appearance_order.append(item["type"])  # 记录出现顺序
+
+        # 3. 确定分组排序
+        if group_order:
+            sorted_groups = sorted(grouped_data.keys(),
+                                   key=lambda g: (group_order.index(g) if g in group_order else float('inf')))
+        else:
+            sorted_groups = group_appearance_order  # 按出现顺序排序（可改成 sorted(grouped_data.keys()) 变成字母序）
+
+        # 4. 结果存储
+        sorted_result = []
+
+        for group in sorted_groups:
+            items = grouped_data[group]
+
+            # 5. 确定子数据排序
+            if group in item_order and item_order[group]:
+                sorted_items = sorted(items, key=lambda x: (
+                    item_order[group].index(x["name"]) if x["name"] in item_order[group] else float('inf')))
+            else:
+                sorted_items = items  # 维持原始顺序（可改成 sorted(items, key=lambda x: x["name"]) 变成按 name 排序）
+
+            sorted_result.extend(sorted_items)
+
+        return sorted_result
