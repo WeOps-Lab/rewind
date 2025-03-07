@@ -20,7 +20,8 @@ def on_message(channel, method_frame, header_frame, body):
     try:
         message = json.loads(body.decode())
         logger.info(f"开始处理消息: {message}")
-        if "text" in message and message["text"].strip():
+        text = message.get("text", "") or ""
+        if text.strip():
             close_old_connections()
             sender_id = message["sender_id"]
             if not sender_id.strip():
