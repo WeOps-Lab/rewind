@@ -6,7 +6,6 @@ from apps.monitor.models.monitor_object import MonitorObject
 
 
 class MonitorPolicy(TimeInfo, MaintainerInfo):
-    NOTICE_TYPE_CHOICES = [('email', 'Email'), ('wechat', 'Wechat'), ('sms', 'SMS')]
 
     monitor_object = models.ForeignKey(MonitorObject, on_delete=models.CASCADE, verbose_name='监控对象')
 
@@ -34,7 +33,8 @@ class MonitorPolicy(TimeInfo, MaintainerInfo):
     no_data_recovery_period = models.JSONField(default=dict, verbose_name="无数据告警恢复的数据周期（eg:10m内有数据）")
 
     notice = models.BooleanField(default=True, verbose_name="是否通知")
-    notice_type = models.CharField(max_length=10, default="email", choices=NOTICE_TYPE_CHOICES, verbose_name="通知方式")
+    notice_type = models.CharField(max_length=50, default="", verbose_name="通知方式")
+    notice_type_id = models.CharField(max_length=100, default="", verbose_name="通知方式ID")
     notice_users = models.JSONField(default=list, verbose_name="通知人")
 
     # 是否启动策略

@@ -11,3 +11,14 @@ class SystemMgmtUtils:
     def get_user_all():
         result = SystemMgmt().get_all_users()
         return result["data"]
+
+    @staticmethod
+    def search_channel_list(channel_type="email"):
+        """email、enterprise_wechat"""
+        result = SystemMgmt().search_channel_list(channel_type)
+        return result
+
+    @staticmethod
+    def send_msg_with_channel(channel_id, title, content, receivers):
+        result = SystemMgmt().send_msg_with_channel(channel_id, title, content, receivers)
+        return result

@@ -355,13 +355,10 @@ class MonitorPolicyScan:
                 result.append({"user": user, "status": "success"})
 
         try:
-            send_mail(
-                subject=title,
-                message=content,
-                from_email=DEFAULT_FROM_EMAIL,
-                recipient_list=[email for email in user_email_map.values() if email],
-                fail_silently=False,
+            send_result = SystemMgmtUtils.send_msg_with_channel(
+                self.policy.notice_type_id, title, content, [email for email in user_email_map.values() if email]
             )
+            logger.info(f"send email success: {send_result}")
         except Exception as e:
             logger.error(f"send email failed: {e}")
 
