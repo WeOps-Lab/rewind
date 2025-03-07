@@ -141,7 +141,7 @@ class MonitorObjectService:
     @staticmethod
     def set_object_order(order: list):
         """设置监控对象排序"""
-        Setting.objects.filter(name=OBJ_ORDER).update(value=order)
+        Setting.objects.update_or_create(name=OBJ_ORDER, defaults={"value": order})
 
     @staticmethod
     def sort_items(data):
