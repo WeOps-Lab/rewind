@@ -80,6 +80,6 @@ class SystemMgmt(object):
         :param receivers: ["abc@canway.net"] 企微传用户的ID列表
         """
         return_data = self.client.run(
-            "search_channel_list", channel_id=channel_id, title=title, content=content, receivers=receivers
+            "send_msg_with_channel", channel_id=channel_id, title=title, content=content, receivers=receivers
         )
         return return_data
