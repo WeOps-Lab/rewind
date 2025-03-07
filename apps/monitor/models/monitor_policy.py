@@ -34,7 +34,7 @@ class MonitorPolicy(TimeInfo, MaintainerInfo):
 
     notice = models.BooleanField(default=True, verbose_name="是否通知")
     notice_type = models.CharField(max_length=50, default="", verbose_name="通知方式")
-    notice_type_id = models.CharField(max_length=100, default="", verbose_name="通知方式ID")
+    notice_type_id = models.IntegerField(default=0, verbose_name="通知方式ID")
     notice_users = models.JSONField(default=list, verbose_name="通知人")
 
     # 是否启动策略

@@ -16,7 +16,7 @@ class SystemMgmtUtils:
     def search_channel_list(channel_type="email"):
         """email、enterprise_wechat"""
         result = SystemMgmt().search_channel_list(channel_type)
-        return result
+        return result["data"]
 
     @staticmethod
     def send_msg_with_channel(channel_id, title, content, receivers):
