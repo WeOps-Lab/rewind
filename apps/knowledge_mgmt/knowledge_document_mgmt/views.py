@@ -1,8 +1,11 @@
+import hashlib
+
 from django.db import transaction
-from django.http import JsonResponse
+from django.http import FileResponse, JsonResponse
 from django.utils.translation import gettext as _
 from django_filters import filters
 from django_filters.rest_framework import FilterSet
+from django_minio_backend import MinioBackend
 from rest_framework import viewsets
 from rest_framework.decorators import action
 
@@ -10,7 +13,13 @@ from apps.bot_mgmt.models import ConversationTag
 from apps.core.logger import logger
 from apps.core.utils.elasticsearch_utils import get_es_client
 from apps.knowledge_mgmt.knowledge_document_mgmt.serializers import KnowledgeDocumentSerializer
-from apps.knowledge_mgmt.models import KnowledgeBase, KnowledgeDocument, ManualKnowledge, WebPageKnowledge
+from apps.knowledge_mgmt.models import (
+    FileKnowledge,
+    KnowledgeBase,
+    KnowledgeDocument,
+    ManualKnowledge,
+    WebPageKnowledge,
+)
 from apps.knowledge_mgmt.models.knowledge_document import DocumentStatus
 from apps.knowledge_mgmt.services.knowledge_search_service import KnowledgeSearchService
 from apps.knowledge_mgmt.tasks import general_embed, general_embed_by_document_list
@@ -213,3 +222,22 @@ class KnowledgeDocumentViewSet(viewsets.ModelViewSet):
             obj.save()
         doc.save()
         return JsonResponse({"result": True})
+
+    @action(methods=["GET"], detail=True)
+    def get_file_link(self, request, *args, **kwargs):
+        instance: KnowledgeDocument = self.get_object()
+        if instance.knowledge_source_type != "file":
+            return JsonResponse({"result": False, "message": _("Not a file")})
+        file_obj = FileKnowledge.objects.filter(knowledge_document_id=instance.id).first()
+        if not file_obj:
+            return JsonResponse({"result": False, "message": _("File not found")})
+        storage = MinioBackend(bucket_name="munchkin-private")
+        file_data = storage.open(file_obj.file.name, "rb")
+        # Calculate ETag
+        data = file_data.read()
+        etag = hashlib.md5(data).hexdigest()
+        # Reset file pointer to start
+        file_data.seek(0)
+        response = FileResponse(file_data)
+        response["ETag"] = etag
+        return response
