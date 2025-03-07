@@ -33,7 +33,7 @@
       "children": [
         {
           "id": "asset_list",
-          "name": "Asset-List",
+          "name": "Asset—List",
           "operation": [
             "View",
             "Add",
@@ -44,7 +44,7 @@
         },
         {
           "id": "asset_basic_information",
-          "name": "Asset Basic information",
+          "name": "Asset-Basic information",
           "operation": [
             "View",
             "Edit"
@@ -52,7 +52,7 @@
         },
         {
           "id": "asset_relationships",
-          "name": "Asset Relationships",
+          "name": "Asset-Relationships",
           "operation": [
             "View",
             "Add",
@@ -61,7 +61,7 @@
         },
         {
           "id": "asset_change_records",
-          "name": "Asset Change Records",
+          "name": "Asset-Change Records",
           "operation": [
             "View"
           ]
@@ -69,11 +69,11 @@
       ]
     },
     {
-      "name": "management",
+      "name": "Management",
       "children": [
         {
-          "id": "asset_management",
-          "name": "Model Management",
+          "id": "model_management",
+          "name": "Model-Management",
           "operation": [
             "View",
             "Add Model",
@@ -85,40 +85,62 @@
           ]
         },
         {
-          "name": "auto_discovery",
-          "children": [
-            {
-              "id": "discovery_scan",
-              "name": "Scan",
-              "operation": [
-                "View",
-                "Add",
-                "Edit",
-                "Delete",
-                "Execute"
-              ]
-            },
-            {
-              "id": "discovery_collection",
-              "name": "Collection",
-              "operation": [
-                "View",
-                "Add",
-                "Edit",
-                "Delete",
-                "Execute"
-              ]
-            },
-            {
-              "id": "discovery_feature_library",
-              "name": "Feature Library",
-              "operation": [
-                "View",
-                "Add",
-                "Edit",
-                "Delete"
-              ]
-            }
+          "id": "model_attributes",
+          "name": "Model-Attributes",
+          "operation": [
+            "View",
+            "Add",
+            "Edit",
+            "Delete"
+          ]
+        },
+        {
+          "id": "model_relationships",
+          "name": "Model-Relationships",
+          "operation": [
+            "View",
+            "Add",
+            "Edit",
+            "Delete"
+          ]
+        },
+        {
+          "id": "auto_discovery",
+          "name": "Auto-Discovery",
+          "operation": [
+            "View"
+          ]
+        },
+        {
+          "id": "discovery_scan",
+          "name": "Discovery-Scan",
+          "operation": [
+            "View",
+            "Add",
+            "Edit",
+            "Delete",
+            "Execute"
+          ]
+        },
+        {
+          "id": "discovery_collection",
+          "name": "Discovery-Collection",
+          "operation": [
+            "View",
+            "Add",
+            "Edit",
+            "Delete",
+            "Execute"
+          ]
+        },
+        {
+          "id": "discovery_feature_library",
+          "name": "Discovery-Feature-Library",
+          "operation": [
+            "View",
+            "Add",
+            "Edit",
+            "Delete"
           ]
         }
       ]

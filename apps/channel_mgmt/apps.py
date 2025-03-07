@@ -7,7 +7,8 @@ class HandleConfig(AppConfig):
     name = "apps.channel_mgmt"
     verbose_name = "channel management"
 
-    # def ready(self):
+    def ready(self):
+        import apps.channel_mgmt.nats_api  # noqa
 
     # from apps.channel_mgmt.signals.user_create_signal import user_create_signal
 
