@@ -15,3 +15,12 @@ class SystemMgmtView(ViewSet):
     def get_user_all(self, request):
         data = SystemMgmtUtils.get_user_all()
         return WebUtils.response_success(data)
+
+    @swagger_auto_schema(
+        operation_description="查询通知渠道",
+        tags=['SystemMgmt']
+    )
+    @action(methods=['get'], detail=False, url_path='search_channel_list')
+    def search_channel_list(self, request):
+        data = SystemMgmtUtils.search_channel_list()
+        return WebUtils.response_success(data)
