@@ -75,7 +75,7 @@
       "query": "avg(ping_result_code{instance_type=\"ping\",__$labels__}) by (instance_id)",
       "display_name": "Ping State",
       "data_type": "Enum",
-      "unit": "[{\"name\":\"Failure\",\"id\":1},{\"name\":\"Success\",\"id\":0}]",
+      "unit": "[{\"name\":\"Error\",\"id\":2},{\"name\":\"Failure\",\"id\":1},{\"name\":\"Success\",\"id\":0}]",
       "dimensions": [
         {
           "name": "agent_id",
