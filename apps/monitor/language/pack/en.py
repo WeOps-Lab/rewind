@@ -1786,6 +1786,8 @@ MONITOR_OBJECT_METRIC = {
         "name": "Stopped Containers",
         "desc": "This metric indicates the number of stopped containers on the Docker host, helping to understand container status."
     },
+},
+"Docker Container": {
     "docker_container_status": {
         "name": "Status",
         "desc": "This metric indicates the state of the container, where 0 means the container is normal."

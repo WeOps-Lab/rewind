@@ -1798,6 +1798,8 @@ MONITOR_OBJECT_METRIC = {
         "name": "停止的容器数",
         "desc": "该指标表示Docker主机上停止的容器数，帮助了解容器的运行情况。"
     },
+},
+"Docker Container": {
     "docker_container_status": {
         "name": "容器状态",
         "desc": "该指标表示容器的状态，0表示容器正常。"
