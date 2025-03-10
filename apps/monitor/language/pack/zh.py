@@ -1,9 +1,12 @@
 MONITOR_OBJECT_TYPE = {
     "OS": "操作系统",
     "Web": "网络",
+    "Middleware": "中间件",
+    "Database": "数据库",
     "K8S": "K8S",
     "Network Device": "网络设备",
     "Hardware Device": "硬件设备",
+    "Container Management": "容器管理",
     "Other": "其他",
 }
 
@@ -11,9 +14,19 @@ MONITOR_OBJECT = {
     "Host": "主机",
     "Website": "网站",
     "Ping": "Ping",
-    "Cluster": "K8S集群",
-    "Pod": "Pod",
-    "Node": "Node",
+    "RabbitMQ": "RabbitMQ",
+    "Nginx": "Nginx",
+    "Apache": "Apache",
+    "ClickHouse": "ClickHouse",
+    "Consul": "Consul",
+    "Tomcat": "Tomcat",
+    "Zookeeper": "Zookeeper",
+    "ActiveMQ": "ActiveMQ",
+    "ElasticSearch": "ElasticSearch",
+    "MongoDB": "MongoDB",
+    "Mysql": "Mysql",
+    "Postgres": "Postgres",
+    "Redis": "Redis",
     "Switch": "交换机",
     "Router": "路由器",
     "Loadbalance": "负载均衡",
@@ -23,6 +36,11 @@ MONITOR_OBJECT = {
     "Scanning Device": "扫描设备",
     "Storage": "存储设备",
     "Hardware Server": "硬件服务器",
+    "Docker": "Docker",
+    "Docker Container": "Docker容器",
+    "Cluster": "K8S集群",
+    "Pod": "Pod",
+    "Node": "Node",
     "SNMP Trap": "SNMP Trap"
 }
 
@@ -91,6 +109,62 @@ MONITOR_OBJECT_PLUGIN = {
         "name": "SNMP Trap",
         "desc": "SNMP Trap监控插件用于接收和处理网络设备主动推送的报警或状态通知（Trap消息），以实现实时监控和故障告警。"
     },
+    "Zookeeper": {
+        "name": "Zookeeper",
+        "desc": "通过采集Zookeeper运行时的性能数据和稳定性指标，如运行时长、平均延迟、读写比例等，帮助用户实时监控集群状态并优化性能。"
+    },
+    "Apache": {
+        "name": "Apache",
+        "desc": "实时采集Apache运行时间、资源使用情况、请求处理效率及带宽数据，帮助用户优化性能、诊断问题和实现高效运维管理。"
+    },
+    "ClickHouse": {
+        "name": "ClickHouse",
+        "desc": "采集ClickHouse实例运行时指标，如内存、磁盘、查询事件等，用于性能监控、资源跟踪及故障诊断，保障数据库稳定运行。"
+    },
+    "RabbitMQ": {
+        "name": "RabbitMQ",
+        "desc": "用于监控RabbitMQ的运行状态、资源使用、消息流量和队列健康状况。"
+    },
+    "ActiveMQ": {
+        "name": "ActiveMQ",
+        "desc": "用于采集 ActiveMQ 主题相关指标，实时监控消费者数量、入队/出队速率，以及主题消息堆积情况，确保消息队列运行稳定。"
+    },
+    "Nginx": {
+        "name": "Nginx",
+        "desc": "通过采集Nginx请求、连接状态及处理效率等指标，帮助监控和优化网站的性能与稳定性。"
+    },
+    "Tomcat": {
+        "name": "Tomcat",
+        "desc": "用于采集Tomcat连接器和JVM内存的关键性能指标，帮助监控服务器资源使用、请求处理效率及错误情况，优化系统性能。"
+    },
+    "Consul": {
+        "name": "Consul",
+        "desc": "用于实时监控 Consul 服务健康状态，采集状态检查结果，分析通过、警告和关键性指标，帮助用户及时发现故障并确保服务高可用性。"
+    },
+    "ElasticSearch": {
+        "name": "ElasticSearch",
+        "desc": "通过收集 Elasticsearch 文件系统、HTTP 请求、IO 统计、文档统计、查询缓存和截断器的相关指标，帮助用户监控集群健康状态和性能表现。"
+    },
+    "MongoDB": {
+        "name": "MongoDB",
+        "desc": "通过采集 MongoDB 的读写活动、命令执行、连接数、延迟、内存使用及网络流量指标，帮助优化性能，保障数据库高效稳定运行。"
+    },
+    "Mysql": {
+        "name": "Mysql",
+        "desc": "用于收集和监控MySQL数据库健康状况及性能的关键指标。"
+    },
+    "Postgres": {
+        "name": "Postgres",
+        "desc": "通过采集 PostgreSQL 的会话管理、事务指标和 I/O性能相关数据，帮助监控数据库的资源使用状况、访问行为和运行效率以及潜在问题。"
+    },
+    "Redis": {
+        "name": "Redis",
+        "desc": "用于采集 Redis 性能及资源使用情况的关键指标，帮助提升系统效率和稳定性。"
+    },
+    "Docker": {
+        "name": "Docker",
+        "desc": "用于采集和分析 Docker 容器的状态、资源使用情况（CPU、内存、网络、IO）和性能指标，帮助识别异常及优化容器运行效率。"
+    }
 }
 
 MONITOR_OBJECT_METRIC_GROUP = {
@@ -214,7 +288,114 @@ MONITOR_OBJECT_METRIC_GROUP = {
         "Environment": "环境",
     },
     "SNMP Trap": {
-    }
+    },
+    "Zookeeper": {
+        "Uptime": "运行时间",
+        "Performance": "性能",
+        "Connection": "连接",
+        "Znode": "Znode",
+        "Traffic": "流量",
+    },
+    "Apache": {
+        "Uptime": "运行时间",
+        "Work": "线程",
+        "Request": "请求",
+        "CPU": "CPU",
+        "Duration": "响应时间",
+    },
+    "ClickHouse": {
+        "Uptime": "运行时间",
+        "Memory": "内存",
+        "Disk": "磁盘",
+        "Query": "查询",
+        "Part": "分片",
+        "Load": "负载",
+    },
+    "RabbitMQ": {
+        "Exchange": "交换消息",
+        "Node": "Node",
+        "Message": "消息",
+    },
+    "ActiveMQ": {
+        "Topic": "Topic",
+    },
+    "Nginx": {
+        "Request": "请求",
+        "Connection": "连接",
+        "Efficiency": "效率",
+    },
+    "Tomcat": {
+        "Request": "请求",
+        "Net": "网络",
+        "Threads": "线程",
+        "Error": "错误",
+        "JMX ": "JMX ",
+    },
+    "Consul": {
+        "Check": "检查情况",
+    },
+    "ElasticSearch": {
+        "Disk": "磁盘",
+        "HTTP": "HTTP",
+        "IO": "IO",
+        "Indices": "索引",
+        "Cache": "缓存",
+        "Circuit Breakers": "断路器",
+    },
+    "MongoDB": {
+        "Active Operations": "活动操作",
+        "Commands": "指令",
+        "Connections": "连接",
+        "Latency": "延迟",
+        "Memory": "内存",
+        "Traffic": "流量",
+        "Storage": "存储",
+    },
+    "Mysql": {
+        "Connection": "连接",
+        "Error": "错误",
+        "Cache": "缓存",
+        "Traffic": "流量",
+        "Command": "命令",
+        "Session": "会话",
+    },
+    "Postgres": {
+        "Performance": "性能",
+        "Cache": "缓存",
+        "Memory": "内存",
+        "Transaction": "事务",
+        "Session": "会话",
+    },
+    "Redis": {
+        "Performance": "性能",
+        "Cache": "缓存",
+        "Memory": "内存",
+        "Clients": "客户端",
+        "CPU": "CPU",
+        "Replication": "复制",
+        "Disk": "磁盘",
+        "Connectivity": "连接",
+    },
+    "Redis": {
+        "Performance": "性能",
+        "Cache": "缓存",
+        "Memory": "内存",
+        "Clients": "客户端",
+        "CPU": "CPU",
+        "Replication": "复制",
+        "Disk": "磁盘",
+        "Connectivity": "连接",
+    },
+    "Docker": {
+        "Docker Count": "Docker数量",
+    },
+    "Docker Container": {
+        "Memory": "内存",
+        "CPU": "CPU",
+        "Net": "网络",
+        "Status": "状态",
+        "IO": "IO",
+    },
 }
 
 MONITOR_OBJECT_METRIC = {
@@ -1069,7 +1250,583 @@ MONITOR_OBJECT_METRIC = {
     }
     },
     "SNMP Trap": {        
+    },
+    "Zookeeper": {
+    "zookeeper_uptime": {
+        "name": "系统运行时间",
+        "desc": "该指标表示Zookeeper服务的运行时长，用于监测系统是否正常运行。"
+    },
+    "zookeeper_avg_latency": {
+        "name": "平均延迟",
+        "desc": "该指标表示Zookeeper处理请求的平均延迟时间，用于监测系统的响应能力。"
+    },
+    "zookeeper_read_write_ratio": {
+        "name": "读写比",
+        "desc": "该指标表示Zookeeper提交和快照的比例，用于判断Zookeeper的读写负载分布。"
+    },
+    "zookeeper_snapshot_to_commit_ratio": {
+        "name": "快照与提交比",
+        "desc": "该指标表示Zookeeper生成快照的频率与提交请求的频率的比值，用于监测持久化操作与事务提交的关系。"
+    },
+    "zookeeper_connection_drop_count": {
+        "name": "连接断开次数",
+        "desc": "该指标表示Zookeeper连接断开的次数，用于监测连接稳定性。"
+    },
+    "zookeeper_connection_rejected": {
+        "name": "拒绝连接次数",
+        "desc": "该指标表示Zookeeper拒绝的连接次数，用于监测连接是否被正确处理。"
+    },
+    "zookeeper_znode_count": {
+        "name": "Znode数量",
+        "desc": "该指标表示Zookeeper中当前5分钟内每秒Znode的变化数量，有助于监测Zookeeper的数据量变化。"
+    },
+    "zookeeper_packets_received": {
+        "name": "接收的包数量",
+        "desc": "该指标表示Zookeeper接收到的网络包数量，用于监测网络流量情况。"
     }
+},
+"Apache": {
+    "apache_uptime": {
+        "name": "系统运行时长",
+        "desc": "该指标表示Apache服务器自启动以来的运行时间，用于监测服务器的健康状态。"
+    },
+    "apache_busy_workers": {
+        "name": "繁忙工作进程数",
+        "desc": "该指标表示Apache服务器中当前处于繁忙状态的工作进程数，用于评估服务器的负载情况。"
+    },
+    "apache_idle_workers": {
+        "name": "空闲工作进程数",
+        "desc": "该指标表示Apache服务器中当前处于空闲状态的工作进程数，反映了服务器的资源利用情况。"
+    },
+    "apache_req_per_sec": {
+        "name": "每秒请求数",
+        "desc": "该指标表示Apache每秒处理的请求数量，用于监测服务器的请求处理能力。"
+    },
+    "apache_bytes_per_sec": {
+        "name": "每秒字节数",
+        "desc": "该指标表示Apache每秒传输的字节数，反映了网络流量的情况。"
+    },
+    "apache_total_accesses": {
+        "name": "总访问次数",
+        "desc": "该指标表示Apache服务器自启动以来的总访问次数，反映服务器的总体请求量。"
+    },
+    "apache_total_duration": {
+        "name": "总处理时长",
+        "desc": "该指标表示Apache服务器自启动以来的总请求处理时长，用于评估服务器的处理负载。"
+    },
+    "apache_cpu_system": {
+        "name": "系统CPU使用率",
+        "desc": "该指标表示Apache服务器在系统层面的CPU使用率。"
+    },
+    "apache_cpu_user": {
+        "name": "用户CPU使用率",
+        "desc": "该指标表示Apache服务器在用户进程层面的CPU使用率。"
+    },
+    "apache_cpu_load": {
+        "name": "CPU负载",
+        "desc": "该指标表示Apache服务器的CPU负载情况，反映系统的总体负载状态。"
+    },
+    "apache_duration_per_req": {
+        "name": "每个请求的处理时长",
+        "desc": "该指标表示每个请求的平均处理时长，帮助评估服务器处理请求的效率。"
+    }
+},
+"ClickHouse": {
+    "clickhouse_asynchronous_metrics_uptime": {
+        "name": "系统运行时间",
+        "desc": "ClickHouse 运行的时间，以分钟为单位，反映实例的稳定性和重启频率。"
+    },
+    "clickhouse_metrics_memory_tracking": {
+        "name": "内存使用量",
+        "desc": "ClickHouse 当前进程消耗的内存，用于监控内存使用增长趋势。"
+    },
+    "clickhouse_asynchronous_metrics_os_memory_available": {
+        "name": "可用内存",
+        "desc": "系统当前可以用于进程的物理内存总量，反映资源利用率情况。"
+    },
+    "clickhouse_asynchronous_metrics_disk_used_default": {
+        "name": "磁盘使用量（默认盘）",
+        "desc": "当前已使用的磁盘存储空间，用于评估存储容量和扩展需求。"
+    },
+    "clickhouse_asynchronous_metrics_disk_total_default": {
+        "name": "磁盘总容量（默认盘）",
+        "desc": "默认磁盘的总容量，用于评估可用存储容量以及集群规划。"
+    },
+    "clickhouse_events_query": {
+        "name": "查询速率",
+        "desc": "ClickHouse 每秒处理的查询数量，展示系统的处理性能能力。"
+    },
+    "clickhouse_events_inserted_rows": {
+        "name": "插入行速率",
+        "desc": "最近五分钟内插入的行数速率，衡量数据写入性能。"
+    },
+    "clickhouse_events_select_query": {
+        "name": "查询行速率",
+        "desc": "最近五分钟内处理的 SELECT 查询的速率，衡量查询性能。"
+    },
+    "clickhouse_events_compressed_read_buffer_bytes": {
+        "name": "压缩数据读取速率",
+        "desc": "ClickHouse 系统读取的压缩数据速率，展示 IO 性能和数据读取效率。"
+    },
+    "clickhouse_metrics_parts_active": {
+        "name": "活跃分片数",
+        "desc": "显示 MergeTree 表当前的活跃分片数量，用于监控表的碎片管理情况及状态。"
+    },
+    "clickhouse_metrics_parts_outdated": {
+        "name": "过期分片数",
+        "desc": "表示 MergeTree 表中的过期分片数量，用于监控分片清理及磁盘回收状态。"
+    },
+    "clickhouse_asynchronous_metrics_load_average1": {
+        "name": "系统负载（1分钟）",
+        "desc": "系统在最近 1 分钟的负载平均值，展示资源消耗和任务压力。"
+    }
+},
+"RabbitMQ": {
+    "rabbitmq_exchange_publish_in_rate": {
+        "name": "交换发布进入速率",
+        "desc": "该指标表示每秒通过 RabbitMQ 交换机发布进入的消息数量。用于评估消息发布速率，帮助发现消息流入的瓶颈。"
+    },
+    "rabbitmq_exchange_publish_out_rate": {
+        "name": "交换发布输出速率",
+        "desc": "该指标表示每秒通过 RabbitMQ 交换机发布输出的消息数量。用于评估消息的流出速率，帮助识别消息流出问题。"
+    },
+    "rabbitmq_node_disk_free": {
+        "name": "剩余磁盘空间",
+        "desc": "该指标表示 RabbitMQ 节点上剩余的磁盘空间，单位为GiB。低磁盘空间可能会导致性能下降或故障。"
+    },
+    "rabbitmq_node_fd_used": {
+        "name": "已用文件描述符数量",
+        "desc": "该指标表示 RabbitMQ 节点已用的文件描述符数量。过多的文件描述符使用可能会导致系统无法处理更多的连接。"
+    },
+    "rabbitmq_node_mem_used": {
+        "name": "内存使用量",
+        "desc": "该指标表示 RabbitMQ 节点的内存使用情况。内存使用过高可能会导致性能下降，甚至导致节点崩溃。"
+    },
+    "rabbitmq_node_run_queue": {
+        "name": "正在处理的队列数",
+        "desc": "该指标表示 RabbitMQ 节点当前正在处理的队列数。队列数过多可能表明系统压力较大，且可能需要进行优化。"
+    },
+    "rabbitmq_node_uptime": {
+        "name": "节点运行时间",
+        "desc": "该指标表示 RabbitMQ 节点的运行时间，单位为分钟。长时间运行的节点可能需要重启来释放资源并进行维护。"
+    },
+    "rabbitmq_fd_usage_ratio": {
+        "name": "文件描述符使用率",
+        "desc": "该指标表示 RabbitMQ 节点已用文件描述符与总文件描述符的比例。过高的比例可能导致文件描述符不足。"
+    },
+    "rabbitmq_overview_messages_ready": {
+        "name": "就绪消息数",
+        "desc": "该指标表示当前待处理的消息数量。过多的就绪消息可能意味着消费者滞后或消息处理速度较慢。"
+    },
+    "rabbitmq_overview_messages_unacked": {
+        "name": "未确认消息数",
+        "desc": "该指标表示未被消费者确认的消息数量。未确认的消息过多可能表示消费者处理速度过慢，或者有未处理的消息积压。"
+    },
+    "rabbitmq_queue_message_backlog_ratio": {
+        "name": "队列消息积压率",
+        "desc": "该指标用于衡量队列中待处理消息与已确认消息的比例，帮助识别系统中是否存在消息积压。"
+    },
+    "rabbitmq_unacked_message_ratio": {
+        "name": "未确认消息占比",
+        "desc": "该指标用于衡量队列中未被消费者确认的消息比例，过高可能表示消费者处理消息滞后。"
+    }
+},
+"ActiveMQ": {
+    "activemq_topic_consumer_count": {
+        "name": "消费者数量",
+        "desc": "该指标表示每个主题的消费者数量，用于监测消费者是否均衡分布。"
+    },
+    "activemq_topic_dequeue_rate": {
+        "name": "消息消费速率",
+        "desc": "该指标表示主题的消息消费速率，即每秒钟消费的消息数量。"
+    },
+    "activemq_topic_enqueue_rate": {
+        "name": "消息入队速率",
+        "desc": "该指标表示主题的消息入队速率，即每秒钟入队的消息数量。"
+    },
+    "activemq_topic_size": {
+        "name": "主题消息数",
+        "desc": "该指标表示每个主题中未消费的消息数量，有助于识别主题是否存在消息积压。"
+    }
+},
+"Nginx": {
+    "nginx_requests": {
+        "name": "每秒请求量",
+        "desc": "表示过去 5 分钟内每秒处理的 HTTP 请求数量，反映服务器的负载情况。"
+    },
+    "nginx_accepts": {
+        "name": "每秒连接建立量",
+        "desc": "表示过去 5 分钟内每秒成功建立的客户端连接数量，用于监控连接活跃度。"
+    },
+    "nginx_handled": {
+        "name": "每秒连接处理量",
+        "desc": "表示过去 5 分钟内每秒成功处理的已连接会话数量，监控连接处理能力。"
+    },
+    "nginx_active": {
+        "name": "当前活跃连接数",
+        "desc": "当前所有处于活动状态的连接数，包含读取、写入和等待处理的所有连接。"
+    },
+    "nginx_waiting": {
+        "name": "当前等待连接数",
+        "desc": "当前处于等待状态（空闲）的连接数量，表示当前未处理的客户端连接。"
+    },
+    "nginx_reading": {
+        "name": "当前读取连接数",
+        "desc": "表示当前正在读取客户端请求（头部或主体）的连接数量，用于监控读取阶段的负载。"
+    },
+    "nginx_writing": {
+        "name": "当前写入连接数",
+        "desc": "表示当前正在向客户端写响应数据的连接数量，用于监控响应阶段的性能。"
+    },
+    "nginx_connect_rate": {
+        "name": "连接处理成功率",
+        "desc": "表示过去 5 分钟内已处理的连接数占总接收连接数量的百分比，可用于分析连接处理的稳定性。"
+    },
+    "nginx_request_handling_efficiency": {
+        "name": "每个连接平均请求数",
+        "desc": "表示每个处理连接的平均请求数量，间接反映了 Nginx 的工作效率以及负载级别。"
+    }
+},
+"Tomcat": {
+    "tomcat_connector_request_count": {
+        "name": "请求数量",
+        "desc": "该指标表示Tomcat连接器过去5分钟内平均每秒处理的总请求数，用于监控请求负载。"
+    },
+    "tomcat_connector_processing_time": {
+        "name": "请求处理时间",
+        "desc": "指标用于衡量 Tomcat 连接器在过去 5 分钟内处理请求时间的平均每秒变化情况。它能反映服务器处理请求的效率。"
+    },
+    "tomcat_connector_max_time": {
+        "name": "最大请求处理时间",
+        "desc": "该指标表示Tomcat连接器处理单个请求的最大时间，反映最慢请求的性能。"
+    },
+    "tomcat_connector_bytes_received": {
+        "name": "接收字节数",
+        "desc": "该指标表示 Tomcat 连接器在过去 5 分钟内平均每秒接收数据的字节数，可用于监控 Tomcat 服务器的网络流量负载。"
+    },
+    "tomcat_connector_bytes_sent": {
+        "name": "发送字节数",
+        "desc": "该指标表示Tomcat连接器在过去 5 分钟内平均每秒发送的字节数，用于监控流量和响应负载。"
+    },
+    "tomcat_connector_current_thread_count": {
+        "name": "当前线程数",
+        "desc": "该指标表示Tomcat连接器当前使用的线程数，用于监控并发能力。"
+    },
+    "tomcat_connector_current_threads_busy": {
+        "name": "忙碌线程数",
+        "desc": "该指标表示Tomcat连接器当前忙碌的线程数，用于监控并发处理情况。"
+    },
+    "tomcat_connector_max_threads": {
+        "name": "最大线程数",
+        "desc": "该指标表示Tomcat连接器的最大线程数，用于监控Tomcat的并发能力。"
+    },
+    "tomcat_connector_error_count": {
+        "name": "错误数量",
+        "desc": "该指标表示Tomcat连接器在过去 5 分钟内平均每秒处理请求时的错误次数，用于监控错误率。"
+    },
+    "tomcat_jvm_memory_free": {
+        "name": "JMX 空闲内存",
+        "desc": "该指标表示Tomcat JVM中的空闲内存量，用于监控内存使用情况。"
+    },
+    "tomcat_jvm_memory_max": {
+        "name": "JMX 最大内存",
+        "desc": "该指标表示Tomcat JVM的最大内存量，用于监控内存限制。"
+    },
+    "tomcat_jvm_memorypool_used": {
+        "name": "JMX 已使用内存池",
+        "desc": "该指标表示Tomcat JVM内存池已使用的内存量，用于监控内存池使用情况。"
+    }
+},
+"Consul": {
+    "consul_health_checks_status": {
+        "name": "健康检查状态",
+        "desc": "该指标表示Consul健康检查的状态，其中0为通过，1为警告，2为严重。"
+    },
+    "consul_health_checks_passing": {
+        "name": "通过的健康检查数",
+        "desc": "该指标表示当前通过的健康检查数量，用于监测健康检查的正常情况。"
+    },
+    "consul_health_checks_warning": {
+        "name": "警告的健康检查数",
+        "desc": "该指标表示当前处于警告状态的健康检查数量，用于监测潜在的服务问题。"
+    },
+    "consul_health_checks_critical": {
+        "name": "严重的健康检查数",
+        "desc": "该指标表示当前处于严重状态的健康检查数量，用于监测服务的重大故障。"
+    }
+},
+"ElasticSearch": {
+    "elasticsearch_fs_total_available_in_bytes": {
+        "name": "磁盘剩余空间",
+        "desc": "文件系统剩余可用空间，换算为 GB。"
+    },
+    "elasticsearch_fs_total_free_in_bytes": {
+        "name": "磁盘总剩余空间",
+        "desc": "文件系统内未分配的可用磁盘空间，用于监控整体容量。"
+    },
+    "elasticsearch_http_current_open": {
+        "name": "当前 HTTP 连接数",
+        "desc": "监控当前 HTTP 打开的连接数，判断负载状态。"
+    },
+    "elasticsearch_http_total_opened": {
+        "name": "每 5 分钟新增 HTTP 连接数",
+        "desc": "5 分钟内新建的 HTTP 连接数，可用于监测请求负载变化。"
+    },
+    "elasticsearch_fs_io_stats_total_write_kilobytes": {
+        "name": "每秒磁盘写入速率",
+        "desc": "监控磁盘写入速率（MB/s），用于分析 IO 性能。"
+    },
+    "elasticsearch_fs_io_stats_total_read_kilobytes": {
+        "name": "每秒磁盘读取速率",
+        "desc": "监控磁盘读取速率（MB/s），用于识别 IO 瓶颈。"
+    },
+    "elasticsearch_indices_docs_count": {
+        "name": "索引文档总数",
+        "desc": "当前 Elasticsearch 中所有索引的文档条数。"
+    },
+    "elasticsearch_indices_docs_deleted": {
+        "name": "被删除文档总数",
+        "desc": "被标记删除的文档总数，可用于评估段合并工作量。"
+    },
+    "elasticsearch_indices_query_cache_cache_count": {
+        "name": "查询缓存条数",
+        "desc": "监控查询缓存条目数，用于优化查询性能。"
+    },
+    "elasticsearch_breakers_parent_tripped": {
+        "name": "父级断路器触发次数",
+        "desc": "5 分钟内父级断路器触发的次数，监控内存超限情况。"
+    },
+    "elasticsearch_breakers_fielddata_tripped": {
+        "name": "字段数据断路器触发次数",
+        "desc": "5 分钟内字段数据断路器触发的次数，监控内存溢出情况。"
+    }
+},
+"MongoDB": {
+    "mongodb_active_reads": {
+        "name": "活跃读操作",
+        "desc": "当前正在执行的活跃读操作数，用于监控数据库负载情况。"
+    },
+    "mongodb_active_writes": {
+        "name": "活跃写操作",
+        "desc": "当前正在执行的活跃写操作数，用于监控数据库写入压力。"
+    },
+    "mongodb_commands": {
+        "name": "每秒操作指令数",
+        "desc": "每秒执行的数据库操作指令数，反映数据库负载。"
+    },
+    "mongodb_connections_current": {
+        "name": "当前连接数",
+        "desc": "当前正在与数据库通信的客户端连接数。"
+    },
+    "mongodb_latency_commands": {
+        "name": "操作指令平均延迟",
+        "desc": "数据库指令的平均延迟情况，用于评估数据库性能。"
+    },
+    "mongodb_resident_megabytes": {
+        "name": "MongoDB 内存使用量",
+        "desc": "数据库物理内存使用量，反映资源占用情况。"
+    },
+    "mongodb_net_in_bytes": {
+        "name": "每秒接收流量",
+        "desc": "每秒接收到的数据量，用于监控网络流量。"
+    },
+    "mongodb_net_out_bytes": {
+        "name": "每秒发送流量",
+        "desc": "每秒发送的数据量，用于监控网络流量。"
+    },
+    "mongodb_total_docs_scanned": {
+        "name": "每秒扫描文档数量",
+        "desc": "查询时扫描的文档数量，评估查询性能。"
+    }
+},
+"MySQL": {
+    "mysql_aborted_clients": {
+        "name": "终止的客户端连接次数",
+        "desc": "此指标表示由于客户端错误中止的连接次数。监控此指标可以帮助识别连接可靠性问题。"
+    },
+    "mysql_aborted_connects": {
+        "name": "终止的连接尝试次数",
+        "desc": "此指标表示因连接问题而终止的连接尝试次数。高值可能表示系统配置问题或服务器过载。"
+    },
+    "mysql_access_denied_errors": {
+        "name": "访问拒绝错误次数",
+        "desc": "此指标表示由于权限不足或认证失败导致的访问拒绝次数。监控此指标有助于识别和解决权限问题。"
+    },
+    "mysql_aria_pagecache_blocks_unused": {
+        "name": "未使用的Aria页高速缓存块数",
+        "desc": "此指标表示Aria存储引擎中未使用的页高速缓存块数。监控此指标可以帮助优化缓存分配。"
+    },
+    "mysql_aria_pagecache_blocks_used": {
+        "name": "已使用的Aria页高速缓存块数",
+        "desc": "此指标表示Aria存储引擎中已使用的页高速缓存块数。监控此指标可以帮助评估缓存的有效利用。"
+    },
+    "mysql_bytes_received": {
+        "name": "接收字节数",
+        "desc": "此指标表示MySQL服务器接收到的字节数。监控此指标可以了解网络流量负载情况。"
+    },
+    "mysql_bytes_sent": {
+        "name": "发送字节数",
+        "desc": "此指标表示MySQL服务器发送的字节数。监控此指标可以了解网络流量负载情况。"
+    },
+    "mysql_com_select": {
+        "name": "Select命令执行次数",
+        "desc": "此指标表示Select查询的执行次数。监控此指标有助于了解读取操作的频率和系统负载。"
+    },
+    "mysql_com_insert": {
+        "name": "Insert命令执行次数",
+        "desc": "此指标表示Insert命令的执行次数。监控此指标有助于了解写入操作的频率和系统负载。"
+    },
+    "mysql_com_update": {
+        "name": "Update命令执行次数",
+        "desc": "此指标表示Update命令的执行次数。监控此指标有助于了解更新操作的频率和系统负载。"
+    },
+    "mysql_com_delete": {
+        "name": "Delete命令执行次数",
+        "desc": "此指标表示Delete命令的执行次数。监控此指标有助于了解删除操作的频率和系统负载。"
+    },
+    "mysql_connections_total": {
+        "name": "总连接创建数",
+        "desc": "此指标表示从服务器启动以来创建的总连接数。监控连接总数有助于了解连接模式和流量。"
+    }
+},
+"Postgres": {
+    "postgresql_active_time": {
+        "name": "活跃时间",
+        "desc": "此指标表示 PostgreSQL 在活跃状态下的总时长，反映数据库活动的持续时间。"
+    },
+    "postgresql_blk_read_time": {
+        "name": "块读耗时",
+        "desc": "此指标表示 PostgreSQL 从磁盘读取数据块的总耗时。"
+    },
+    "postgresql_blk_write_time": {
+        "name": "块写耗时",
+        "desc": "此指标表示 PostgreSQL 将数据块写入磁盘的总耗时。"
+    },
+    "postgresql_blks_hit": {
+        "name": "块缓存命中次数",
+        "desc": "此指标表示 PostgreSQL 查询缓存命中数据块的次数，反映了缓存性能。"
+    },
+    "postgresql_blks_read": {
+        "name": "块读取次数",
+        "desc": "此指标表示 PostgreSQL 从磁盘读取的数据块数。"
+    },
+    "postgresql_buffers_alloc": {
+        "name": "分配的缓存数",
+        "desc": "此指标表示 PostgreSQL 分配的缓存块数，用于监控内存使用情况。"
+    },
+    "postgresql_buffers_checkpoint": {
+        "name": "检查点缓存数",
+        "desc": "此指标表示 PostgreSQL 在检查点期间写入的缓存块数。"
+    },
+    "postgresql_xact_commit": {
+        "name": "提交事务数",
+        "desc": "此指标表示 PostgreSQL 提交的事务总数，反映数据库的工作负载情况。"
+    },
+    "postgresql_xact_rollback": {
+        "name": "回滚事务数",
+        "desc": "此指标表示 PostgreSQL 执行的事务回滚操作的总数。"
+    },
+    "postgresql_sessions": {
+        "name": "总会话数",
+        "desc": "此指标表示 PostgreSQL 创建的总会话数，反映数据库连接活动。"
+    },
+    "postgresql_sessions_abandoned": {
+        "name": "放弃会话数",
+        "desc": "此指标表示因长时间未使用而被放弃的会话的计数。"
+    },
+    "postgresql_sessions_killed": {
+        "name": "被终止会话数",
+        "desc": "此指标表示被管理员或系统主动终止的会话总数。"
+    }
+},
+"Redis": {
+    "redis_used_memory": {
+        "name": "已用内存",
+        "desc": "Redis 所使用的总内存大小，包括所有内部数据结构和缓存。"
+    },
+    "redis_mem_fragmentation_ratio": {
+        "name": "内存碎片率",
+        "desc": "内存碎片率，反映内存使用效率。"
+    },
+    "redis_instantaneous_ops_per_sec": {
+        "name": "每秒操作次数",
+        "desc": "当前每秒处理的 Redis 命令数（QPS）。"
+    },
+    "redis_keyspace_hits": {
+        "name": "键空间命中次数",
+        "desc": "缓存命中的次数。"
+    },
+    "redis_keyspace_misses": {
+        "name": "键空间未命中次数",
+        "desc": "缓存未命中的次数。"
+    },
+    "redis_clients": {
+        "name": "已连接客户端数",
+        "desc": "当前连接的客户端数量，反映活跃连接数。"
+    },
+    "redis_used_cpu_sys": {
+        "name": "CPU 使用率（系统）",
+        "desc": "Redis 进程消耗的系统 CPU 时间总计。"
+    },
+    "redis_evicted_keys": {
+        "name": "驱逐的键数",
+        "desc": "因内存限制而被逐出的键值数量。"
+    },
+    "redis_connected_slaves": {
+        "name": "已连接从节点数",
+        "desc": "当前连接到主节点的副本数量。"
+    },
+    "redis_rdb_last_save_time_elapsed": {
+        "name": "上次保存经过时间",
+        "desc": "上次成功进行 RDB 保存操作后的经过时间。"
+    },
+    "redis_rejected_connections": {
+        "name": "拒绝的连接数",
+        "desc": "因服务器过载或策略限制而被拒绝的连接数。"
+    }
+},
+"Docker": {
+    "docker_n_containers": {
+        "name": "容器总数",
+        "desc": "该指标表示Docker主机上容器总数，反映主机的负载情况。"
+    },
+    "docker_n_containers_running": {
+        "name": "正在运行的容器数",
+        "desc": "该指标表示Docker主机上正在运行的容器数，反映主机的负载情况。"
+    },
+    "docker_n_containers_stopped": {
+        "name": "停止的容器数",
+        "desc": "该指标表示Docker主机上停止的容器数，帮助了解容器的运行情况。"
+    },
+    "docker_container_status": {
+        "name": "容器状态",
+        "desc": "该指标表示容器的状态，0表示容器正常。"
+    },
+    "docker_container_status_restart_count": {
+        "name": "重启次数",
+        "desc": "该指标表示容器的重启次数，帮助监控容器是否频繁重启。"
+    },
+    "docker_container_cpu_usage_percent": {
+        "name": "CPU使用率",
+        "desc": "该指标表示容器的CPU使用百分比，监控容器的CPU负载情况。"
+    },
+    "docker_container_mem_usage_percent": {
+        "name": "内存使用率",
+        "desc": "该指标表示容器的内存使用百分比，监控容器的内存负载情况。"
+    },
+    "docker_container_blkio_io_service_bytes_recursive_total": {
+        "name": "总块I/O字节数",
+        "desc": "该指标表示容器的总块I/O字节数，反映容器的磁盘I/O负载。"
+    },
+    "docker_container_net_rx_bytes": {
+        "name": "接收网络字节数",
+        "desc": "该指标表示容器接收到的网络字节数，单位是MiB，用于监控容器的网络流量。"
+    },
+    "docker_container_net_tx_bytes": {
+        "name": "发送网络字节数",
+        "desc": "该指标表示容器发送的网络字节数，单位是MiB，用于监控容器的网络流量。"
+    }
+}
 }
 
 LANGUAGE_DICT = {

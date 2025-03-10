@@ -1,9 +1,12 @@
 MONITOR_OBJECT_TYPE = {
     "OS": "OS",
     "Web": "Web",
+    "Middleware": "Middleware",
+    "Database": "Database",
     "K8S": "K8S",
     "Network Device": "Network Device",
     "Hardware Device": "Hardware Device",
+    "Container Management": "Container Management",
     "Other": "Other",
 }
 
@@ -11,9 +14,19 @@ MONITOR_OBJECT = {
     "Host": "Host",
     "Website": "Website",
     "Ping": "Ping",
-    "Cluster": "Cluster",
-    "Pod": "Pod",
-    "Node": "Node",
+    "RabbitMQ": "RabbitMQ",
+    "Nginx": "Nginx",
+    "Apache": "Apache",
+    "ClickHouse": "ClickHouse",
+    "Consul": "Consul",
+    "Tomcat": "Tomcat",
+    "Zookeeper": "Zookeeper",
+    "ActiveMQ": "ActiveMQ",
+    "ElasticSearch": "ElasticSearch",
+    "MongoDB": "MongoDB",
+    "Mysql": "Mysql",
+    "Postgres": "Postgres",
+    "Redis": "Redis",
     "Switch": "Switch",
     "Router": "Router",
     "Loadbalance": "Loadbalance",
@@ -23,6 +36,11 @@ MONITOR_OBJECT = {
     "Scanning Device": "Scanning Device",
     "Storage": "Storage",
     "Hardware Server": "Hardware Server",
+    "Docker": "Docker",
+    "Docker Container": "Docker Container",
+    "Cluster": "Cluster",
+    "Pod": "Pod",
+    "Node": "Node",
     "SNMP Trap": "SNMP Trap"
 }
 
@@ -90,6 +108,62 @@ MONITOR_OBJECT_PLUGIN = {
     "SNMP Trap": {
         "name": "SNMP Trap",
         "desc": "The SNMP Trap monitoring plugin is used to receive and process alarms or status notifications (Trap messages) actively pushed by network devices, enabling real-time monitoring and fault alerts."
+    },
+    "Zookeeper": {
+        "name": "Zookeeper",
+        "desc": "By collecting runtime performance data and stability metrics of Zookeeper, such as uptime, average latency, and read-write ratios, users can monitor the cluster status in real-time and optimize performance."
+    },
+    "Apache": {
+        "name": "Apache",
+        "desc": "Real-time collection of Apache runtime data, resource utilization, request processing efficiency, and bandwidth statistics, helping users optimize performance, diagnose issues, and achieve efficient operations management."
+    },
+    "ClickHouse": {
+        "name": "ClickHouse",
+        "desc": "Collect runtime metrics of ClickHouse instances, such as memory, disk, query events, etc., for performance monitoring, resource tracking, and fault diagnosis, ensuring stable database operation."
+    },
+    "RabbitMQ": {
+        "name": "RabbitMQ",
+        "desc": "Used for monitoring RabbitMQ's runtime status, resource usage, message flow, and queue health."
+    },
+    "ActiveMQ": {
+        "name": "ActiveMQ",
+        "desc": "Used for collecting ActiveMQ topic-related metrics, enabling real-time monitoring of consumer count, enqueue/dequeue rates, and topic message backlog to ensure stable message queue operation."
+    },
+    "Nginx": {
+        "name": "Nginx",
+        "desc": "By collecting metrics such as Nginx requests, connection status, and processing efficiency, this helps monitor and optimize the website's performance and stability."
+    },
+    "Tomcat": {
+        "name": "Tomcat",
+        "desc": "Collects key performance metrics of Tomcat connectors and JVM memory to monitor server resource usage, request processing efficiency, and errors, optimizing system performance."
+    },  
+    "Consul": {
+        "name": "Consul",
+        "desc": "Used for real-time monitoring of Consul service health, collecting status check results, analyzing passing, warning, and critical metrics to help users promptly identify issues and ensure service availability."
+    },
+    "ElasticSearch": {
+        "name": "ElasticSearch",
+        "desc": "By collecting Elasticsearch file system metrics, HTTP requests, IO statistics, document statistics, query cache, and circuit breaker metrics, this plugin helps users monitor the health and performance of their cluster."
+    },
+    "MongoDB": {
+        "name": "MongoDB",
+        "desc": "By collecting metrics on MongoDB read and write activities, command execution, connection counts, latency, memory usage, and network traffic, this helps optimize performance and ensure efficient and stable database operations."
+    },
+    "Mysql": {
+        "name": "Mysql",
+        "desc": "Used to collect and monitor key metrics for MySQL database health and performance."
+    },
+    "Postgres": {
+        "name": "Postgres",
+        "desc": "Collecting PostgreSQL's session management, transaction metrics, and I/O performance data helps monitor resource usage, access behavior, operational efficiency, and identify potential issues within the database."
+    },
+    "Redis": {
+        "name": "Redis",
+        "desc": "Used to collect key indicators of Redis performance and resource utilization, helping improve system efficiency and stability."
+    },
+    "Docker": {
+        "name": "Docker",
+        "desc": "Used for collecting and analyzing the status, resource usage (CPU, memory, network, IO), and performance metrics of Docker containers, helping to identify anomalies and optimize container operational efficiency."
     }
 }
 
@@ -213,8 +287,105 @@ MONITOR_OBJECT_METRIC_GROUP = {
         "Power": "Power", 
         "Environment": "Environment",            
     },
-    "SNMP Trap": {        
-    }
+    "SNMP Trap": {   
+    },
+    "Zookeeper": {
+        "Uptime": "Uptime",
+        "Performance": "Performance",
+        "Connection": "Connection",
+        "Znode": "Znode",
+        "Traffic": "Traffic",
+    },
+    "Apache": {
+        "Uptime": "Uptime",
+        "Work": "Work",
+        "Request": "Request",
+        "CPU": "CPU",
+        "Duration": "Duration",
+    },
+    "ClickHouse": {
+        "Uptime": "Uptime",
+        "Memory": "Memory",
+        "Disk": "Disk",
+        "Query": "Query",
+        "Part": "Part",
+        "Load": "Load",
+    },
+    "RabbitMQ": {
+        "Exchange": "Exchange",
+        "Node": "Node",
+        "Message": "Message",
+    },
+    "ActiveMQ": {
+        "Topic": "Topic",
+    },
+    "Nginx": {
+        "Request": "Request",
+        "Connection": "Connection",
+        "Efficiency": "Efficiency",
+    },
+    "Tomcat": {
+        "Request": "Request",
+        "Net": "Net",
+        "Threads": "Threads",
+        "Error": "Error",
+        "JMX ": "JMX ",
+    },
+    "Consul": {
+        "Check": "Check",
+    },
+    "ElasticSearch": {
+        "Disk": "Disk",
+        "HTTP": "HTTP",
+        "IO": "IO",
+        "Indices": "Indices",
+        "Cache": "Cache",
+        "Circuit Breakers": "Circuit Breakers",
+    },
+    "MongoDB": {
+        "Active Operations": "Active Operations",
+        "Commands": "Commands",
+        "Connections": "Connections",
+        "Latency": "Latency",
+        "Memory": "Memory",
+        "Traffic": "Traffic",
+        "Storage": "Storage",
+    },
+    "Mysql": {
+        "Connection": "Connection",
+        "Error": "Error",
+        "Cache": "Cache",
+        "Traffic": "Traffic",
+        "Command": "Command",
+        "Session": "Session",
+    },
+    "Postgres": {
+        "Performance": "Performance",
+        "Cache": "Cache",
+        "Memory": "Memory",
+        "Transaction": "Transaction",
+        "Session": "Session",
+    },
+    "Redis": {
+        "Performance": "Performance",
+        "Cache": "Cache",
+        "Memory": "Memory",
+        "Clients": "Clients",
+        "CPU": "CPU",
+        "Replication": "Replication",
+        "Disk": "Disk",
+        "Connectivity": "Connectivity",
+    },
+    "Docker": {
+        "Docker Count": "Docker Count",
+    },
+    "Docker Container": {
+        "Memory": "Memory",
+        "CPU": "CPU",
+        "Net": "Net",
+        "Status": "Status",
+        "IO": "IO",
+    },
 }
 
 MONITOR_OBJECT_METRIC = {
@@ -1066,8 +1237,585 @@ MONITOR_OBJECT_METRIC = {
         "desc": "The temperature indicator measured in degrees Celsius monitors the internal temperature of the device. Monitoring temperature prevents heat accumulation and avoids device overheating. It is crucial for maintaining system stability and longevity."
     }
 },
-    "SNMP Trap": {        
+    "SNMP Trap": {                     
+    },
+    "Zookeeper": {
+    "zookeeper_uptime": {
+        "name": "Uptime",
+        "desc": "This metric shows the uptime of the Zookeeper service, helping to monitor if the system is running normally."
+    },
+    "zookeeper_avg_latency": {
+        "name": "Average Latency",
+        "desc": "This metric represents the average latency of Zookeeper processing requests, used to monitor system response capability."
+    },
+    "zookeeper_read_write_ratio": {
+        "name": "Read/Write Ratio",
+        "desc": "This metric represents the ratio of commits to snapshots in Zookeeper, helping to assess the read/write load distribution."
+    },
+    "zookeeper_snapshot_to_commit_ratio": {
+        "name": "Snapshot to Commit Ratio",
+        "desc": "This metric represents the ratio of snapshot generation frequency to commit request frequency in Zookeeper, helping to monitor the relationship between persistence operations and transaction commits."
+    },
+    "zookeeper_connection_drop_count": {
+        "name": "Connection Drop Count",
+        "desc": "This metric represents the number of connection drops in Zookeeper, used to monitor connection stability."
+    },
+    "zookeeper_connection_rejected": {
+        "name": "Connection Rejected",
+        "desc": "This metric represents the number of rejected connections in Zookeeper, helping to monitor if connections are being correctly handled."
+    },
+    "zookeeper_znode_count": {
+        "name": "Znode Count",
+        "desc": "This metric represents the number of znodes in Zookeeper, helping to monitor changes in Zookeeper's data size."
+    },
+    "zookeeper_packets_received": {
+        "name": "Packets Received",
+        "desc": "This metric shows the number of packets received by Zookeeper, helping to monitor the network traffic."
     }
+},
+"Apache": {
+    "apache_uptime": {
+        "name": "Uptime",
+        "desc": "This metric represents the uptime of the Apache server since it was started, used to monitor the server's health."
+    },
+    "apache_busy_workers": {
+        "name": "Busy Workers",
+        "desc": "This metric represents the number of busy worker processes in the Apache server, used to assess the server's load."
+    },
+    "apache_idle_workers": {
+        "name": "Idle Workers",
+        "desc": "This metric represents the number of idle worker processes in the Apache server, reflecting the server's resource utilization."
+    },
+    "apache_req_per_sec": {
+        "name": "Requests per Second",
+        "desc": "This metric represents the number of requests handled by Apache per second, used to monitor the server's request processing capability."
+    },
+    "apache_bytes_per_sec": {
+        "name": "Bytes per Second",
+        "desc": "This metric represents the number of bytes transferred by Apache per second, reflecting the network traffic."
+    },
+    "apache_total_accesses": {
+        "name": "Total Accesses",
+        "desc": "This metric represents the total number of accesses to the Apache server since startup, reflecting the overall request volume."
+    },
+    "apache_total_duration": {
+        "name": "Total Duration",
+        "desc": "This metric represents the total request processing duration since the Apache server started, used to assess the server's processing load."
+    },
+    "apache_cpu_system": {
+        "name": "System CPU Usage",
+        "desc": "This metric represents the CPU usage at the system level for Apache server."
+    },
+    "apache_cpu_user": {
+        "name": "User CPU Usage",
+        "desc": "This metric represents the CPU usage at the user process level for Apache server."
+    },
+    "apache_cpu_load": {
+        "name": "CPU Load",
+        "desc": "This metric represents the CPU load of the Apache server, reflecting the overall load of the system."
+    },
+    "apache_duration_per_req": {
+        "name": "Duration per Request",
+        "desc": "This metric represents the average duration per request, helping to evaluate the efficiency of request handling by the server."
+    }
+},
+"ClickHouse": {
+    "clickhouse_asynchronous_metrics_uptime": {
+        "name": "Uptime",
+        "desc": "Represents the uptime of the ClickHouse system."
+    },
+    "clickhouse_metrics_memory_tracking": {
+        "name": "Memory Tracking",
+        "desc": "Indicates the current memory usage by the ClickHouse process."
+    },
+    "clickhouse_asynchronous_metrics_os_memory_available": {
+        "name": "Available Memory",
+        "desc": "Indicates the total physical memory available for processes."
+    },
+    "clickhouse_asynchronous_metrics_disk_used_default": {
+        "name": "Disk Usage (Default)",
+        "desc": "Represents the amount of disk space currently used on the default disk."
+    },
+    "clickhouse_asynchronous_metrics_disk_total_default": {
+        "name": "Total Disk Capacity (Default)",
+        "desc": "Displays the total capacity of the default disk."
+    },
+    "clickhouse_events_query": {
+        "name": "Query Rate",
+        "desc": "Displays the number of queries processed per second by ClickHouse."
+    },
+    "clickhouse_events_inserted_rows": {
+        "name": "Inserted Rows Rate",
+        "desc": "Represents the rate of rows inserted during the last 5 minutes."
+    },
+    "clickhouse_events_select_query": {
+        "name": "Select Query Rate",
+        "desc": "Represents the rate of SELECT queries processed during the last 5 minutes."
+    },
+    "clickhouse_events_compressed_read_buffer_bytes": {
+        "name": "Compressed Data Read Rate",
+        "desc": "Displays the rate of compressed data read by ClickHouse system, indicating IO performance."
+    },
+    "clickhouse_metrics_parts_active": {
+        "name": "Active Parts Count",
+        "desc": "Displays the number of active parts in the MergeTree tables."
+    },
+    "clickhouse_metrics_parts_outdated": {
+        "name": "Outdated Parts Count",
+        "desc": "Shows the count of outdated parts in the MergeTree tables."
+    },
+    "clickhouse_asynchronous_metrics_load_average1": {
+        "name": "Load Average (1m)",
+        "desc": "Indicates the average system load over the last 1 minute."
+    }
+},
+"RabbitMQ": {
+    "rabbitmq_exchange_publish_in_rate": {
+        "name": "Exchange Publish In Rate",
+        "desc": "This metric shows the rate of messages published to the RabbitMQ exchange per second. It helps identify bottlenecks in message inflow."
+    },
+    "rabbitmq_exchange_publish_out_rate": {
+        "name": "Exchange Publish Out Rate",
+        "desc": "This metric shows the rate of messages published out of the RabbitMQ exchange per second. It helps identify issues in message outflow."
+    },
+    "rabbitmq_node_disk_free": {
+        "name": "Disk Space Free",
+        "desc": "This metric indicates the free disk space on the RabbitMQ node, in bytes. Low disk space can lead to performance degradation or failures."
+    },
+    "rabbitmq_node_fd_used": {
+        "name": "File Descriptors Used",
+        "desc": "This metric shows the number of file descriptors used by the RabbitMQ node. Excessive use may prevent the system from handling additional connections."
+    },
+    "rabbitmq_node_mem_used": {
+        "name": "Memory Used",
+        "desc": "This metric indicates the memory usage on the RabbitMQ node. High memory usage may lead to performance issues or node crashes."
+    },
+    "rabbitmq_node_run_queue": {
+        "name": "Run Queue",
+        "desc": "This metric shows the number of queues currently being handled by the RabbitMQ node. A high number may indicate system pressure and need for optimization."
+    },
+    "rabbitmq_node_uptime": {
+        "name": "Uptime",
+        "desc": "This metric indicates the uptime of the RabbitMQ node, in seconds. Nodes running for extended periods may require a restart to free resources and perform maintenance."
+    },
+    "rabbitmq_fd_usage_ratio": {
+        "name": "File Descriptor Usage Ratio",
+        "desc": "This metric shows the ratio of used file descriptors to the total number of file descriptors on the RabbitMQ node."
+    },
+    "rabbitmq_overview_messages_ready": {
+        "name": "Messages Ready",
+        "desc": "This metric indicates the number of messages ready for processing. A high number of ready messages may indicate consumer lag or slow processing speed."
+    },
+    "rabbitmq_overview_messages_unacked": {
+        "name": "Unacknowledged Messages",
+        "desc": "This metric represents the number of unacknowledged messages. A high number of unacknowledged messages may indicate slow consumer processing or backlog."
+    },
+    "rabbitmq_queue_message_backlog_ratio": {
+        "name": "Queue Message Backlog Ratio",
+        "desc": "This metric shows the ratio of ready messages to acked messages in the queue, helping to identify message backlog in the system."
+    },
+    "rabbitmq_unacked_message_ratio": {
+        "name": "Unacked Message Ratio",
+        "desc": "This metric shows the ratio of unacknowledged messages to the total messages in the queue, helping to identify slow consumers."
+    }
+},
+"ActiveMQ": {
+    "activemq_topic_consumer_count": {
+        "name": "Consumer Count",
+        "desc": "This metric represents the number of consumers per topic, used to monitor if consumers are evenly distributed."
+    },
+    "activemq_topic_dequeue_rate": {
+        "name": "Dequeue Rate",
+        "desc": "This metric shows the rate at which messages are consumed from the topic, indicating the consumption rate per second."
+    },
+    "activemq_topic_enqueue_rate": {
+        "name": "Enqueue Rate",
+        "desc": "This metric shows the rate at which messages are enqueued to the topic, indicating the incoming message rate per second."
+    },
+    "activemq_topic_size": {
+        "name": "Topic Size",
+        "desc": "This metric shows the number of unconsumed messages in the topic, helping to identify potential message backlog."
+    }
+},
+"Nginx": {
+    "nginx_requests": {
+        "name": "Requests Rate",
+        "desc": "Indicates the number of HTTP requests per second processed over the last 5 minutes, reflecting server load."
+    },
+    "nginx_accepts": {
+        "name": "Accepted Connections Rate",
+        "desc": "Indicates the number of client connections successfully established per second over the last 5 minutes, used to monitor connection activity."
+    },
+    "nginx_handled": {
+        "name": "Handled Connections Rate",
+        "desc": "Indicates the number of connected sessions successfully handled per second over the last 5 minutes, monitoring connection handling capacity."
+    },
+    "nginx_active": {
+        "name": "Active Connections",
+        "desc": "The number of active connections currently including those in reading, writing, and waiting states."
+    },
+    "nginx_waiting": {
+        "name": "Waiting Connections",
+        "desc": "The current number of idle connections waiting to be processed, reflecting the waiting connection queue."
+    },
+    "nginx_reading": {
+        "name": "Reading Connections",
+        "desc": "The number of connections currently reading client requests (header or body), used to monitor load in the reading stage."
+    },
+    "nginx_writing": {
+        "name": "Writing Connections",
+        "desc": "The number of connections currently writing response data to clients, used to monitor performance in the response stage."
+    },
+    "nginx_connect_rate": {
+        "name": "Connection Handling Success Rate",
+        "desc": "The percentage of handled connections out of total accepted connections over the last 5 minutes, used to analyze connection handling stability."
+    },
+    "nginx_request_handling_efficiency": {
+        "name": "Requests per Handled Connection",
+        "desc": "Indicates the average number of requests per handled connection, indirectly reflecting Nginx's efficiency and load level."
+    }
+},
+"Tomcat": {
+    "tomcat_connector_request_count": {
+        "name": "Request Count",
+        "desc": "This metric represents the total number of requests processed per second on average by the Tomcat connector in the past 5 minutes, and is used to monitor the request load."
+    },
+    "tomcat_connector_processing_time": {
+        "name": "Processing Time",
+        "desc": "This metric is used to measure the average per - second change in the time taken by the Tomcat connector to process requests over the past 5 minutes. It can reflect the efficiency of the server in processing requests."
+    },
+    "tomcat_connector_max_time": {
+        "name": "Max Processing Time",
+        "desc": "This metric indicates the maximum time taken to process a single request in Tomcat, reflecting the performance of the slowest request."
+    },
+    "tomcat_connector_bytes_received": {
+        "name": "Bytes Received",
+        "desc": "It represents the number of bytes of data received per second on average by the Tomcat connector in the past 5 minutes. It can be used to monitor the network traffic load of the Tomcat server."
+    },
+    "tomcat_connector_bytes_sent": {
+        "name": "Bytes Sent",
+        "desc": "This metric represents the average number of bytes sent per second by the Tomcat connector in the past 5 minutes, and it is used to monitor traffic and response load."
+    },
+    "tomcat_connector_current_thread_count": {
+        "name": "Current Thread Count",
+        "desc": "This metric shows the current number of threads used by the Tomcat connector, used to monitor concurrency capabilities."
+    },
+    "tomcat_connector_current_threads_busy": {
+        "name": "Busy Thread Count",
+        "desc": "This metric indicates the number of busy threads in the Tomcat connector, used to monitor concurrent processing."
+    },
+    "tomcat_connector_max_threads": {
+        "name": "Max Thread Count",
+        "desc": "This metric indicates the maximum number of threads for the Tomcat connector, used to monitor Tomcat's concurrency capabilities."
+    },
+    "tomcat_connector_error_count": {
+        "name": "Error Count",
+        "desc": "This metric represents the average number of errors per second that occur when the Tomcat connector processes requests in the past 5 minutes, and it is used to monitor the error rate."
+    },
+    "tomcat_jvm_memory_free": {
+        "name": "JMX Free Memory",
+        "desc": "This metric shows the free memory in Tomcat JVM, used to monitor memory usage."
+    },
+    "tomcat_jvm_memory_max": {
+        "name": "JMX Max Memory",
+        "desc": "This metric indicates the maximum memory available to Tomcat JVM, used to monitor memory limits."
+    },
+    "tomcat_jvm_memorypool_used": {
+        "name": "JMX Used Memory Pool",
+        "desc": "This metric shows the amount of memory used in the Tomcat JVM memory pool, used to monitor memory pool usage."
+    }
+},
+"Consul": {
+    "consul_health_checks_status": {
+        "name": "Health Check Status",
+        "desc": "This metric represents the status of the health check in Consul, where 0=passing, 1=warning, 2=critical."
+    },
+    "consul_health_checks_passing": {
+        "name": "Passing Health Checks",
+        "desc": "This metric indicates the number of passing health checks, used to monitor the health status of services."
+    },
+    "consul_health_checks_warning": {
+        "name": "Warning Health Checks",
+        "desc": "This metric shows the number of health checks in warning status, used to monitor potential issues."
+    },
+    "consul_health_checks_critical": {
+        "name": "Critical Health Checks",
+        "desc": "This metric shows the number of health checks in critical status, used to monitor critical failures."
+    }
+},
+"ElasticSearch": {
+    "elasticsearch_fs_total_available_in_bytes": {
+        "name": "Total Available Disk Space",
+        "desc": "Indicates total available disk space, converted to GB."
+    },
+    "elasticsearch_fs_total_free_in_bytes": {
+        "name": "Total Free Disk Space",
+        "desc": "Represents unallocated available disk space."
+    },
+    "elasticsearch_http_current_open": {
+        "name": "Current Open HTTP Connections",
+        "desc": "Tracks the number of currently open HTTP connections."
+    },
+    "elasticsearch_http_total_opened": {
+        "name": "New HTTP Connections in 5m",
+        "desc": "Number of new HTTP connections opened in 5 minutes."
+    },
+    "elasticsearch_fs_io_stats_total_write_kilobytes": {
+        "name": "Disk Write Throughput",
+        "desc": "Monitors disk write throughput (MB/s)."
+    },
+    "elasticsearch_fs_io_stats_total_read_kilobytes": {
+        "name": "Disk Read Throughput",
+        "desc": "Tracks disk read throughput (MB/s)."
+    },
+    "elasticsearch_indices_docs_count": {
+        "name": "Total Document Count",
+        "desc": "Total number of document entries in Elasticsearch."
+    },
+    "elasticsearch_indices_docs_deleted": {
+        "name": "Total Deleted Document Count",
+        "desc": "Total number of deleted documents in Elasticsearch."
+    },
+    "elasticsearch_indices_query_cache_cache_count": {
+        "name": "Query Cache Count",
+        "desc": "Tracks the number of query cache entries."
+    },
+    "elasticsearch_breakers_parent_tripped": {
+        "name": "Parent Circuit Breaker Tripped",
+        "desc": "Parent circuit breaker trips in 5 minutes."
+    },
+    "elasticsearch_breakers_fielddata_tripped": {
+        "name": "Field Data Circuit Breaker Tripped",
+        "desc": "Field data circuit breaker trips in 5 minutes."
+    }
+},
+"MongoDB": {
+    "mongodb_active_reads": {
+        "name": "Active Reads",
+        "desc": "The number of active read operations currently being executed, used to monitor database load."
+    },
+    "mongodb_active_writes": {
+        "name": "Active Writes",
+        "desc": "The number of active write operations currently being executed, used to monitor write pressure."
+    },
+    "mongodb_commands": {
+        "name": "Commands Per Second",
+        "desc": "The number of database operations per second, reflecting database load."
+    },
+    "mongodb_connections_current": {
+        "name": "Current Connections",
+        "desc": "The number of active client connections to the database."
+    },
+    "mongodb_latency_commands": {
+        "name": "Command Latency",
+        "desc": "The average latency of database commands, used to assess database performance."
+    },
+    "mongodb_resident_megabytes": {
+        "name": "Resident Memory Usage",
+        "desc": "The amount of physical memory used by MongoDB, reflecting resource usage."
+    },
+    "mongodb_net_in_bytes": {
+        "name": "Incoming Traffic",
+        "desc": "The amount of incoming data received per second, used to monitor network traffic."
+    },
+    "mongodb_net_out_bytes": {
+        "name": "Outgoing Traffic",
+        "desc": "The amount of outgoing data sent per second, used to monitor network traffic."
+    },
+    "mongodb_total_docs_scanned": {
+        "name": "Documents Scanned",
+        "desc": "The number of documents scanned per second during queries, used to assess query performance."
+    }
+},
+"MySQL": {
+    "mysql_aborted_clients": {
+        "name": "Aborted Clients",
+        "desc": "This metric represents the number of connections aborted due to client errors. Monitoring this metric can help identify connection reliability issues."
+    },
+    "mysql_aborted_connects": {
+        "name": "Aborted Connects",
+        "desc": "This metric represents the number of connection attempts aborted due to connection issues. High values may indicate configuration issues or server overload."
+    },
+    "mysql_access_denied_errors": {
+        "name": "Access Denied Errors",
+        "desc": "This metric represents the number of access denials due to insufficient privileges or authentication failures. Monitoring this metric helps in identifying and resolving permission issues."
+    },
+    "mysql_aria_pagecache_blocks_unused": {
+        "name": "Aria Pagecache Blocks Unused",
+        "desc": "This metric indicates the number of unused page cache blocks in the Aria storage engine. Monitoring this metric helps optimize cache allocation."
+    },
+    "mysql_aria_pagecache_blocks_used": {
+        "name": "Aria Pagecache Blocks Used",
+        "desc": "This metric indicates the number of used page cache blocks in the Aria storage engine. Monitoring this metric helps assess the effective utilization of the cache."
+    },
+    "mysql_bytes_received": {
+        "name": "Bytes Received",
+        "desc": "This metric indicates the number of bytes received by the MySQL server. Monitoring this metric helps understand the network traffic load."
+    },
+    "mysql_bytes_sent": {
+        "name": "Bytes Sent",
+        "desc": "This metric indicates the number of bytes sent by the MySQL server. Monitoring this metric helps understand the network traffic load."
+    },
+    "mysql_com_select": {
+        "name": "Select Commands",
+        "desc": "This metric represents the number of Select queries executed. Monitoring this metric helps understand the frequency of read operations and system load."
+    },
+    "mysql_com_insert": {
+        "name": "Insert Commands",
+        "desc": "This metric represents the number of Insert commands executed. Monitoring this metric helps understand the frequency of write operations and system load."
+    },
+    "mysql_com_update": {
+        "name": "Update Commands",
+        "desc": "This metric represents the number of Update commands executed. Monitoring this metric helps understand the frequency of update operations and system load."
+    },
+    "mysql_com_delete": {
+        "name": "Delete Commands",
+        "desc": "This metric represents the number of Delete commands executed. Monitoring this metric helps understand the frequency of delete operations and system load."
+    },
+    "mysql_connections_total": {
+        "name": "Total Connections Created",
+        "desc": "This metric represents the total number of connections created since the server started. Monitoring the total connections helps understand connection patterns and load."
+    }
+},
+"Postgres": {
+    "postgresql_active_time": {
+        "name": "Active Time",
+        "desc": "This metric indicates the total active time of PostgreSQL, reflecting the duration of database activity."
+    },
+    "postgresql_blk_read_time": {
+        "name": "Block Read Time",
+        "desc": "This metric indicates the total time spent by PostgreSQL reading blocks from the disk."
+    },
+    "postgresql_blk_write_time": {
+        "name": "Block Write Time",
+        "desc": "This metric indicates the total time spent by PostgreSQL writing blocks to the disk."
+    },
+    "postgresql_blks_hit": {
+        "name": "Block Cache Hits",
+        "desc": "This metric indicates the number of times PostgreSQL queries hit the cache, reflecting cache efficiency."
+    },
+    "postgresql_blks_read": {
+        "name": "Block Reads",
+        "desc": "This metric indicates the number of blocks read by PostgreSQL from the disk."
+    },
+    "postgresql_buffers_alloc": {
+        "name": "Buffers Allocated",
+        "desc": "This metric indicates the number of buffer blocks allocated by PostgreSQL to monitor memory usage."
+    },
+    "postgresql_buffers_checkpoint": {
+        "name": "Checkpoint Buffers",
+        "desc": "This metric indicates the number of buffer blocks written during checkpoints in PostgreSQL."
+    },
+    "postgresql_xact_commit": {
+        "name": "Transaction Commits",
+        "desc": "This metric indicates the total number of transactions committed by PostgreSQL, reflecting the workload of the database."
+    },
+    "postgresql_xact_rollback": {
+        "name": "Transaction Rollbacks",
+        "desc": "This metric indicates the total number of transaction rollbacks performed by PostgreSQL."
+    },
+    "postgresql_sessions": {
+        "name": "Total Sessions",
+        "desc": "This metric indicates the total number of sessions created by PostgreSQL, reflecting database connection activity."
+    },
+    "postgresql_sessions_abandoned": {
+        "name": "Abandoned Sessions",
+        "desc": "This metric indicates the count of sessions abandoned due to prolonged inactivity."
+    },
+    "postgresql_sessions_killed": {
+        "name": "Killed Sessions",
+        "desc": "This metric indicates the total number of sessions terminated by an administrator or system."
+    }
+},
+"Redis": {
+    "redis_used_memory": {
+        "name": "Used Memory",
+        "desc": "This metric indicates the memory used by the Redis allocator."
+    },
+    "redis_mem_fragmentation_ratio": {
+        "name": "Memory Fragmentation",
+        "desc": "This metric indicates the memory fragmentation ratio of the Redis allocator."
+    },
+    "redis_instantaneous_ops_per_sec": {
+        "name": "Operations per Second",
+        "desc": "This metric indicates the number of commands processed per second by Redis."
+    },
+    "redis_keyspace_hits": {
+        "name": "Keyspace Hits",
+        "desc": "This metric indicates the number of cache hits."
+    },
+    "redis_keyspace_misses": {
+        "name": "Keyspace Misses",
+        "desc": "This metric indicates the number of cache misses."
+    },
+    "redis_clients": {
+        "name": "Connected Clients",
+        "desc": "This metric indicates the number of active client connections."
+    },
+    "redis_used_cpu_sys": {
+        "name": "CPU Used (System)",
+        "desc": "This metric indicates the total system CPU time consumed by the Redis process."
+    },
+    "redis_evicted_keys": {
+        "name": "Evicted Keys",
+        "desc": "This metric indicates the number of keys evicted due to memory constraints."
+    },
+    "redis_connected_slaves": {
+        "name": "Connected Slaves",
+        "desc": "This metric indicates the number of replicas connected to the master node."
+    },
+    "redis_rdb_last_save_time_elapsed": {
+        "name": "Last Save Elapsed Time",
+        "desc": "This metric indicates the time elapsed since the last successful RDB save operation."
+    },
+    "redis_rejected_connections": {
+        "name": "Rejected Connections",
+        "desc": "This metric indicates the number of connections rejected due to server overload or policy limits."
+    }
+},
+"Docker": {
+    "docker_n_containers": {
+        "name": "Containers Count",
+        "desc": "This metric indicates the total number of containers on the Docker host, reflecting the host's load."
+    },
+    "docker_n_containers_running": {
+        "name": "Running Containers",
+        "desc": "This metric indicates the number of containers running on the Docker host, reflecting the host's load."
+    },
+    "docker_n_containers_stopped": {
+        "name": "Stopped Containers",
+        "desc": "This metric indicates the number of stopped containers on the Docker host, helping to understand container status."
+    },
+    "docker_container_status": {
+        "name": "Status",
+        "desc": "This metric indicates the state of the container, where 0 means the container is normal."
+    },
+    "docker_container_status_restart_count": {
+        "name": "Restart Count",
+        "desc": "This metric indicates the number of container restarts, helping monitor if the container is frequently restarting."
+    },
+    "docker_container_cpu_usage_percent": {
+        "name": "CPU Usage Percent",
+        "desc": "This metric indicates the percentage of CPU usage of the container, monitoring the CPU load of the container."
+    },
+    "docker_container_mem_usage_percent": {
+        "name": "Memory Usage Percent",
+        "desc": "This metric indicates the percentage of memory usage of the container, monitoring the memory load of the container."
+    },
+    "docker_container_blkio_io_service_bytes_recursive_total": {
+        "name": "Total Block I/O Bytes",
+        "desc": "This metric indicates the total block I/O bytes of the container, reflecting the disk I/O load of the container."
+    },
+    "docker_container_net_rx_bytes": {
+        "name": "Received Network Bytes",
+        "desc": "This metric indicates the number of network bytes received by the container, in MiB, used to monitor the network traffic of the container."
+    },
+    "docker_container_net_tx_bytes": {
+        "name": "Transmitted Network Bytes",
+        "desc": "This metric indicates the number of network bytes sent by the container, in MiB, used to monitor the network traffic of the container."
+    }
+}
+
 }
 
 LANGUAGE_DICT = {
