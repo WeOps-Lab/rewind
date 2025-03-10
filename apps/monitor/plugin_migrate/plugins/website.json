@@ -8,7 +8,7 @@
     {
       "metric_group": "HTTP",
       "name": "http_success.rate",
-      "query": "count(http_response_result_type{instance_type=\"web\",result=\"success\",__$labels__}) by (instance_id) / count(http_response_result_type{instance_type=\"web\",__$labels__}) by (instance_id)*100",
+      "query": "count(last_over_time(http_response_result_type{instance_type=\"web\",result=\"success\",__$labels__})) by (instance_id) *100",
       "display_name": "Success Rate",
       "data_type": "Number",
       "unit": "percent",
