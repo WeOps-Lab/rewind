@@ -9,17 +9,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name="channeltemplate",
-            name="channel_obj",
-        ),
-        migrations.AddField(
-            model_name="channeltemplate",
-            name="channel_type",
-            field=models.CharField(
-                choices=[("email", "Email"), ("enterprise_wechat", "Enterprise Wechat")], default="email", max_length=30
-            ),
-        ),
         migrations.AlterField(
             model_name="channel",
             name="channel_type",

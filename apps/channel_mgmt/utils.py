@@ -2,18 +2,20 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
+import requests
 from wechatpy import WeChatClientException
 from wechatpy.enterprise import WeChatClient
 
 from apps.channel_mgmt.models import Channel
+from apps.core.logger import logger
 
 
 def send_wechat(channel_obj: Channel, content, receivers):
     """发送企业微信消息"""
     channel_config = channel_obj.config
-    channel_obj.encrypt_field("secret", channel_config)
-    channel_obj.encrypt_field("token", channel_config)
-    channel_obj.encrypt_field("aes_key", channel_config)
+    channel_obj.decrypt_field("secret", channel_config)
+    channel_obj.decrypt_field("token", channel_config)
+    channel_obj.decrypt_field("aes_key", channel_config)
     try:
         # 创建企业微信客户端
         client = WeChatClient(corp_id=channel_config["corp_id"], secret=channel_config["secret"])
@@ -29,11 +31,11 @@ def send_wechat(channel_obj: Channel, content, receivers):
 def send_email(channel_obj: Channel, title, content, receivers):
     """发送邮件"""
     channel_config = channel_obj.config
-    channel_obj.encrypt_field("smtp_pwd", channel_config)
+    channel_obj.decrypt_field("smtp_pwd", channel_config)
     try:
         msg = MIMEMultipart()
         msg["From"] = channel_config["mail_sender"]
-        msg["To"] = receivers
+        msg["To"] = ",".join(receivers)
         msg["Subject"] = title
 
         msg.attach(MIMEText(content, "plain", "utf-8"))
@@ -55,3 +57,17 @@ def send_email(channel_obj: Channel, title, content, receivers):
         return {"result": True, "message": "Successfully sent email"}
     except Exception as e:
         return {"result": False, "message": f"Error sending email: {str(e)}"}
+
+
+def send_by_bot(channel_obj: Channel, content):
+    channel_config = channel_obj.config
+    channel_obj.decrypt_field("bot_key", channel_config)
+    bot_key = channel_config["bot_key"]
+    url = f"https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key={bot_key}"
+    res = requests.post(url, json={"msgtype": "text", "text": {"content": content}})
+    try:
+        res = res.json()
+        return res
+    except Exception as e:
+        logger.exception(e)
+        return {"result": False, "message": "failed to send bot message"}

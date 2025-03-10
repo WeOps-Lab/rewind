@@ -2,7 +2,7 @@ from django.utils.translation import gettext as _
 
 import nats_client
 from apps.channel_mgmt.models import Channel, ChannelChoices
-from apps.channel_mgmt.utils import send_email, send_wechat
+from apps.channel_mgmt.utils import send_by_bot, send_email, send_wechat
 
 
 @nats_client.register
@@ -20,4 +20,6 @@ def send_msg_with_channel(channel_id, title, content, receivers):
         return {"result": False, "message": _("Channel not found")}
     if channel_obj.channel_type == ChannelChoices.EMAIL:
         return send_email(channel_obj, title, content, receivers)
+    elif channel_obj.channel_type == ChannelChoices.ENTERPRISE_WECHAT_BOT:
+        return send_by_bot(channel_obj, content)
     return send_wechat(channel_obj, content, receivers)

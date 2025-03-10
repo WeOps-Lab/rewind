@@ -1,1 +1,1 @@
-from .channel_view import ChannelTemplateViewSet, ChannelViewSet  # noqa
+from .channel_view import ChannelViewSet  # noqa

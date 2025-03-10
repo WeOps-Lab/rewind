@@ -1,1 +1,1 @@
-from .channel_serializer import ChannelSerializer, ChannelTemplateSerializer  # noqa
+from .channel_serializer import ChannelSerializer  # noqa

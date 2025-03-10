@@ -1,4 +1,4 @@
-from apps.channel_mgmt.models import Channel, ChannelTemplate
+from apps.channel_mgmt.models import Channel, ChannelChoices
 from config.drf.serializers import I18nSerializer
 
 
@@ -24,10 +24,6 @@ class ChannelSerializer(I18nSerializer):
             Channel.encrypt_field("secret", config)
             Channel.encrypt_field("token", config)
             Channel.encrypt_field("aes_key", config)
+        elif validated_data["channel_type"] == ChannelChoices.ENTERPRISE_WECHAT_BOT:
+            Channel.encrypt_field("bot_key", config)
         validated_data["config"] = config
-
-
-class ChannelTemplateSerializer(I18nSerializer):
-    class Meta:
-        model = ChannelTemplate
-        fields = "__all__"

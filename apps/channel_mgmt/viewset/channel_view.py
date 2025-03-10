@@ -4,8 +4,8 @@ from django_filters.rest_framework import FilterSet
 from rest_framework import viewsets
 from rest_framework.decorators import action
 
-from apps.channel_mgmt.models import Channel, ChannelTemplate
-from apps.channel_mgmt.serializers import ChannelSerializer, ChannelTemplateSerializer
+from apps.channel_mgmt.models import Channel
+from apps.channel_mgmt.serializers import ChannelSerializer
 
 
 class ChannelFilter(FilterSet):
@@ -36,11 +36,3 @@ class ChannelViewSet(viewsets.ModelViewSet):
 class TemplateFilter(FilterSet):
     channel_type = filters.CharFilter(field_name="channel_type", lookup_expr="exact")
     name = filters.CharFilter(field_name="name", lookup_expr="lte")
-
-
-class ChannelTemplateViewSet(viewsets.ModelViewSet):
-    queryset = ChannelTemplate.objects.all()
-    serializer_class = ChannelTemplateSerializer
-    filterset_class = TemplateFilter
-
-    ordering = ("-id",)
