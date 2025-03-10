@@ -127,7 +127,7 @@ class MetricVieSet(viewsets.ModelViewSet):
                 metric_map = lan.get_val("MONITOR_OBJECT_METRIC", monitor_object_name)
                 if not metric_map:
                     metric_map = {}
-                result["display_name"] = metric_map.get(result["name"], {}).get("name") or result["name"]
+                result["display_name"] = metric_map.get(result["name"], {}).get("name") or result["display_name"]
                 result["display_description"] = metric_map.get(result["name"], {}).get("desc") or result["description"]
         return WebUtils.response_success(results)
 
