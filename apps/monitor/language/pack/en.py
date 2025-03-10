@@ -1627,7 +1627,7 @@ MONITOR_OBJECT_METRIC = {
         "desc": "The number of documents scanned per second during queries, used to assess query performance."
     }
 },
-"MySQL": {
+"Mysql": {
     "mysql_aborted_clients": {
         "name": "Aborted Clients",
         "desc": "This metric represents the number of connections aborted due to client errors. Monitoring this metric can help identify connection reliability issues."

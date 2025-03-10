@@ -1639,7 +1639,7 @@ MONITOR_OBJECT_METRIC = {
         "desc": "查询时扫描的文档数量，评估查询性能。"
     }
 },
-"MySQL": {
+"Mysql": {
     "mysql_aborted_clients": {
         "name": "终止的客户端连接次数",
         "desc": "此指标表示由于客户端错误中止的连接次数。监控此指标可以帮助识别连接可靠性问题。"
