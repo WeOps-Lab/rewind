@@ -68,16 +68,24 @@ class ModelManage(object):
         return model[0]
 
     @staticmethod
-    def search_model(language: str = "en"):
+    def search_model(language: str = "en", order_type: str = "ASC", order: str = "id"):
         """
         查询模型
+        Args:
+            language: 语言，默认英语
+            order_type: 排序方式，asc升序/desc降序
+            order: 排序字段，默认order_id
         """
         with Neo4jClient() as ag:
-            models, _ = ag.query_entity(MODEL, [])
+            models, _ = ag.query_entity(MODEL, [], order=order, order_type=order_type)
+
         lan = SettingLanguage(language)
 
         for model in models:
             model["model_name"] = lan.get_val("MODEL", model["model_id"]) or model["model_name"]
+            # 确保所有模型都有order_id
+            if "order_id" not in model:
+                model["order_id"] = 0
 
         return models
 
@@ -330,3 +338,78 @@ class ModelManage(object):
             _, count = ag.query_entity(INSTANCE, params, page=dict(skip=0, limit=1))
         if count > 0:
             raise BaseAppException("model exist instance")
+
+    # ===========
+
+    @staticmethod
+    def get_max_order_id(classification_id: str):
+        """
+        获取当前最大的 order_id
+        Args:
+            classification_id: 分类ID
+        """
+        with Neo4jClient() as ag:
+            models, _ = ag.query_entity(MODEL,
+                                        [{"field": "classification_id", "type": "str=", "value": classification_id}],
+                                        order="order_id", order_type="desc", page={"skip": 0, "limit": 1})
+            if not models:
+                return 0
+            return models[0].get("order_id", 0)
+
+    @staticmethod
+    def update_model_orders(model_orders: list):
+        """
+        批量更新模型排序
+        Args:
+            model_orders: [{"model_id": "model_1", "order_id": 1}, ...]
+        """
+        with Neo4jClient() as ag:
+            for order_info in model_orders:
+                model_query = {"field": "model_id", "type": "str=", "value": order_info["model_id"]}
+                models, model_count = ag.query_entity(MODEL, [model_query])
+                if model_count == 0:
+                    continue
+                model_info = models[0]
+                ag.set_entity_properties(
+                    MODEL,
+                    [model_info["_id"]],
+                    {"order_id": order_info["order_id"]},
+                    {},
+                    [],
+                    False
+                )
+        return True
+
+    @staticmethod
+    def reset_all_model_orders():
+        """
+        重置所有模型的 order_id
+        按照分类分组，每个分类内部从1开始排序
+        Returns:
+            bool: 更新是否成功
+        """
+        with Neo4jClient() as ag:
+            # 获取所有模型并按classification_id分组
+            models, _ = ag.query_entity(MODEL, [], order="classification_id")
+
+            # 按classification_id分组
+            grouped_models = {}
+            for model in models:
+                classification_id = model["classification_id"]
+                if classification_id not in grouped_models:
+                    grouped_models[classification_id] = []
+                grouped_models[classification_id].append(model)
+
+            # 为每个分组内的模型更新order_id
+            for classification_id, group_models in grouped_models.items():
+                for index, model in enumerate(group_models, start=1):
+                    ag.set_entity_properties(
+                        MODEL,
+                        [model["_id"]],
+                        {"order_id": index},
+                        {},
+                        [],
+                        False
+                    )
+
+        return True

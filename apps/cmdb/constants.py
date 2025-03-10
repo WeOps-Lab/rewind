@@ -101,3 +101,99 @@ SUBORDINATE_MODEL = "subordinate_model"
 
 # 加密的属性列表
 ENCRYPTED_KEY = {"password", "secret_key", "encryption_key"}
+
+
+# ====== 配置采集 ======
+
+class CollectRunStatusType(object):
+    NOT_START = 0
+    RUNNING = 1
+    SUCCESS = 2
+    ERROR = 3
+    TIME_OUT = 4
+    WRITING = 5
+    FORCE_STOP = 6
+    EXAMINE = 7  # 审批 但是不做枚举
+
+    CHOICE = (
+        (NOT_START, "未执行"),
+        (RUNNING, "正在采集"),
+        (SUCCESS, "成功"),
+        (ERROR, "异常"),
+        (TIME_OUT, "超时"),
+        (EXAMINE, "待审批"),
+        (WRITING, "正在写入"),
+        (FORCE_STOP, "强制终止"),
+    )
+
+
+class CollectPluginTypes(object):
+    """
+    采集插件类型
+    """
+
+    VM = "vm"
+    SNMP = "snmp"
+    K8S = "k8s"
+    CLOUD = "cloud"
+    PROTOCOL = "protocol"
+
+    CHOICE = (
+        (VM, "VM采集"),
+        (SNMP, "SNMP采集"),
+        (K8S, "K8S采集"),
+        (CLOUD, "云采集"),
+        (PROTOCOL, "协议采集"),
+    )
+
+
+class CollectInputMethod(object):
+    """
+    采集录入方式
+    """
+
+    AUTO = 0
+    MANUAL = 1
+
+    CHOICE = (
+        (AUTO, "自动"),
+        (MANUAL, "手动"),
+    )
+
+
+class CollectDriverTypes(object):
+    """
+    采集驱动类型
+    """
+
+    PROTOCOL = "protocol"
+    JOB = "job"
+
+    CHOICE = (
+        (PROTOCOL, "协议采集"),
+        (JOB, "脚本采集")
+    )
+
+
+# 采集对象树
+COLLECT_OBJ_TREE = [
+    {
+        "id": "k8s",
+        "name": "K8S",
+        "children": [
+            {"id": "k8s_cluster", "name": "K8S", "type": CollectDriverTypes.PROTOCOL}
+        ],
+    },
+    # {
+    #     "id": "bk_database",
+    #     "name": "数据库",
+    #     "children": [
+    #         {"id": "redis", "name": "Redis"},
+    #         {"id": "mysql", "name": "MySQL"},
+    #         {"id": "oracle", "name": "Oracle"},
+    #     ],
+    # }
+
+]
+
+# ====== 配置采集 ======

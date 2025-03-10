@@ -1,6 +1,7 @@
 import os
 
 import requests
+from django.conf import settings
 from dotenv import load_dotenv
 
 from apps.cmdb.constants import INSTANCE, INSTANCE_ASSOCIATION
@@ -14,12 +15,12 @@ load_dotenv()
 class Collection:
     def __init__(self):
         self.url = os.getenv("COLLECTION_URL")
+        if settings.DEBUG:
+            self.url = "http://victoria-metrics.dev.cc/prometheus/api/v1/query"
 
     def query(self, sql):
         """查询数据"""
-        if "FORMAT JSON" not in sql.upper():
-            sql = f"{sql} FORMAT JSON"
-        resp = requests.post(self.url, data=sql)
+        resp = requests.post(self.url, data={"query": sql})
         if resp.status_code != 200:
             raise Exception(f"request error！{resp.text}")
         return resp.json()
@@ -27,7 +28,7 @@ class Collection:
 
 # 纳管数据（数据纳管到数据库）
 class Management:
-    def __init__(self, organization, cluster_name, model_id, old_data, new_data, unique_keys, collect_time):
+    def __init__(self, organization, cluster_name, model_id, old_data, new_data, unique_keys, collect_time, task_id):
         self.organization = organization
         self.collect_time = collect_time
         self.cluster_name = cluster_name
@@ -36,6 +37,9 @@ class Management:
         self.new_data = new_data
         self.unique_keys = unique_keys
         self.check_attr_map = self.get_check_attr_map()
+        self.task_id = task_id
+        self.old_map, self.new_map = self.format_data()
+        self.add_list, self.update_list, self.delete_list = self.contrast(self.old_map, self.new_map)
 
     def get_check_attr_map(self):
         attrs = ModelManage.search_model_attr(self.model_id)
@@ -65,28 +69,31 @@ class Management:
         """数据对比"""
         add_list, update_list, delete_list = [], [], []
         for key, info in new_map.items():
+            info["model_id"] = self.model_id
             if key not in old_map:
                 add_list.append(info)
             else:
                 info.update(_id=old_map[key]["_id"])
                 update_list.append(info)
         for key, info in old_map.items():
+            info["model_id"] = self.model_id
             if key not in new_map:
                 delete_list.append(info)
         return add_list, update_list, delete_list
 
     def add_inst(self, inst_list):
         """新增实例"""
-        if not inst_list:
-            return
-
         result = {"success": [], "failed": []}
+        if not inst_list:
+            return result
+
         with Neo4jClient() as ag:
             exist_items, _ = ag.query_entity(INSTANCE, [{"field": "model_id", "type": "str=", "value": self.model_id}])
             for instance_info in inst_list:
                 try:
                     instance_info.update(
                         model_id=self.model_id,
+                        self_cluster=self.cluster_name,
                         organization=self.organization,
                         collect_task=self.cluster_name,
                         auto_collect=True,
@@ -104,10 +111,10 @@ class Management:
 
     def update_inst(self, inst_list):
         """更新实例"""
-        if not inst_list:
-            return
-
         result = {"success": [], "failed": []}
+        if not inst_list:
+            return result
+
         with Neo4jClient() as ag:
             exist_items, _ = ag.query_entity(INSTANCE, [{"field": "model_id", "type": "str=", "value": self.model_id}])
             for instance_info in inst_list:
@@ -132,12 +139,15 @@ class Management:
                     result["failed"].append({"instance_info": instance_info, "error": getattr(e, "message", e)})
         return result
 
-    def delete_inst(self, inst_list):
+    @staticmethod
+    def delete_inst(inst_list):
         """删除实例"""
-        if not inst_list:
-            return
 
         result = {"success": [], "failed": []}
+
+        if not inst_list:
+            return result
+
         with Neo4jClient() as ag:
             for instance_info in inst_list:
                 try:
@@ -181,10 +191,12 @@ class Management:
                 )
         return assos_result
 
+    def update(self):
+        update_result = self.update_inst(self.update_list)
+        return dict(add={"success": [], "failed": []}, update=update_result, delete={"success": [], "failed": []})
+
     def controller(self):
-        old_map, new_map = self.format_data()
-        add_list, update_list, delete_list = self.contrast(old_map, new_map)
-        delete_result = self.delete_inst(delete_list)
-        add_result = self.add_inst(add_list)
-        update_result = self.update_inst(update_list)
+        delete_result = self.delete_inst(self.delete_list)
+        add_result = self.add_inst(self.add_list)
+        update_result = self.update_inst(self.update_list)
         return dict(add=add_result, update=update_result, delete=delete_result)

@@ -70,12 +70,12 @@ class Neo4jClient:
         return properties_str
 
     def create_entity(
-        self,
-        label: str,
-        properties: dict,
-        check_attr_map: dict,
-        exist_items: list,
-        operator: str = None,
+            self,
+            label: str,
+            properties: dict,
+            check_attr_map: dict,
+            exist_items: list,
+            operator: str = None,
     ):
         """
         快速创建一个实体
@@ -129,12 +129,12 @@ class Neo4jClient:
         return {k: v for k, v in item.items() if k in check_attr_map}
 
     def _create_entity(
-        self,
-        label: str,
-        properties: dict,
-        check_attr_map: dict,
-        exist_items: list,
-        operator: str = None,
+            self,
+            label: str,
+            properties: dict,
+            check_attr_map: dict,
+            exist_items: list,
+            operator: str = None,
     ):
         # 校验必填项标签非空
         if not label:
@@ -157,14 +157,14 @@ class Neo4jClient:
         return self.entity_to_dict(entity)
 
     def create_edge(
-        self,
-        label: str,
-        a_id: int,
-        a_label: str,
-        b_id: int,
-        b_label: str,
-        properties: dict,
-        check_asst_key: str,
+            self,
+            label: str,
+            a_id: int,
+            a_label: str,
+            b_id: int,
+            b_label: str,
+            properties: dict,
+            check_asst_key: str,
     ):
         """
         快速创建一条边
@@ -173,14 +173,14 @@ class Neo4jClient:
         return result
 
     def _create_edge(
-        self,
-        label: str,
-        a_id: int,
-        a_label: str,
-        b_id: int,
-        b_label: str,
-        properties: dict,
-        check_asst_key: str = "model_asst_id",
+            self,
+            label: str,
+            a_id: int,
+            a_label: str,
+            b_id: int,
+            b_label: str,
+            properties: dict,
+            check_asst_key: str = "model_asst_id",
     ):
         # 校验必填项标签非空
         if not label:
@@ -189,7 +189,8 @@ class Neo4jClient:
         # 校验边是否已经存在
         check_asst_val = properties.get(check_asst_key)
         edge_count = self.session.run(
-            f"MATCH (a:{a_label})-[e]-(b:{b_label}) WHERE id(a) = {a_id} AND id(b) = {b_id} AND e.{check_asst_key} = '{check_asst_val}' RETURN COUNT(e) AS count"  # noqa
+            f"MATCH (a:{a_label})-[e]-(b:{b_label}) WHERE id(a) = {a_id} AND id(b) = {b_id} AND e.{check_asst_key} = '{check_asst_val}' RETURN COUNT(e) AS count"
+            # noqa
         ).single()["count"]
         if edge_count > 0:
             raise BaseAppException("edge already exists")
@@ -198,18 +199,19 @@ class Neo4jClient:
         properties_str = self.format_properties(properties)
         edge = self.session.run(
             # f"MATCH (a:{a_label}), (b:{b_label}) WHERE id(a) = {a_id} AND id(b) = {b_id} CREATE (a)-[e:{label} {properties_str}]->(b) RETURN e"  # noqa
-            f"MATCH (a:{a_label}) WHERE id(a) = {a_id} WITH a MATCH (b:{b_label}) WHERE id(b) = {b_id} CREATE (a)-[e:{label} {properties_str}]->(b) RETURN e"  # noqa
+            f"MATCH (a:{a_label}) WHERE id(a) = {a_id} WITH a MATCH (b:{b_label}) WHERE id(b) = {b_id} CREATE (a)-[e:{label} {properties_str}]->(b) RETURN e"
+            # noqa
         ).single()
 
         return self.edge_to_dict(edge)
 
     def batch_create_entity(
-        self,
-        label: str,
-        properties_list: list,
-        check_attr_map: dict,
-        exist_items: list,
-        operator: str = None,
+            self,
+            label: str,
+            properties_list: list,
+            check_attr_map: dict,
+            exist_items: list,
+            operator: str = None,
     ):
         """批量创建实体"""
         results = []
@@ -226,12 +228,12 @@ class Neo4jClient:
         return results
 
     def batch_create_edge(
-        self,
-        label: str,
-        a_label: str,
-        b_label: str,
-        edge_list: list,
-        check_asst_key: str,
+            self,
+            label: str,
+            a_label: str,
+            b_label: str,
+            edge_list: list,
+            check_asst_key: str,
     ):
         """批量创建边"""
         results = []
@@ -296,13 +298,14 @@ class Neo4jClient:
         return f"{search_params_str} AND {permission_params}"
 
     def query_entity(
-        self,
-        label: str,
-        params: list,
-        page: dict = None,
-        order: str = None,
-        param_type="AND",
-        permission_params: str = "",
+            self,
+            label: str,
+            params: list,
+            page: dict = None,
+            order: str = None,
+            order_type: str = "ASC",
+            param_type="AND",
+            permission_params: str = "",
     ):
         """
         查询实体
@@ -314,7 +317,7 @@ class Neo4jClient:
         sql_str = f"MATCH (n{label_str}) {params_str} RETURN n"
 
         # order by
-        sql_str += f" ORDER BY n.{order}" if order else " ORDER BY ID(n)"
+        sql_str += f" ORDER BY n.{order} {order_type}" if order else f" ORDER BY ID(n) {order_type}"
 
         count_str = f"MATCH (n{label_str}) {params_str} RETURN COUNT(n) AS count"
         count = None
@@ -344,11 +347,11 @@ class Neo4jClient:
         return self.entity_to_list(objs)
 
     def query_edge(
-        self,
-        label: str,
-        params: list,
-        param_type: str = "AND",
-        return_entity: bool = False,
+            self,
+            label: str,
+            params: list,
+            param_type: str = "AND",
+            return_entity: bool = False,
     ):
         """
         查询边
@@ -380,13 +383,13 @@ class Neo4jClient:
         return properties_str if properties_str == "" else properties_str[:-1]
 
     def set_entity_properties(
-        self,
-        label: str,
-        entity_ids: list,
-        properties: dict,
-        check_attr_map: dict,
-        exist_items: list,
-        check: bool = True,
+            self,
+            label: str,
+            entity_ids: list,
+            properties: dict,
+            check_attr_map: dict,
+            exist_items: list,
+            check: bool = True,
     ):
         """
         设置实体属性
