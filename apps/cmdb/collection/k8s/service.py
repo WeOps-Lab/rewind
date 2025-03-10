@@ -530,7 +530,7 @@ class CollectMetrics:
 
         result = []
         for pod in pod_info:
-            namespace = f"{pod['instance_id']}/{pod['namespace']}"
+            namespace = f"{pod['namespace']}/({self.cluster_name})"
 
             # 3. 构建基础Pod信息
             # pod.inst_name={pod.name}({cluster.inst_name or namespace.self_cluster}/{namespace.name})
@@ -613,8 +613,7 @@ class CollectMetrics:
                 pod_data["k8s_namespace"] = namespace
                 associations.append({
                     "model_id": "k8s_namespace",
-                    # "inst_name": f"{pod_data['namespace']}({self.cluster_name})",
-                    "inst_name": "1111",
+                    "inst_name": namespace,
                     "asst_id": "group",
                     "model_asst_id": POD_NAMESPACE_RELATION
                 })
