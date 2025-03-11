@@ -148,12 +148,12 @@ class MonitorPolicyScan:
         if source_type == "instance":
             instance_list = source_values
         elif source_type == "organization":
-            instance_list = list(MonitorInstanceOrganization.objects.filter(organization__in=source_values).values_list(
+            instance_list = list(MonitorInstanceOrganization.objects.filter(monitor_instance__monitor_object_id=self.policy.monitor_object_id, organization__in=source_values).values_list(
                 "monitor_instance_id", flat=True
             ))
         else:
             instance_list = []
-        objs = MonitorInstance.objects.filter(id__in=instance_list)
+        objs = MonitorInstance.objects.filter(monitor_object_id=self.policy.monitor_object_id, id__in=instance_list)
         return {i.id: i.name for i in objs}
 
     def format_to_vm_filter(self, conditions):

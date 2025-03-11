@@ -18,7 +18,8 @@ def vm_to_dataframe(vm_data, instance_id_keys=None):
         selected_cols = ["metric_instance_id"]  # 默认使用 instance_id
 
     # 生成instance_id（拼接选定的维度字段）
-    df["instance_id"] = df[selected_cols].astype(str).agg("_".join, axis=1)
+    # df["instance_id"] = df[selected_cols].astype(str).agg("_".join, axis=1)
+    df["instance_id"] = df[selected_cols].apply(lambda row: tuple(row), axis=1)
 
     return df
 
