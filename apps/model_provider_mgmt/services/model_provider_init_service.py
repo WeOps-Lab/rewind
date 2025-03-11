@@ -98,6 +98,18 @@ class ModelProviderInitService:
                     }
                 },
             )
+            LLMModel.objects.get_or_create(
+                name="QwQ",
+                llm_model_type=LLMModelChoices.HUGGING_FACE,
+                defaults={
+                    "llm_config": {
+                        "openai_api_key": "your_openai_api_key",
+                        "openai_base_url": "https://api.deepseek.com",
+                        "temperature": 0.7,
+                        "model": "Qwen/QwQ-32B",
+                    }
+                },
+            )
 
         Token.objects.get_or_create(user=self.owner)
 
