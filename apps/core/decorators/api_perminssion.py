@@ -1,4 +1,5 @@
 import logging
+import os
 from functools import wraps
 
 from django.utils.translation import gettext as _
@@ -14,7 +15,11 @@ class HasRole(object):
         if roles is None:
             roles = []
         if isinstance(roles, str):
-            roles = [roles]
+            if roles == "admin":
+                client_id = os.getenv("CLIENT_ID", "")
+                roles = ["admin", f"{client_id}_admin"]
+            else:
+                roles = [roles]
         self.roles = roles
 
     def __call__(self, task_definition):
