@@ -15,9 +15,9 @@ class Collection:
     def __init__(self):
         self.url = os.getenv("COLLECTION_URL", "http://victoria-metrics.dev.cc/prometheus/api/v1/query")
 
-    def query(self, sql):
+    def query(self, sql, timeout=60):
         """查询数据"""
-        resp = requests.post(self.url, data={"query": sql})
+        resp = requests.post(self.url, data={"query": sql}, timeout=timeout)
         if resp.status_code != 200:
             raise Exception(f"request error！{resp.text}")
         return resp.json()
