@@ -1,7 +1,6 @@
 import os
 
 import requests
-from django.conf import settings
 from dotenv import load_dotenv
 
 from apps.cmdb.constants import INSTANCE, INSTANCE_ASSOCIATION
@@ -14,9 +13,7 @@ load_dotenv()
 # 采集数据（数据查询）
 class Collection:
     def __init__(self):
-        self.url = os.getenv("COLLECTION_URL")
-        if settings.DEBUG:
-            self.url = "http://victoria-metrics.dev.cc/prometheus/api/v1/query"
+        self.url = os.getenv("COLLECTION_URL", "http://victoria-metrics.dev.cc/prometheus/api/v1/query")
 
     def query(self, sql):
         """查询数据"""
