@@ -17,16 +17,17 @@ def verify_token(token, client_id):
     if not is_active:
         return {"result": False, "message": _("Token is invalid")}
     roles = user_info["realm_access"]["roles"]
-    groups = cache.get(f"group_{user_info.get('sub')}")
+    is_superuser = "admin" in roles or f"{client_id}_admin" in roles
+    groups = cache.get(f"group_{user_info.get('username')}")
     if not groups:
-        groups = client.get_user_groups(user_info.get("sub"), "admin" in roles)
-        cache.set(f"group_{user_info.get('sub')}", groups, 60 * 5)
+        groups = client.get_user_groups(user_info.get("sub"), is_superuser)
+        cache.set(f"group_{user_info.get('username')}", groups, 60 * 5)
     return {
         "result": True,
         "data": {
             "username": user_info["username"],
             "email": user_info.get("email", ""),
-            "is_superuser": "admin" in roles or f"{client_id}_admin" in roles,
+            "is_superuser": is_superuser,
             "group_list": groups,
             "roles": roles,
             "locale": user_info.get("locale", "en"),
