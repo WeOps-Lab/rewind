@@ -258,6 +258,12 @@ class MonitorPolicyScan:
 
         # 计算告警
         alert_events, info_events = calculate_alerts(self.policy.alert_name, df, self.policy.threshold)
+
+        if alert_events:
+            logger.info(f"=======alert events: {alert_events}")
+            logger.info(f"=======alert events search result: {vm_data}")
+            logger.info(f"=======alert events resource scope: {self.instances_map.keys()}")
+
         return alert_events, info_events
 
     def no_data_event(self):
@@ -278,6 +284,11 @@ class MonitorPolicyScan:
                     "level": "no_data",
                     "content": "no data",
                 })
+
+        if events:
+            logger.info(f"-------no data events: {events}")
+            logger.info(f"-------no data events search result: {_aggregration_metrics}")
+            logger.info(f"-------no data events resource scope: {self.instances_map.keys()}")
 
         return events
 
