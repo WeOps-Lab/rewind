@@ -82,12 +82,15 @@ class RuleGrouping:
         """根据条件类型规则获取关联信息"""
         obj_metric_map = {i["name"]: i for i in MONITOR_OBJS}
         obj_metric_map = obj_metric_map.get(rule.monitor_object.name)
+        obj_instance_id_set = set(MonitorInstance.objects.filter(monitor_object_id=rule.monitor_object_id).values_list("id", flat=True))
         if not obj_metric_map:
             raise ValueError("Monitor object default metric does not exist")
         asso_list = []
         metrics = VictoriaMetricsAPI().query(rule.grouping_rules["query"])
-        for metric_info in metrics.get("result", []):
+        for metric_info in metrics.get("data", {}).get("result", []):
             instance_id = tuple([metric_info["metric"].get(i) for i in obj_metric_map["instance_id_keys"]])
+            if instance_id not in obj_instance_id_set:
+                continue
             if instance_id:
                 instance_id = str(instance_id)
                 asso_list.extend([(instance_id, i) for i in rule.organizations])
