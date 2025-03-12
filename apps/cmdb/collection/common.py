@@ -13,7 +13,7 @@ load_dotenv()
 # 采集数据（数据查询）
 class Collection:
     def __init__(self):
-        self.url = os.getenv("COLLECTION_URL", "http://victoria-metrics.dev.cc/prometheus/api/v1/query")
+        self.url = os.getenv("VICTORIAMETRICS_HOST", "http://victoria-metrics.dev.cc/prometheus/api/v1/query")
 
     def query(self, sql, timeout=60):
         """查询数据"""
