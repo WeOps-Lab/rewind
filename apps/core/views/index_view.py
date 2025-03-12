@@ -16,6 +16,14 @@ def index(request):
 
 @api_view(["GET"])
 def login_info(request):
+    is_first_login = False
+    if not request.user.group_list:
+        is_first_login = True
+    elif len(request.user.group_list) == 1 and request.user.group_list[0].group_name == os.environ.get(
+        "DEFAULT_GROUP_NAME", "Default"
+    ):
+        is_first_login = True
+
     return JsonResponse(
         {
             "result": True,
@@ -24,6 +32,7 @@ def login_info(request):
                 "is_superuser": request.user.is_superuser,
                 "group_list": request.user.group_list,
                 "roles": request.user.roles,
+                "is_first_login": is_first_login,
             },
         }
     )

@@ -194,7 +194,7 @@ and userobj.username like %(username)s"""
 
     def get_group_users(self, group_id, query_params):
         sql = """SELECT
-  ue.id, ue.email, ue.first_name as firstName, ue.last_name as lastName, ue.username
+  ue.id, ue.email, ue.first_name as firstname, ue.last_name as lastname, ue.username
 FROM
   user_entity ue
   JOIN user_group_membership ugm ON ue.ID = ugm.user_id
@@ -212,11 +212,20 @@ and
             sql += " OFFSET %(offset)s LIMIT %(limit)s"
             params.update({"offset": query_params["first"], "limit": query_params["max"]})
         return_data = SQLExecute.execute_sql(sql, params)
-        return return_data
+        return [
+            {
+                "id": i["id"],
+                "email": i["email"],
+                "firstName": i["firstname"],
+                "lastName": i["lastname"],
+                "username": i["id"],
+            }
+            for i in return_data
+        ]
 
     def get_role_users(self, role_id, query_params):
         sql = """SELECT
-  ue.id, ue.email, ue.first_name as firstName, ue.last_name as lastName, ue.username
+  ue.id, ue.email, ue.first_name as firstname, ue.last_name as lastname, ue.username
 FROM
   user_entity ue
   JOIN user_role_mapping ugm ON ue.ID = ugm.user_id
@@ -234,4 +243,13 @@ and
             sql += " OFFSET %(offset)s LIMIT %(limit)s"
             params.update({"offset": query_params["first"], "limit": query_params["max"]})
         return_data = SQLExecute.execute_sql(sql, params)
-        return return_data
+        return [
+            {
+                "id": i["id"],
+                "email": i["email"],
+                "firstName": i["firstname"],
+                "lastName": i["lastname"],
+                "username": i["id"],
+            }
+            for i in return_data
+        ]
