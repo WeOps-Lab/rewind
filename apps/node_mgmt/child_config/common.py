@@ -1,6 +1,7 @@
 from apps.node_mgmt.child_config.telegraf.database import DataBaseConfig
 from apps.node_mgmt.child_config.telegraf.docker import DockerConfig
 from apps.node_mgmt.child_config.telegraf.host import HostConfig
+from apps.node_mgmt.child_config.telegraf.http import HttpConfig
 from apps.node_mgmt.child_config.telegraf.ipmi import IpmiConfig
 from apps.node_mgmt.child_config.telegraf.middleware import MiddlewareConfig
 from apps.node_mgmt.child_config.telegraf.ping import PingConfig
@@ -19,6 +20,7 @@ OBJECT_TYPE_MAP = {
     "middleware": MiddlewareConfig.patch_set_node_config,
     "docker": DockerConfig.patch_set_node_config,
     "database": DataBaseConfig.patch_set_node_config,
+    "http": HttpConfig.patch_set_node_config,
 }
 
 
