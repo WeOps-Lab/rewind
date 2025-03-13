@@ -224,6 +224,13 @@ MONITOR_OBJS = [
         "instance_id_keys": ["instance_id"],
         "supplementary_indicators": ["postgresql_active_time", "postgresql_blks_hit"],
     },
+    {
+        "type": "VMWare",
+        "name": "vCenter",
+        "default_metric": 'any({instance_type="vmware"}) by (instance_id)',
+        "instance_id_keys": ["instance_id"],
+        "supplementary_indicators": [],
+    },
 ]
 
 # 阀值对比方法

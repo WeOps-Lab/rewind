@@ -32,6 +32,8 @@ class NodeMgmt(object):
                     "url": "https://wepaas.canway.net/",
                     "type": "http_response",
                     "instance_id": "https://wepaas.canway.net/"
+                    "instance_type": "website"
+                    "interval": 10
                 }]
             }]
         }

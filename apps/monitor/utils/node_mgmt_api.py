@@ -26,8 +26,36 @@ class FormatChildConfig:
             return FormatChildConfig.format_docker(instances, configs)
         elif object_type == "database":
             return FormatChildConfig.format_database(configs, instances)
+        elif object_type == "vmware":
+            return FormatChildConfig.format_vmware(configs, instances)
         else:
             raise ValueError(f"Unsupported object type: {object_type}")
+
+    @staticmethod
+    def format_vmware(configs, instances):
+        result = {"object_type": "database", "nodes": []}
+
+        for instance in instances:
+            instance_id, instance_type = instance["instance_id"], instance["instance_type"]
+            for node_id in instance["node_ids"]:
+                node_info = {"id": node_id, "configs": []}
+                for config in configs:
+                    username, password = config.get("username", ""), config.get("password", "")
+                    host = instance.get("host", "")
+                    interval = config.get("interval", 60)
+                    url = f"http://127.0.0.1:8083/api/monitor/{instance_type}/metrics?username={username}&password={password}&host={host}"
+                    config_info = {
+                        "type": config["type"],
+                        "instance_id": instance_id,
+                        "instance_type": instance_type,
+                        "interval": interval,
+                        "url": url,
+                    }
+                    node_info["configs"].append(config_info)
+
+                result["nodes"].append(node_info)
+
+        return result
 
     @staticmethod
     def format_database(configs, instances):
