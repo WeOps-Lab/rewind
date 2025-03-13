@@ -33,7 +33,7 @@ class FormatChildConfig:
 
     @staticmethod
     def format_vmware(configs, instances):
-        result = {"object_type": "database", "nodes": []}
+        result = {"object_type": "http", "nodes": []}
 
         for instance in instances:
             instance_id, instance_type = instance["instance_id"], instance["instance_type"]
