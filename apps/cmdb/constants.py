@@ -1,4 +1,6 @@
 # 模型分类标签
+import os
+
 CLASSIFICATION = "classification"
 
 # 模型标签
@@ -181,19 +183,29 @@ COLLECT_OBJ_TREE = [
         "id": "k8s",
         "name": "K8S",
         "children": [
-            {"id": "k8s_cluster", "name": "K8S", "type": CollectDriverTypes.PROTOCOL}
+            {"id": "k8s_cluster", "model_id": "k8s_cluster", "name": "K8S", "type": CollectDriverTypes.PROTOCOL}
         ],
     },
-    # {
-    #     "id": "bk_database",
-    #     "name": "数据库",
-    #     "children": [
-    #         {"id": "redis", "name": "Redis"},
-    #         {"id": "mysql", "name": "MySQL"},
-    #         {"id": "oracle", "name": "Oracle"},
-    #     ],
-    # }
+    {
+        "id": "vmware",
+        "name": "VMware",
+        "children": [
+            {"id": "vmware_vc", "model_id": "vmware_vc", "name": "vCenter", "type": CollectDriverTypes.PROTOCOL}
+        ],
+    },
+    {
+        "id": "network",
+        "name": "NetWork",
+        "children": [
+            {"id": "network", "model_id": "network", "name": "NetWork", "type": CollectDriverTypes.PROTOCOL}
+        ],
+    }
 
 ]
 
 # ====== 配置采集 ======
+
+VICTORIAMETRICS_HOST = os.getenv("VICTORIAMETRICS_HOST", "")
+
+STARGAZER_URL = os.getenv("STARGAZER_URL", "http://stargazer:8083")
+

@@ -7,7 +7,7 @@ def crontab_format(value_type: str, value: str):
     """将数据转换成crontab格式"""
     is_interval = True
     if value_type == "cycle":
-        scan_cycle = "0 */{} * * *".format(int(value))
+        scan_cycle = "*/{} * * * *".format(int(value))
     elif value_type == "timing":
         time_data = value.split(":")
         if len(time_data) != 2:

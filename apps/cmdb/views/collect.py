@@ -5,6 +5,8 @@
 
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
+
+from apps.rpc.node_mgmt import NodeMgmt
 from config.drf.viewsets import ModelViewSet
 from rest_framework.decorators import action
 from django.db import transaction
@@ -101,6 +103,7 @@ class CollectModelViewSet(ModelViewSet):
         instance.save()
         sync_collect_task.delay(instance.id)
         # sync_collect_task(instance.id)
+
         return WebUtils.response_success(instance.id)
 
     @action(methods=["POST"], detail=False)
@@ -110,3 +113,18 @@ class CollectModelViewSet(ModelViewSet):
         任务审批
         """
         return WebUtils.response_success()
+
+    @action(methods=["GET"], detail=False)
+    def nodes(self, request, *args, **kwargs):
+        """
+        获取所有节点
+        """
+        params = request.GET.dict()
+        query_data = {
+            "page": int(params.get("page", 1)),
+            "page_size": int(params.get("page_size", 10)),
+            "name": params.get("name",""),
+        }
+        node = NodeMgmt()
+        data = node.node_list(query_data)
+        return WebUtils.response_success(data)

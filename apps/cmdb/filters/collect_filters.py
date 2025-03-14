@@ -14,7 +14,8 @@ class CollectModelFilter(FilterSet):
     search = CharFilter(field_name="name", lookup_expr="icontains", label="模型ID")
     driver_type = CharFilter(field_name="driver_type", label="任务类型")
     exec_status = CharFilter(field_name="exec_status", label="任务类型")
+    model_id = CharFilter(field_name="model_id", label="模型id")
 
     class Meta:
         model = CollectModels
-        fields = ["search", "driver_type", "exec_status"]
+        fields = ["search", "driver_type", "exec_status", "model_id"]

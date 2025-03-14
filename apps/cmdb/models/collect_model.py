@@ -73,3 +73,7 @@ class CollectModels(MaintainerInfo, TimeInfo):
             "delete": {"data": delete_data, "count": len(delete_data)},
             "relation": {"data": relation_data, "count": len(relation_data)},
         }
+
+    @property
+    def is_k8s(self):
+        return self.task_type == CollectPluginTypes.K8S

@@ -15,7 +15,7 @@ from apps.cmdb.collection.k8s.constants import (
     K8S_POD_CONTAINER_RESOURCE_REQUESTS, K8S_NODE_ROLE, K8S_NODE_INFO, K8S_NODE_STATUS_CAPACITY, REPLICAS_KEY,
     REPLICAS_METRICS, K8S_STATEFULSET_REPLICAS, K8S_REPLICASET_REPLICAS, K8S_DEPLOYMENT_REPLICAS, ANNOTATIONS_METRICS,
     K8S_DEPLOYMENT_ANNOTATIONS, K8S_REPLICASET_ANNOTATIONS, K8S_STATEFULSET_ANNOTATIONS, K8S_DAEMONSET_ANNOTATIONS,
-    K8S_JOB_ANNOTATIONS, K8S_CRONJOB_ANNOTATIONS, POD_NODE_RELATION,
+    K8S_JOB_ANNOTATIONS, K8S_CRONJOB_ANNOTATIONS, POD_NODE_RELATION, VMWARE_CLUSTER,
 )
 from apps.cmdb.constants import INSTANCE
 from apps.cmdb.graph.neo4j import Neo4jClient
@@ -43,13 +43,8 @@ class MetricsCannula:
         self.cluster_name = cluster_name
         self.collection_metrics = self.get_collection_metrics()
         self.now_time = datetime.now(timezone.utc).isoformat()
-        self.collect_data = {
-            "k8s_node": self.collection_metrics["node"],
-            "k8s_pod": self.collection_metrics["pod"],
-            "k8s_workload": self.collection_metrics["workload"],
-            "k8s_namespace": self.collection_metrics["namespace"]
-        }  # 采集后的原始数据
-
+        self.collect_data = {}  # 采集后的原始数据
+        self.collect_params = {}
         self.add_list = []
         self.update_list = []
         self.delete_list = []
@@ -57,7 +52,9 @@ class MetricsCannula:
 
     def get_collection_metrics(self):
         """获取采集指标"""
-        new_metrics = CollectMetrics(self.cluster_name)
+        new_metrics = CollectK8sMetrics(self.cluster_name)
+        self.collect_data = new_metrics.collect_data
+        self.collect_params = new_metrics.collect_params
         return new_metrics.run()
 
     @staticmethod
@@ -74,16 +71,6 @@ class MetricsCannula:
             if key not in new_map:
                 delete_list.append(info)
         return add_list, update_list, delete_list
-
-    @property
-    def collect_params(self):
-        params = {
-            "node": "k8s_node",
-            "pod": "k8s_pod",
-            "namespace": "k8s_namespace",
-            "workload": "k8s_workload",
-        }
-        return params
 
     def collect_controller(self):
         result = {}
@@ -117,14 +104,33 @@ class MetricsCannula:
         return result
 
 
-# 指标采集处理（指标查询、指标格式化）
-class CollectMetrics:
+class CollectK8sMetrics:
     def __init__(self, cluster_name):
         self.cluster_name = cluster_name
         self.metrics = self.get_metrics()
         self.collection_metrics_dict = {i: [] for i in COLLECTION_METRICS.keys()}
         self.timestamp_gt = False
-        self.workload_map = {}
+
+    @property
+    def collect_data(self):
+        """采集数据"""
+        data = {
+            "k8s_node": self.collection_metrics_dict["node"],
+            "k8s_pod": self.collection_metrics_dict["pod"],
+            "k8s_workload": self.collection_metrics_dict["workload"],
+            "k8s_namespace": self.collection_metrics_dict["namespace"]
+        }
+        return data
+
+    @property
+    def collect_params(self):
+        params = {
+            "node": "k8s_node",
+            "pod": "k8s_pod",
+            "namespace": "k8s_namespace",
+            "workload": "k8s_workload",
+        }
+        return params
 
     @staticmethod
     def get_metrics():
@@ -195,63 +201,6 @@ class CollectMetrics:
                 )
             )
         self.collection_metrics_dict["namespace"] = result
-
-    # def format_workload_metrics(self):
-    #     """格式化workload"""
-    #     replicaset_owner_dict, replicaset_metrics, workload_metrics = {}, [], []
-    #     for index_data in self.collection_metrics_dict["workload"]:
-    #         if index_data["index_key"] == K8S_WORKLOAD_REPLICASET:
-    #             replicaset_metrics.append(index_data)
-    #         elif index_data["index_key"] == K8S_WORKLOAD_REPLICASET_OWNER:
-    #             replicaset_owner_dict[(index_data["namespace"], index_data["replicaset"])] = index_data
-    #         else:
-    #             workload_metrics.append(index_data)
-    #     for replicaset_info in replicaset_metrics:
-    #         owner_info = replicaset_owner_dict.get((replicaset_info["namespace"], replicaset_info["replicaset"]))
-    #         if owner_info and owner_info["owner_kind"].lower() in WORKLOAD_TYPE_DICT.values():
-    #             replicaset_info.update(
-    #                 owner_kind=owner_info["owner_kind"].lower(),
-    #                 owner_name=owner_info["owner_name"],
-    #             )
-    #     workload_metrics.extend(replicaset_metrics)
-    #     result = []
-    #     for workload_info in workload_metrics:
-    #         inst_name_key = WORKLOAD_NAME_DICT[workload_info["index_key"]]
-    #         namespase = f"{workload_info['instance_id']}/{workload_info['namespace']}"
-    #         # if workload_info.get("owner_kind"):
-    #         #     pass
-    #         # 关联workload
-    #         # assos = [
-    #         #     {
-    #         #         "model_id": "k8s_workload",
-    #         #         "inst_name": f"{namespase}/{workload_info['owner_name']}",
-    #         #         "asst_id": "group",
-    #         #         "model_asst_id": WORKLOAD_WORKLOAD_RELATION,
-    #         #     }
-    #         # ]
-    #         # else:
-    #         # 关联namespace
-    #         workload_info.update(k8s_namespace=namespase)
-    #         assos = [
-    #             {
-    #                 "model_id": "k8s_namespace",
-    #                 "inst_name": namespase,
-    #                 "asst_id": "belong",
-    #                 "model_asst_id": WORKLOAD_NAMESPACE_RELATION,
-    #             }
-    #         ]
-    #
-    #         result.append(
-    #             dict(
-    #                 inst_name=f"{workload_info['instance_id']}/{workload_info['namespace']}/{workload_info[inst_name_key]}",
-    #                 # noqa
-    #                 name=workload_info[inst_name_key],
-    #                 workload_type=WORKLOAD_TYPE_DICT[workload_info["index_key"]],
-    #                 assos=assos,
-    #             )
-    #         )
-    #
-    #     self.collection_metrics_dict["workload"] = result
 
     def search_replicas(self):
         """查询副本数量"""
@@ -392,7 +341,6 @@ class CollectMetrics:
                     "model_asst_id": WORKLOAD_NAMESPACE_RELATION
                 }]
             })
-            self.workload_map[f"{workload_type}_{name}"] = inst_name
 
         # 处理ReplicaSet
         for rs_info in replicaset_metrics:
@@ -426,79 +374,8 @@ class CollectMetrics:
                         "model_asst_id": WORKLOAD_NAMESPACE_RELATION
                     }]
                 })
-                self.workload_map[f"{workload_type}_{name}"] = inst_name
 
         self.collection_metrics_dict["workload"] = result
-
-    # def format_pod_metrics(self):
-    #     """格式化pod"""
-    #     inst_index_info_list, inst_limit_resource_dict, inst_request_resource_dict = [], {}, {}
-    #     for index_data in self.collection_metrics_dict["pod"]:
-    #         if index_data["index_key"] == "kube_pod_info":
-    #             inst_index_info_list.append(index_data)
-    #         elif index_data["index_key"] == "kube_pod_container_resource_limits":
-    #             inst_limit_resource_dict[(index_data["pod"], index_data["resource"])] = index_data["index_value"]
-    #         elif index_data["index_key"] == "kube_pod_container_resource_requests":
-    #             inst_request_resource_dict[(index_data["pod"], index_data["resource"])] = index_data["index_value"]
-    #
-    #     result = []
-    #     for inst_index_info in inst_index_info_list:
-    #         namespase = f"{inst_index_info['instance_id']}/{inst_index_info['namespace']}"
-    #
-    #         info = dict(
-    #             inst_name=inst_index_info["uid"],
-    #             name=inst_index_info["pod"],
-    #             ip_addr=inst_index_info["pod_ip"],
-    #         )
-    #
-    #         limit_cpu = inst_limit_resource_dict.get((inst_index_info["pod"], "cpu"))
-    #         if limit_cpu:
-    #             info.update(limit_cpu=float(limit_cpu))
-    #         limit_memory = inst_limit_resource_dict.get((inst_index_info["pod"], "memory"))
-    #         if limit_memory:
-    #             info.update(limit_memory=int(float(limit_memory) / 1024 ** 3))
-    #         request_cpu = inst_request_resource_dict.get((inst_index_info["pod"], "cpu"))
-    #         if request_cpu:
-    #             info.update(request_cpu=float(request_cpu))
-    #         request_memory = inst_request_resource_dict.get((inst_index_info["pod"], "memory"))
-    #         if request_memory:
-    #             info.update(request_memory=int(float(request_memory) / 1024 ** 3))
-    #
-    #         assos = [
-    #             {
-    #                 "model_id": "k8s_node",
-    #                 "inst_name": f"{inst_index_info['instance_id']}/{inst_index_info['node']}",
-    #                 "asst_id": "group",
-    #                 "model_asst_id": POD_WORKLOAD_RELATION,
-    #             }
-    #         ]
-    #
-    #         if inst_index_info["created_by_kind"] in WORKLOAD_TYPE_DICT.values():
-    #             # 关联workload
-    #             inst_index_info.update(k8s_workload=f"{inst_index_info['created_by_name']}")
-    #             assos.append(
-    #                 {
-    #                     "model_id": "k8s_workload",
-    #                     "inst_name": f"{namespase}/{inst_index_info['created_by_name']}",
-    #                     "asst_id": "group",
-    #                     "model_asst_id": POD_WORKLOAD_RELATION,
-    #                 }
-    #             )
-    #         else:
-    #             # 关联namespace
-    #             inst_index_info.update(k8s_namespace=namespase)
-    #             assos.append(
-    #                 {
-    #                     "model_id": "k8s_namespace",
-    #                     "inst_name": namespase,
-    #                     "asst_id": "group",
-    #                     "model_asst_id": POD_NAMESPACE_RELATION,
-    #                 }
-    #             )
-    #         info.update(assos=assos)
-    #         result.append(info)
-    #
-    #     self.collection_metrics_dict["pod"] = result
 
     def format_pod_metrics(self):
         """
@@ -677,3 +554,190 @@ class CollectMetrics:
         data = self.query_data()
         self.format_data(data)
         return self.collection_metrics_dict
+
+
+class CollectVmwareMetrics:
+    def __init__(self, inst_name):
+        self.vc_name = inst_name
+        self.collection_metrics_dict = {i: [] for i in VMWARE_CLUSTER.keys()}
+        self.timestamp_gt = False
+        self.asso = "asso"
+        self.result = {}
+
+    # @staticmethod
+    # def get_ds_asso(data, inst_name):
+    #     result = [{
+    #         "model_id": "vmware_esxi",
+    #         "inst_name": data["vmware_esxi"],
+    #         "asst_id": "connect",
+    #         "model_asst_id": "vmware_ds_connect_vmware_esxi"
+    #     }]
+    #     return result
+
+    @staticmethod
+    def get_esxi_asso(data, inst_name):
+        vmware_ds = data.get("vmware_ds", "")
+        vmware_ds_list = vmware_ds.split(",")
+        result = [
+            {
+                "model_id": "vmware_vc",
+                "inst_name": inst_name,
+                "asst_id": "group",
+                "model_asst_id": "vmware_esxi_group_vmware_vc"
+            }
+        ]
+        for ds in vmware_ds_list:
+            result.append({
+                "model_id": "vmware_ds",
+                "inst_name": ds,
+                "asst_id": "connect",
+                "model_asst_id": "vmware_esxi_connect_vmware_ds"
+            })
+        return result
+
+    @staticmethod
+    def get_vm_asso(data, inst_name):
+        result = [
+            {
+                "model_id": "vmware_ds",
+                "inst_name": data["vmware_esxi"],
+                "asst_id": "run",
+                "model_asst_id": "vmware_vm_run_vmware_esxi"
+            }
+        ]
+        vmware_esxi_list = data["vmware_ds"].split(",")
+        for ds in vmware_esxi_list:
+            result.append({
+                "model_id": "vmware_ds",
+                "inst_name": ds,
+                "asst_id": "connect",
+                "model_asst_id": "vmware_vm_connect_vmware_ds"
+            })
+        return result
+
+    @property
+    def model_field_mapping(self):
+
+        test_data = {
+            "vmware_vc": [{
+                "vc_version": "7.0.3",
+                "inst_name": "VMware vCenter Server"
+            }],
+            "vmware_ds": [{
+                "resource_id": "datastore-1646",
+                "url": "ds:///vmfs/volumes/6385b001-37c96502-d73f-509a4c67b4c3/",
+                "name": "datastore1-16.16",
+                "system_type": "VMFS",
+                "storage_gb": 2505,
+                "vmware_esxi": "host-1645"
+            }],
+            "vmware_vm": [{
+                "resource_id": "vm-1656",
+                "inst_name": "vmdmeo01",
+                "ip_addr": "",
+                "vmware_esxi": "host-1645",
+                "vmware_ds": ["datastore-1646"],
+                "cluster": "GZ-Cluster",
+                "os_name": "CentOS 7 (64-bit)",
+                "vcpus": 4,
+                "memory": 4096
+            }],
+            "vmware_esxi": [{
+                "ip_addr": "10.10.16.16",
+                "inst_name": "10.10.16.16",
+                "resource_id": "host-1645",
+                "memory": 65361,
+                "cpu_model": "Intel(R) Xeon(R) CPU E3-1240 v5 @ 3.50GHz",
+                "cpu_cores": 4,
+                "vcpus": 8,
+                "esxi_version": "7.0.3",
+                "vmware_ds": "datastore-1646"
+            }],
+        }
+
+        mapping = {
+            "vmware_vc": {
+                "vc_version": "vc_version"
+            },
+            "vmware_vm": {
+                "inst_name": "inst_name",
+                "ip_addr": "ip_addr",
+                "resource_id": "resource_id",
+                "os_name": "os_name",
+                "vcpus": "vcpus",
+                "memory": "memory",
+                self.asso: self.get_vm_asso
+            },
+            "vmware_esxi": {
+                "inst_name": "inst_name",
+                "ip_addr": "ip_addr",
+                "resource_id": "resource_id",
+                "cpu_cores": "cpu_cores",
+                "vcpus": "vcpus",
+                "memory": "memory",
+                "esxi_version": "esxi_version",
+                self.asso: self.get_vm_asso
+
+            },
+            "vmware_ds": {
+                "inst_name": "inst_name",
+                "system_type": "system_type",
+                "resource_id": "resource_id",
+                "storage": "storage",
+                "url": "url",
+                # self.asso: self.get_ds_asso
+            }
+
+        }
+
+        return mapping
+
+    def query_data(self):
+        """查询数据"""
+        sql = " or ".join(
+            "{}{{instance_id=\"{}\"}}".format(j, self.vc_name) for m in VMWARE_CLUSTER.values() for j in m)
+        data = Collection().query(sql)
+        return data.get("data", [])
+
+    def format_data(self, data):
+        """格式化数据"""
+        for index_data in data["result"]:
+            metric_name = index_data["metric"]["__name__"]
+            value = index_data["value"]
+            _time, value = value[0], value[1]
+            if not self.timestamp_gt:
+                if timestamp_gt_one_day_ago(_time):
+                    break
+                else:
+                    self.timestamp_gt = True
+
+            index_dict = dict(
+                index_key=metric_name,
+                index_value=value,
+                index_time=index_data["TimeUnix"],
+                **index_data["metric"],
+            )
+            self.collection_metrics_dict[index_dict["model_id"]].append(index_dict)
+
+    def format_metrics(self):
+        """格式化数据"""
+        for model_id, metrics in self.collection_metrics_dict.items():
+            result = []
+            mapping = self.model_field_mapping.get(model_id, {})
+            for index_data in metrics:
+                data = {}
+                for field, key in mapping.items():
+                    if callable(key):
+                        data[self.asso] = key(index_data, index_data["inst_name"])
+                    else:
+                        data[field] = index_data.get(key, "")
+
+                result.append(data)
+            self.result[model_id] = result
+
+    def run(self):
+        """执行"""
+        data = self.query_data()
+        self.format_data(data)
+        self.format_metrics()
+        return self.result

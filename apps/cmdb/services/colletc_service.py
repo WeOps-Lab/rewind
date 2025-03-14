@@ -2,13 +2,13 @@
 # @File: colletc_service.py
 # @Time: 2025/3/3 15:23
 # @Author: windyzhao
-import datetime
-
+import urllib.parse
 from django.db import transaction
 
-from apps.cmdb.celery_tasks import sync_collect_task
-from apps.cmdb.constants import CollectRunStatusType
+from apps.cmdb.constants import STARGAZER_URL
+from apps.core.logger import logger
 from apps.core.utils.celery_utils import crontab_format, CeleryUtils
+from apps.rpc.node_mgmt import NodeMgmt
 
 
 class CollectModelService(object):
@@ -18,13 +18,12 @@ class CollectModelService(object):
     @staticmethod
     def format_params(data):
         is_interval, scan_cycle = crontab_format(data["scan_cycle"]["value_type"], data["scan_cycle"]["value"])
-        not_required = ["access_point", "ip_range", "instances", "credential", "plugin_id"]
+        not_required = ["access_point", "ip_range", "instances", "credential", "plugin_id", "params"]
         params = {
             "name": data["name"],
             "task_type": data["task_type"],
             "driver_type": data["driver_type"],
             "model_id": data["model_id"],  # 也就是id
-            "params": data["params"],
             "timeout": data["timeout"],
             "input_method": data["input_method"],
             "is_interval": is_interval,
@@ -41,6 +40,28 @@ class CollectModelService(object):
 
         return params, is_interval, scan_cycle
 
+    @staticmethod
+    def push_butch_node_params(instance):
+        """
+        格式化调用node的参数 并推送
+        """
+        node = BaseNodeParams(instance)
+        node_params = node.main()
+        node_mgmt = NodeMgmt()
+        result = node_mgmt.batch_setting_node_child_config(node_params)
+        logger.info(f"推送节点参数结果: {result}")
+
+    @staticmethod
+    def delete_butch_node_params(instance):
+        """
+        格式化调用node的参数 并删除
+        """
+        node = BaseNodeParams(instance)
+        node_params = node.main(operator="delete")
+        node_mgmt = NodeMgmt()
+        result = node_mgmt.delete_instance_child_config(node_params)
+        logger.info(f"删除节点参数结果: {result}")
+
     @classmethod
     def create(cls, request, view_self):
         create_data, is_interval, scan_cycle = cls.format_params(request.data)
@@ -56,6 +77,9 @@ class CollectModelService(object):
                 task_name = f"{cls.NAME}_{instance.id}"
                 CeleryUtils.create_or_update_periodic_task(name=task_name, crontab=scan_cycle, args=[instance.id],
                                                            task=cls.TASK)
+
+            if not instance.is_k8s:
+                cls.push_butch_node_params(instance)
 
         return instance.id
 
@@ -76,13 +100,117 @@ class CollectModelService(object):
             else:
                 CeleryUtils.delete_periodic_task(task_name)
 
+            if not instance.is_k8s:
+                cls.delete_butch_node_params(instance)
+                cls.push_butch_node_params(instance)
+
         return instance.id
 
     @classmethod
     def destroy(cls, request, view_self):
         instance = view_self.get_object()
         instance_id = instance.id
+        if not instance.is_k8s:
+            cls.delete_butch_node_params(instance)
         task_name = f"{cls.NAME}_{instance_id}"
         CeleryUtils.delete_periodic_task(task_name)
         instance.delete()
         return instance_id
+
+
+class BaseNodeParams(object):
+    def __init__(self, instance):
+        self.instance = instance
+        self.model_id = instance.model_id
+        self.base_path = f"{STARGAZER_URL}/api/collect/collect_info"
+
+    @property
+    def format_server_path(self):
+
+        """
+        格式化服务器的路径
+        """
+        params = getattr(self, f"{self.model_id}_credential")
+        encoded_params = {k: urllib.parse.quote(str(v), safe='@') for k, v in params.items()}
+        url = f"{self.base_path}?" + "&".join(f"{k}={v}" for k, v in encoded_params.items())
+        return url
+
+    @property
+    def vmware_vc_credential(self):
+        """
+        生成vmware vc的凭据
+        """
+        vc_instance = self.instance.instances[0]
+        credential = self.instance.credential
+        credential_data = {
+            "username": credential.get("username"),
+            "password": credential.get("password"),
+            "hostname": vc_instance.get("ip_addr"),
+            "port": credential.get("port", 443),
+            "ssl": str(credential.get("ssl", False)).lower(),
+        }
+        return credential_data
+
+    @property
+    def get_instances(self):
+        return self.instance.instances
+
+    @property
+    def get_instance_type(self):
+        if self.model_id == "vmware_vc":
+            return "vmware"
+        return self.model_id
+
+    def get_vmware_vc_instance_id(self, instance):
+        """
+        获取实例id
+        """
+        instance_id = f"{self.model_id}_{instance['_id']}"
+        return instance_id
+
+    def vmware_vc_params(self):
+        """
+        生成vmware vc的参数
+        """
+        url = self.format_server_path
+        params = {
+            "object_type": "http",
+            "nodes": []
+        }
+
+        for node in self.instance.access_point:
+            for instance in self.get_instances:
+                node_data = {
+                    "id": node["id"],
+                    "configs": [{
+                        "url": url,
+                        "type": "http",
+                        "instance_id": str(tuple([self.get_vmware_vc_instance_id(instance)])),
+                        "interval": 60,
+                        "instance_type": self.get_instance_type,
+                    }]
+                }
+                params["nodes"].append(node_data)
+
+        return params
+
+    def vmware_vc_delete_params(self):
+        """
+        生成vmware vc的删除参数
+        """
+        params = []
+
+        for instance in self.get_instances:
+            params.append(self.get_vmware_vc_instance_id(instance))
+
+        return params
+
+    def main(self, operator="push"):
+        """
+        主函数
+        """
+        if operator == "push":
+            params = getattr(self, f"{self.model_id}_params")()
+        else:
+            params = getattr(self, f"{self.model_id}_delete_params")()
+        return params
