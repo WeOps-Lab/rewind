@@ -4,8 +4,6 @@ import uuid
 from celery.app import shared_task
 from datetime import datetime, timezone
 
-from django.conf.global_settings import DEFAULT_FROM_EMAIL
-from django.core.mail import send_mail
 from django.db.models import F
 from apps.monitor.constants import LEVEL_WEIGHT
 from apps.monitor.models import MonitorPolicy, MonitorInstanceOrganization, MonitorAlert, MonitorEvent, MonitorInstance, \
