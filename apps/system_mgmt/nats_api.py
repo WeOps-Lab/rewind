@@ -54,7 +54,7 @@ def get_client(client_id=""):
     client = KeyCloakClient()
     res = client.realm_client.get_clients()
     if client_id:
-        filter_client = [client_id]
+        filter_client = client_id.split(";")
     else:
         filter_client = [i["clientId"] for i in res]
     return {
