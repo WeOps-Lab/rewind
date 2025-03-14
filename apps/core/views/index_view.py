@@ -43,7 +43,8 @@ def login_info(request):
 
 def get_client(request):
     client = SystemMgmt()
-    return_data = client.get_client("")
+    app_list = [i.split("_")[0] for i in request.user.roles]
+    return_data = client.get_client(";".join(list(set(app_list))))
     return JsonResponse(return_data)
 
 
