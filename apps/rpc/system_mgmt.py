@@ -83,3 +83,21 @@ class SystemMgmt(object):
             "send_msg_with_channel", channel_id=channel_id, title=title, content=content, receivers=receivers
         )
         return return_data
+
+    def create_default_group(self, group_name, user_id, default_group_id):
+        """
+        :param group_name: 默认组名
+        :param user_id: 用户id
+        :param default_group_id: 默认组ID
+        """
+        return_data = self.client.run(
+            "create_default_group", group_name=group_name, user_id=user_id, default_group_id=default_group_id
+        )
+        return return_data
+
+    def join_default_role(self, user_id):
+        """
+        :param user_id: 用户id
+        """
+        return_data = self.client.run("join_default_role", user_id=user_id)
+        return return_data
