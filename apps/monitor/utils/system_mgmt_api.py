@@ -13,7 +13,7 @@ class SystemMgmtUtils:
         return result["data"]
 
     @staticmethod
-    def search_channel_list(channel_type="email"):
+    def search_channel_list(channel_type=""):
         """email、enterprise_wechat"""
         result = SystemMgmt().search_channel_list(channel_type)
         return result["data"]
