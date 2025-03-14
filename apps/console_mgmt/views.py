@@ -7,7 +7,9 @@ from apps.rpc.system_mgmt import SystemMgmt
 
 
 def get_opspilot_quota(request):
-    return JsonResponse({"result": True, "data": []})
+    opspilot = OpsPilot()
+    res = opspilot.get_my_quota(request.user.username)
+    return JsonResponse(res)
 
 
 def init_user_set(request):
