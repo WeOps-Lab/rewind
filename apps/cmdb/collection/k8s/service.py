@@ -41,10 +41,10 @@ class MetricsCannula:
         self.task_id = str(task_id)
         self.manual = manual  # 是否手动
         self.cluster_name = cluster_name
-        self.collection_metrics = self.get_collection_metrics()
-        self.now_time = datetime.now(timezone.utc).isoformat()
         self.collect_data = {}  # 采集后的原始数据
         self.collect_params = {}
+        self.collection_metrics = self.get_collection_metrics()
+        self.now_time = datetime.now(timezone.utc).isoformat()
         self.add_list = []
         self.update_list = []
         self.delete_list = []
