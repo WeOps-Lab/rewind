@@ -8,6 +8,7 @@ class EmbedMgmtConfig(AppConfig):
     verbose_name = "模型供应商"
 
     def ready(self):
+        import apps.model_provider_mgmt.nats_api  # noqa
         from apps.model_provider_mgmt.signals import user_create_signal
 
         post_migrate.connect(user_create_signal, sender=self)

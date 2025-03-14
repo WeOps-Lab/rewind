@@ -14,7 +14,7 @@ class LLMModelChoices(models.TextChoices):
 
 class LLMModel(models.Model, EncryptMixin):
     id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=255, unique=True, verbose_name="名称")
+    name = models.CharField(max_length=255, verbose_name="名称")
     llm_model_type = models.CharField(max_length=255, choices=LLMModelChoices.choices, verbose_name="LLM模型类型")
     llm_config = models.JSONField(
         verbose_name="LLM配置",
@@ -26,6 +26,7 @@ class LLMModel(models.Model, EncryptMixin):
     enabled = models.BooleanField(default=True, verbose_name="启用")
     team = models.JSONField(default=list)
     is_build_in = models.BooleanField(default=True, verbose_name="是否内置")
+    consumer_team = models.CharField(default="", blank=True, null=True, max_length=64)
 
     def __str__(self):
         return self.name

@@ -54,7 +54,7 @@ class QuotaRuleViewSet(viewsets.ModelViewSet):
         all_file_size, used_file_size, is_file_uniform = client.get_file_quota()
         skill_count, used_skill_count, is_skill_uniform = client.get_skill_quota()
         bot_count, used_bot_count, is_bot_uniform = client.get_bot_quota()
-
+        token_set = client.get_token_quota()
         return_data = {
             "used_file_size": used_file_size,
             "is_file_uniform": is_file_uniform,
@@ -65,5 +65,6 @@ class QuotaRuleViewSet(viewsets.ModelViewSet):
             "all_file_size": all_file_size,
             "all_skill_count": skill_count,
             "all_bot_count": bot_count,
+            "token_set": token_set,
         }
         return JsonResponse({"result": True, "data": return_data})

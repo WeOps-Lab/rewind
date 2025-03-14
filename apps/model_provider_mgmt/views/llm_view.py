@@ -30,26 +30,16 @@ class LLMViewSet(AuthViewSet):
     queryset = LLMSkill.objects.all()
     filterset_class = LLMFilter
 
-    def _validate_name(self, skill_list, group_list, team):
-        exist_teams = []
-        for i in skill_list:
-            exist_teams.extend(i)
-        team_name_map = {i["id"]: i["name"] for i in group_list}
-        for i in team:
-            if i in exist_teams:
-                return _(f"A skill with the same name already exists in group {team_name_map.get(i)}.")
-        return ""
-
     def create(self, request, *args, **kwargs):
         params = request.data
         client = get_quota_client(request)
         skill_count, used_skill_count, __ = client.get_skill_quota()
         if skill_count != -1 and skill_count <= used_skill_count:
             return JsonResponse({"result": False, "message": _("Skill count exceeds quota limit.")})
-        skill_list = list(LLMSkill.objects.filter(name=params["name"]).values_list("team", flat=True))
-        validate_msg = self._validate_name(skill_list, request.user.group_list, params["team"])
+        validate_msg = self._validate_name(params["name"], request.user.group_list, params["team"])
         if validate_msg:
-            return JsonResponse({"result": False, "message": validate_msg})
+            message = _(f"A skill with the same name already exists in group {validate_msg}.")
+            return JsonResponse({"result": False, "message": message})
         params["enable_conversation_history"] = True
         serializer = self.get_serializer(data=params)
         serializer.is_valid(raise_exception=True)
@@ -60,12 +50,12 @@ class LLMViewSet(AuthViewSet):
     def update(self, request, *args, **kwargs):
         instance: LLMSkill = self.get_object()
         params = request.data
-        skill_list = list(
-            LLMSkill.objects.filter(name=params["name"]).exclude(id=instance.id).values_list("team", flat=True)
+        validate_msg = self._validate_name(
+            params["name"], request.user.group_list, params["team"], exclude_id=instance.id
         )
-        validate_msg = self._validate_name(skill_list, request.user.group_list, params["team"])
         if validate_msg:
-            return JsonResponse({"result": False, "message": validate_msg})
+            message = _(f"A skill with the same name already exists in group {validate_msg}.")
+            return JsonResponse({"result": False, "message": message})
         if (not request.user.is_superuser) and (instance.created_by != request.user.username):
             params.pop("team", [])
         if "llm_model" in params:
@@ -110,10 +100,25 @@ class LLMModelViewSet(AuthViewSet):
     queryset = LLMModel.objects.all()
     search_fields = ["name"]
 
+    @action(methods=["POST"], detail=False)
+    def search_by_groups(self, request, *args, **kwargs):
+        group_id = request.data.get("group_id", "")
+        if not group_id:
+            return super().list(request, *args, **kwargs)
+        teams = [i["id"] for i in request.user.group_list]
+        if group_id not in teams:
+            return JsonResponse({"result": False, "message": _("Group does not exist.")})
+        model_list = LLMModel.objects.filter(team__contains=group_id).values_list("name", flat=True)
+        return JsonResponse({"result": True, "data": list(model_list)})
+
     def create(self, request, *args, **kwargs):
         params = request.data
         if not params.get("team"):
             return JsonResponse({"result": False, "message": _("The team is empty.")})
+        validate_msg = self._validate_name(params["name"], request.user.group_list, params["team"])
+        if validate_msg:
+            message = _(f"A LLM Model with the same name already exists in group {validate_msg}.")
+            return JsonResponse({"result": False, "message": message})
         LLMModel.objects.create(
             name=params["name"],
             llm_model_type=params["llm_model_type"],
@@ -123,6 +128,17 @@ class LLMModelViewSet(AuthViewSet):
             is_build_in=False,
         )
         return JsonResponse({"result": True})
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        params = request.data
+        validate_msg = self._validate_name(
+            params["name"], request.user.group_list, params["team"], exclude_id=instance.id
+        )
+        if validate_msg:
+            message = _(f"A LLM Model with the same name already exists in group {validate_msg}.")
+            return JsonResponse({"result": False, "message": message})
+        return super().update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
         obj = self.get_object()

@@ -55,3 +55,17 @@ class AuthViewSet(MaintainerViewSet):
         if getattr(instance, "_prefetched_objects_cache", None):
             instance._prefetched_objects_cache = {}
         return Response(serializer.data)
+
+    def _validate_name(self, name, group_list, team, exclude_id=None):
+        queryset = self.queryset.filter(name=name)
+        if exclude_id:
+            queryset = queryset.exclude(id=exclude_id)
+        team_list = list(queryset.values_list("team", flat=True))
+        exist_teams = []
+        for i in team_list:
+            exist_teams.extend(i)
+        team_name_map = {i["id"]: i["name"] for i in group_list}
+        for i in team:
+            if i in exist_teams:
+                return team_name_map.get(i)
+        return ""

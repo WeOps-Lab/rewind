@@ -1,6 +1,7 @@
 from django.db.models import Q
 
 from apps.base.models import QuotaRule
+from apps.base.models.quota_rule import TeamTokenUseInfo
 from apps.bot_mgmt.models import Bot
 from apps.knowledge_mgmt.models import FileKnowledge
 from apps.model_provider_mgmt.models import LLMSkill
@@ -88,3 +89,23 @@ class QuotaUtils(object):
             bot_count,
             bool(bot_count_map["private"]),
         )
+
+    def get_token_quota(self):
+        if not self.quota_list:
+            return {}
+        llm_model_token_set = {}
+        unit_map = {"thousand": 1000, "million": 1000000}
+        for quota in self.quota_list:
+            token_config = quota["token_set"]
+            for llm_model, value in token_config.items():
+                llm_model_token_set.setdefault(llm_model, []).append(value["value"] * unit_map.get(value["unit"], 1))
+        used_token_map = dict(
+            TeamTokenUseInfo.objects.filter(team__contains=self.team).values_list("llm_model", "used_token")
+        )
+        return_data = {}
+        for llm_model, value in used_token_map.items():
+            return_data[llm_model] = {
+                "used_token": used_token_map.get(llm_model, 0),
+                "all_token": min(value) if value else 0,
+            }
+        return return_data

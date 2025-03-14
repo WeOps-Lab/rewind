@@ -5,6 +5,7 @@ from django.conf import settings
 from django.utils.translation import gettext as _
 from langserve import RemoteRunnable
 
+from apps.base.models.quota_rule import TeamTokenUseInfo
 from apps.knowledge_mgmt.models import KnowledgeBase, KnowledgeDocument
 from apps.knowledge_mgmt.services.knowledge_search_service import KnowledgeSearchService
 from apps.model_provider_mgmt.models import LLMModel, TokenConsumption
@@ -69,6 +70,14 @@ class LLMService:
         if not result["result"]:
             raise Exception(result["message"])
         data = result["data"]
+        group = llm_model.consumer_team or llm_model.team[0]
+        used_token = data["input_tokens"] + data["output_tokens"]
+        team_info, is_created = TeamTokenUseInfo.objects.get_or_create(
+            group=group, llm_model=llm_model.name, defaults={"token": used_token}
+        )
+        if not is_created:
+            team_info.used_token += used_token
+            team_info.save()
         content = data["content"]
         if not show_think:
             content = re.sub(r"<think>.*?</think>", "", content, flags=re.DOTALL).strip()

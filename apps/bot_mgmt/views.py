@@ -333,7 +333,7 @@ def set_channel_type_line(end_time, queryset, start_time):
     num_days = (end_time - start_time).days + 1
     all_dates = [start_time + datetime.timedelta(days=i) for i in range(num_days)]
     formatted_dates = {date.strftime("%Y-%m-%d"): 0 for date in all_dates}
-    known_channel_types = ["web", "ding_talk", "enterprise_wechat"]
+    known_channel_types = ["web", "ding_talk", "enterprise_wechat", "wechat_official_account"]
     result_dict = {channel_type: formatted_dates.copy() for channel_type in known_channel_types}
     total_user_count = formatted_dates.copy()
     # 更新字典与查询结果
