@@ -8,8 +8,8 @@ COLLECTORS = [
         "node_operating_system": "linux",
         "service_type": "exec",
         "executable_path": "/opt/fusion-collectors/bin/telegraf",
-        "execute_parameters": "--config %s --test",
-        "validation_parameters": "",
+        "execute_parameters": "--config %s",
+        "validation_parameters": "--config %s --test",
         "default_template": "",
         "introduction": "Telegraf 是一个插件驱动的服务器代理，用于收集和报告指标。"
     },
@@ -19,7 +19,7 @@ COLLECTORS = [
         "node_operating_system": "windows",
         "service_type": "exec",
         "executable_path": "C:\\Program Files\\Telegraf\\telegraf.exe",
-        "execute_parameters": "-config C:\\Program Files\\Telegraf\\telegraf.conf --test",
+        "execute_parameters": "-config C:\\Program Files\\Telegraf\\telegraf.conf",
         "validation_parameters": "-test -config C:\\Program Files\\Telegraf\\telegraf.conf",
         "default_template": "",
         "introduction": "Telegraf 是一个插件驱动的服务器代理，用于收集和报告指标。"
