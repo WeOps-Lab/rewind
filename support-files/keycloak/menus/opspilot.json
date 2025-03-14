@@ -1,7 +1,7 @@
 {
   "client_id": "opspilot",
   "name": "OpsPilot",
-  "url": "/opspilot",
+  "url": "/opspilot/studio",
   "description": "Create roles for the OpsPilot app to manage data permissions, menu permissions, and feature permissions.",
   "menus": [
     {

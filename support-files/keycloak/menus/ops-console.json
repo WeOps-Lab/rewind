@@ -1,22 +1,9 @@
 {
   "client_id": "ops-console",
   "name": "OpsConsole",
-  "url": "",
+  "url": "/ops-console/home",
   "description": "",
-  "menus": [
-    {
-      "name": "Index",
-      "children": [
-        {
-          "id": "index",
-          "name": "Index",
-          "operation": [
-            "View"
-          ]
-        }
-      ]
-      }
-  ],
+  "menus": [],
   "roles": [
     {
       "name": "admin",
@@ -26,9 +13,7 @@
     {
       "name": "normal",
       "role_name": "ops-console_normal",
-      "menus": [
-        "index-View"
-      ]
+      "menus": []
     }
   ]
 }

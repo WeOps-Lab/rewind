@@ -1,7 +1,7 @@
 {
   "client_id": "monitor",
   "name": "Monitor",
-  "url": "",
+  "url": "/monitor/search",
   "description": "Create roles for the Monitor app to manage data permissions, menu permissions, and feature permissions.",
   "menus": [
     {

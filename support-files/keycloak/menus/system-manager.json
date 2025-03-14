@@ -1,7 +1,7 @@
 {
   "client_id": "system-manager",
   "name": "Setting",
-  "url": "",
+  "url": "/system-manager/user",
   "description": "Create roles for the Setting app to manage data permissions, menu permissions, and feature permissions.",
   "menus": [
     {

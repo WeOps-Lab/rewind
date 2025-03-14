@@ -1,7 +1,7 @@
 {
   "client_id": "cmdb",
   "name": "CMDB",
-  "url": "",
+  "url": "/cmdb/assetSearch",
   "description": "Create roles for the cmdb app to manage data permissions, menu permissions, and feature permissions.",
   "menus": [
     {

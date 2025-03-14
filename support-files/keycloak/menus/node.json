@@ -1,7 +1,7 @@
 {
   "client_id": "node",
   "name": "Node",
-  "url": "",
+  "url": "/node-manager/cloudregion",
   "description": "Create roles for the Node app to manage data permissions, menu permissions, and feature permissions.",
   "menus": [
     {
