@@ -17,11 +17,10 @@ def index(request):
 @api_view(["GET"])
 def login_info(request):
     is_first_login = False
+    default_group = os.environ.get("DEFAULT_GROUP_NAME", "Default")
     if not request.user.group_list:
         is_first_login = True
-    elif len(request.user.group_list) == 1 and request.user.group_list[0].group_name == os.environ.get(
-        "DEFAULT_GROUP_NAME", "Default"
-    ):
+    elif len(request.user.group_list) == 1 and request.user.group_list[0].group_name == default_group:
         is_first_login = True
     client = SystemMgmt()
     res = client.search_users({"search": request.user.username})
@@ -43,7 +42,11 @@ def login_info(request):
 
 def get_client(request):
     client = SystemMgmt()
-    return_data = client.get_client("")
+    if "admin" in request.user.roles:
+        app_list = []
+    else:
+        app_list = [i.split("_")[0] for i in request.user.roles]
+    return_data = client.get_client(";".join(list(set(app_list))))
     return JsonResponse(return_data)
 
 
