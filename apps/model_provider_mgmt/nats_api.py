@@ -18,7 +18,7 @@ def init_user_set(group_id, group_name):
         name_list.add(llm_model.name)
     LLMModel.objects.bulk_create(add_model_list)
     QuotaRule.objects.create(
-        name=f"组{group_name}-大模型Token",
+        name=f"group-{group_name}-llm-quota",
         target_type="group",
         target_list=[group_id],
         rule_type="shared",
