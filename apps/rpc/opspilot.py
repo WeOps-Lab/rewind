@@ -5,10 +5,10 @@ class OpsPilot(object):
     def __init__(self):
         self.client = RpcClient("opspilot")
 
-    def init_user_set(self, username, group_id):
+    def init_user_set(self, group_id, group_name):
         """
-        :param username: 用户名
         :param group_id: 组ID
+        :param group_name: 组名
         """
-        return_data = self.client.run("init_user_set", username=username, group_id=group_id)
+        return_data = self.client.run("init_user_set", group_id=group_id, group_name=group_name)
         return return_data
