@@ -23,11 +23,14 @@ def login_info(request):
         "DEFAULT_GROUP_NAME", "Default"
     ):
         is_first_login = True
-
+    client = SystemMgmt()
+    res = client.search_users({"search": request.user.username})
+    user_id = [i for i in res["data"]["users"] if i["username"] == request.user.username][0]["id"]
     return JsonResponse(
         {
             "result": True,
             "data": {
+                "user_id": user_id,
                 "username": request.user.username,
                 "is_superuser": request.user.is_superuser,
                 "group_list": request.user.group_list,

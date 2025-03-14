@@ -135,3 +135,20 @@ def get_all_groups():
     client = KeyCloakClient()
     return_data = client.get_user_groups("", True)
     return {"result": True, "data": return_data}
+
+
+@nats_client.register
+def create_default_group(group_name, user_id, default_group_id):
+    client = KeyCloakClient()
+    group_id = client.realm_client.create_group({"name": group_name}, default_group_id)
+    client.realm_client.group_user_add(user_id, group_id)
+    client.realm_client.group_user_remove(user_id, default_group_id)
+    return {"result": True, "data": {"group_id": group_id}}
+
+
+@nats_client.register
+def join_default_role(user_id):
+    client = KeyCloakClient()
+    role_obj = client.realm_client.get_realm_roles(search_text="opspilot_normal")
+    client.realm_client.assign_realm_roles(user_id, role_obj)
+    return {"result": True}
