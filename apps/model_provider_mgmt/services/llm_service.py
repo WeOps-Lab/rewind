@@ -73,7 +73,7 @@ class LLMService:
         group = llm_model.consumer_team or llm_model.team[0]
         used_token = data["input_tokens"] + data["output_tokens"]
         team_info, is_created = TeamTokenUseInfo.objects.get_or_create(
-            group=group, llm_model=llm_model.name, defaults={"token": used_token}
+            group=group, llm_model=llm_model.name, defaults={"used_token": used_token}
         )
         if not is_created:
             team_info.used_token += used_token
