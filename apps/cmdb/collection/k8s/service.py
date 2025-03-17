@@ -737,9 +737,9 @@ class CollectVmwareMetrics:
         for model_id, metrics in self.collection_metrics_dict.items():
             result = []
             if model_id == "vmware_vc":
-                self.model_resource_id_mapping = {model_id: {}}
+                self.model_resource_id_mapping.update({model_id: {}})
             else:
-                self.model_resource_id_mapping = {model_id: {i["resource_id"]: i["inst_name"] for i in metrics}}
+                self.model_resource_id_mapping.update({model_id: {i["resource_id"]: i["inst_name"] for i in metrics}})
             mapping = self.model_field_mapping.get(model_id, {})
             for index_data in metrics:
                 data = {}
