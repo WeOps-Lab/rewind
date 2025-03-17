@@ -4,9 +4,11 @@ from string import Template
 from apps.node_mgmt.models.sidecar import CollectorConfiguration, ChildConfig
 
 CONFIG_MAP = {
-    "http": """[[inputs.http]]
+    "http": """[[inputs.prometheus]]
     urls = ["${url}"]
     interval = "${interval}s"
+    timeout = "30s"
+    response_timeout = "30s"
     tags = { "instance_id"="${instance_id}", "instance_type"="${instance_type}", "collect_type"="http" }""",
 }
 

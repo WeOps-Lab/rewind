@@ -7,7 +7,7 @@ CONFIG_MAP = {
     "elasticsearch": """[[inputs.elasticsearch]]
     servers = ["${server}"]
     username = "${username}"
-    password = "${password}" 
+    password = "${password}"
     interval = "${interval}s"
     tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="database" }""",
 
@@ -31,7 +31,7 @@ CONFIG_MAP = {
     "redis": """[[inputs.redis]]
     servers = ["tcp://${host}:${port}"]
     username = "${username}"
-    password = "${password}" 
+    password = "${password}"
     interval = "${interval}s"
     tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="database" }""",
 
