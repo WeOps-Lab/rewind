@@ -249,7 +249,7 @@ and
                 "email": i["email"],
                 "firstName": i["firstname"],
                 "lastName": i["lastname"],
-                "username": i["id"],
+                "username": i["username"],
             }
             for i in return_data
         ]
