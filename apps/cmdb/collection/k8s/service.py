@@ -1,5 +1,6 @@
 import json
 from datetime import datetime, timezone, timedelta
+from typing import Type
 
 from apps.cmdb.collection.common import Collection, Management
 from apps.cmdb.collection.k8s.constants import (
@@ -36,11 +37,12 @@ def timestamp_gt_one_day_ago(collect_timestamp):
 
 # 指标纳管（纳管控制器）
 class MetricsCannula:
-    def __init__(self, organization: list, cluster_name: str, task_id: int, manual: bool = False):
+    def __init__(self, organization: list, inst_name: str, task_id: int, collect_plugin: Type, manual: bool = False):
         self.organization = organization
         self.task_id = str(task_id)
         self.manual = manual  # 是否手动
-        self.cluster_name = cluster_name
+        self.inst_name = inst_name
+        self.collect_plugin = collect_plugin
         self.collect_data = {}  # 采集后的原始数据
         self.collect_params = {}
         self.collection_metrics = self.get_collection_metrics()
@@ -52,7 +54,7 @@ class MetricsCannula:
 
     def get_collection_metrics(self):
         """获取采集指标"""
-        new_metrics = CollectK8sMetrics(self.cluster_name)
+        new_metrics = self.collect_plugin(self.inst_name)
         self.collect_data = new_metrics.collect_data
         self.collect_params = new_metrics.collect_params
         return new_metrics.run()
@@ -72,18 +74,18 @@ class MetricsCannula:
                 delete_list.append(info)
         return add_list, update_list, delete_list
 
-    def collect_controller(self):
+    def collect_controller(self) -> dict:
         result = {}
         for key, model_id in self.collect_params.items():
             params = [
                 {"field": "model_id", "type": "str=", "value": model_id},
-                {"field": "collect_task", "type": "str=", "value": self.cluster_name},
+                {"field": "collect_task", "type": "str=", "value": self.inst_name},
             ]
             with Neo4jClient() as ag:
                 already_data, _ = ag.query_entity(INSTANCE, params)
                 management = Management(
                     self.organization,
-                    self.cluster_name,
+                    self.inst_name,
                     model_id,
                     already_data,
                     self.collection_metrics[key],
