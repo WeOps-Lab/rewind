@@ -77,9 +77,13 @@ class K8sCollect(BaseCollect):
                     for i in data:
                         _data = {"_status": status}
                         if status == "failed":
+                            update_data = i.get("instance_info")
                             _data.update(i["instance_info"])
                         else:
-                            _data.update(i["inst_info"])  # TODO 如果有关联的话得补充关联的创建状态和数据
+                            update_data = i.get("inst_info")
+                        if not update_data:
+                            continue
+                        _data.update(i["inst_info"])  # TODO 如果有关联的话得补充关联的创建状态和数据
                         format_data[operator].append(_data)
 
         return k8s_cannula.collect_data, format_data
