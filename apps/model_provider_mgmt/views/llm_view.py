@@ -101,10 +101,10 @@ class LLMModelViewSet(AuthViewSet):
     search_fields = ["name"]
 
     @action(methods=["POST"], detail=False)
-    def search_by_groups(self, request, *args, **kwargs):
+    def search_by_groups(self, request):
         group_id = request.data.get("group_id", "")
         if not group_id:
-            return super().list(request, *args, **kwargs)
+            return JsonResponse({"result": False, "message": _("No Group ID")})
         teams = [i["id"] for i in request.user.group_list]
         if group_id not in teams:
             return JsonResponse({"result": False, "message": _("Group does not exist.")})
