@@ -743,11 +743,11 @@ class CollectVmwareMetrics:
             mapping = self.model_field_mapping.get(model_id, {})
             for index_data in metrics:
                 data = {}
-                for field, key in mapping.items():
-                    if callable(key):
-                        data[self.asso] = key(index_data, index_data["inst_name"])
+                for field, key_or_func in mapping.items():
+                    if callable(key_or_func):
+                        data[self.asso] = key_or_func(index_data, index_data["inst_name"])
                     else:
-                        data[field] = index_data.get(key, "")
+                        data[field] = index_data.get(key_or_func, "")
 
                 result.append(data)
             self.result[model_id] = result
