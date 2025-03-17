@@ -20,7 +20,7 @@ def login_info(request):
     default_group = os.environ.get("DEFAULT_GROUP_NAME", "Default")
     if not request.user.group_list:
         is_first_login = True
-    elif len(request.user.group_list) == 1 and request.user.group_list[0].group_name == default_group:
+    elif len(request.user.group_list) == 1 and request.user.group_list[0]["name"] == default_group:
         is_first_login = True
     client = SystemMgmt()
     res = client.search_users({"search": request.user.username})
