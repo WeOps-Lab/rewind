@@ -16,6 +16,9 @@ class QuotaRule(TimeInfo):
 
 
 class TeamTokenUseInfo(TimeInfo):
-    group = models.CharField(max_length=100, verbose_name="Group", unique=True)
+    group = models.CharField(max_length=100, verbose_name="Group")
     llm_model = models.CharField(max_length=100, verbose_name="LLM Model")
     used_token = models.BigIntegerField(verbose_name="Used Token")
+
+    class Meta:
+        unique_together = ("group", "llm_model")

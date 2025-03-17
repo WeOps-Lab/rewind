@@ -1,5 +1,3 @@
-from django.conf import settings
-from langserve import RemoteRunnable
 from rest_framework.authtoken.models import Token
 
 from apps.base.models import User
@@ -11,7 +9,6 @@ from apps.model_provider_mgmt.models import (
     RerankModelChoices,
     RerankProvider,
 )
-from apps.model_provider_mgmt.models.llm_skill import SkillTools
 from apps.model_provider_mgmt.models.ocr_provider import OCRProvider
 
 
@@ -132,19 +129,3 @@ class ModelProviderInitService:
                 },
             },
         )
-        tools_server = RemoteRunnable(settings.TOOLS_CHAT_SERVICE_URL)
-        tools = tools_server.invoke([])
-        if not tools:
-            return
-        for key, value in tools.items():
-            tool_obj = value["tool_config"]
-            SkillTools.objects.update_or_create(
-                name=key,
-                defaults={
-                    "display_name": tool_obj["display_name"],
-                    "params": tool_obj.get("parameters", {}),
-                    "description": tool_obj["description"],
-                    "tags": [value["toolset_description"]],
-                    "icon": tool_obj["icon"],
-                },
-            )
