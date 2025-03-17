@@ -565,6 +565,7 @@ class CollectVmwareMetrics:
         self.timestamp_gt = False
         self.asso = "asso"
         self.result = {}
+        self.model_resource_id_mapping = {}
 
     # @staticmethod
     # def get_ds_asso(data, inst_name):
@@ -576,46 +577,56 @@ class CollectVmwareMetrics:
     #     }]
     #     return result
 
-    @staticmethod
-    def get_esxi_asso(data, inst_name):
+    def get_esxi_asso(self, data, vc_name):
         vmware_ds = data.get("vmware_ds", "")
         vmware_ds_list = vmware_ds.split(",")
         result = [
             {
                 "model_id": "vmware_vc",
-                "inst_name": inst_name,
+                "inst_name": vc_name,
                 "asst_id": "group",
                 "model_asst_id": "vmware_esxi_group_vmware_vc"
             }
         ]
         for ds in vmware_ds_list:
+            inst_name = self.model_resource_id_mapping["vmware_ds"].get(ds, "")
             result.append({
                 "model_id": "vmware_ds",
-                "inst_name": ds,
+                "inst_name": inst_name,
                 "asst_id": "connect",
                 "model_asst_id": "vmware_esxi_connect_vmware_ds"
             })
         return result
 
-    @staticmethod
-    def get_vm_asso(data, inst_name):
-        result = [
-            {
-                "model_id": "vmware_ds",
-                "inst_name": data["vmware_esxi"],
+    def get_vm_asso(self, data, *args, **kwargs):
+        result = []
+        esxi_inst_name = self.model_resource_id_mapping["vmware_esxi"].get(data["vmware_esxi"], "")
+        if esxi_inst_name:
+            result.append({
+                "model_id": "vmware_esxi",
+                "inst_name": esxi_inst_name,
                 "asst_id": "run",
                 "model_asst_id": "vmware_vm_run_vmware_esxi"
-            }
-        ]
+            })
+
         vmware_esxi_list = data["vmware_ds"].split(",")
         for ds in vmware_esxi_list:
+            inst_name = self.model_resource_id_mapping["vmware_ds"].get(ds, "")
+            if not inst_name:
+                continue
             result.append({
                 "model_id": "vmware_ds",
-                "inst_name": ds,
+                "inst_name": inst_name,
                 "asst_id": "connect",
                 "model_asst_id": "vmware_vm_connect_vmware_ds"
             })
         return result
+
+    @staticmethod
+    def set_inst_name(data):
+        # {vm的名称}[{moid}]
+        inst_name = f"{data['name']}[{data['resource_id']}]"
+        return inst_name
 
     @property
     def model_field_mapping(self):
@@ -662,7 +673,7 @@ class CollectVmwareMetrics:
                 "vc_version": "vc_version"
             },
             "vmware_vm": {
-                "inst_name": "inst_name",
+                "inst_name": self.set_inst_name,
                 "ip_addr": "ip_addr",
                 "resource_id": "resource_id",
                 "os_name": "os_name",
@@ -671,7 +682,7 @@ class CollectVmwareMetrics:
                 self.asso: self.get_vm_asso
             },
             "vmware_esxi": {
-                "inst_name": "inst_name",
+                "inst_name": self.set_inst_name,
                 "ip_addr": "ip_addr",
                 "resource_id": "resource_id",
                 "cpu_cores": "cpu_cores",
@@ -682,7 +693,7 @@ class CollectVmwareMetrics:
 
             },
             "vmware_ds": {
-                "inst_name": "inst_name",
+                "inst_name": self.set_inst_name,
                 "system_type": "system_type",
                 "resource_id": "resource_id",
                 "storage": "storage",
@@ -725,6 +736,10 @@ class CollectVmwareMetrics:
         """格式化数据"""
         for model_id, metrics in self.collection_metrics_dict.items():
             result = []
+            if model_id == "vmware_vc":
+                self.model_resource_id_mapping = {model_id: {}}
+            else:
+                self.model_resource_id_mapping = {model_id: {i["resource_id"]: i["inst_name"] for i in metrics}}
             mapping = self.model_field_mapping.get(model_id, {})
             for index_data in metrics:
                 data = {}
