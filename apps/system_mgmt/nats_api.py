@@ -1,3 +1,5 @@
+import os
+
 from django.utils.translation import gettext_lazy as _
 
 import nats_client
@@ -21,7 +23,7 @@ def verify_token(token, client_id):
     groups = cache.get(f"group_{user_info.get('username')}")
     if not groups:
         groups = client.get_user_groups(user_info.get("sub"), is_superuser)
-        cache.set(f"group_{user_info.get('username')}", groups, 60 * 5)
+        cache.set(f"group_{user_info.get('username')}", groups, 60)
     return {
         "result": True,
         "data": {
@@ -140,7 +142,14 @@ def get_all_groups():
 @nats_client.register
 def create_default_group(group_name, user_id, default_group_id):
     client = KeyCloakClient()
-    group_id = client.realm_client.create_group({"name": group_name}, default_group_id, skip_exists=True)
+    top_group_name = os.getenv("TOP_GROUP", "Default")
+    top_group = client.realm_client.get_groups({"search": top_group_name})
+    top_group = [i["id"] for i in top_group if i["name"] == top_group_name]
+    if top_group:
+        top_group = top_group[0]
+    else:
+        top_group = client.realm_client.create_group({"name": top_group_name})
+    group_id = client.realm_client.create_group({"name": group_name}, top_group, skip_exists=True)
     if not group_id:
         return {"result": False, "message": f"group named '{group_name}' already exists."}
     client.realm_client.group_user_add(user_id, group_id)
