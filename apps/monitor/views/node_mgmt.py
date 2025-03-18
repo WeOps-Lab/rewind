@@ -7,6 +7,7 @@ from rest_framework.viewsets import ViewSet
 
 from apps.core.utils.web_utils import WebUtils
 from apps.monitor.services.node_mgmt import InstanceConfigService
+from apps.monitor.utils.config_format import ConfigFormat
 from apps.monitor.utils.node_mgmt_api import NodeUtils
 
 logger = logging.getLogger("app")
@@ -97,6 +98,8 @@ class NodeMgmtView(ViewSet):
     @action(methods=['post'], detail=False, url_path='get_instance_child_config')
     def get_instance_child_config(self, request):
         data = InstanceConfigService.get_instance_configs(request.data["instance_id"], request.data["instance_type"])
+        for config in data:
+            config["content"] = ConfigFormat.toml_to_dict(config["content"])
         return WebUtils.response_success(data)
 
     @swagger_auto_schema(
@@ -105,7 +108,7 @@ class NodeMgmtView(ViewSet):
             type=openapi.TYPE_OBJECT,
             properties={
                 "id": openapi.Schema(type=openapi.TYPE_STRING, description="子配置id"),
-                "content": openapi.Schema(type=openapi.TYPE_STRING, description="子配置内容"),
+                "content": openapi.Schema(type=openapi.TYPE_OBJECT, description="子配置内容"),
             },
             required=["id", "content"]
         ),
@@ -113,5 +116,6 @@ class NodeMgmtView(ViewSet):
     )
     @action(methods=['post'], detail=False, url_path='update_instance_child_config')
     def update_instance_child_config(self, request):
-        data = NodeUtils.update_instance_child_config(request.data)
+        content = ConfigFormat.json_to_toml(request.data["content"])
+        data = NodeUtils.update_instance_child_config(dict(id=request.data["id"], content=content))
         return WebUtils.response_success(data)
