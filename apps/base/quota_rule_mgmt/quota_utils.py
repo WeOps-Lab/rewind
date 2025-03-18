@@ -25,7 +25,7 @@ class QuotaUtils(object):
     def get_quota_list(self):
         quota_list = QuotaRule.objects.filter(
             Q(target_type="user", target_list__contains=self.username)
-            | Q(target_type="team", target_list__contains=self.team)
+            | Q(target_type="group", target_list__contains=self.team)
         ).values()
         return list(quota_list)
 
@@ -98,12 +98,14 @@ class QuotaUtils(object):
         for quota in self.quota_list:
             token_config = quota["token_set"]
             for llm_model, value in token_config.items():
-                llm_model_token_set.setdefault(llm_model, []).append(value["value"] * unit_map.get(value["unit"], 1))
+                llm_model_token_set.setdefault(llm_model, []).append(
+                    int(value["value"]) * unit_map.get(value["unit"], 1)
+                )
         used_token_map = dict(
-            TeamTokenUseInfo.objects.filter(team__contains=self.team).values_list("llm_model", "used_token")
+            TeamTokenUseInfo.objects.filter(group__contains=self.team).values_list("llm_model", "used_token")
         )
         return_data = {}
-        for llm_model, value in used_token_map.items():
+        for llm_model, value in llm_model_token_set.items():
             return_data[llm_model] = {
                 "used_token": used_token_map.get(llm_model, 0),
                 "all_token": min(value) if value else 0,
