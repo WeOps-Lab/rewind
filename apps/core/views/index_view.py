@@ -17,7 +17,7 @@ def index(request):
 @api_view(["GET"])
 def login_info(request):
     is_first_login = False
-    default_group = os.environ.get("DEFAULT_GROUP_NAME", "Default")
+    default_group = os.environ.get("DEFAULT_GROUP_NAME", "Guest")
     if not request.user.group_list:
         is_first_login = True
     elif len(request.user.group_list) == 1 and request.user.group_list[0]["name"] == default_group:
