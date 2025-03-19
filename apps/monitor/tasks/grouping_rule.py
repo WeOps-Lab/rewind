@@ -88,11 +88,10 @@ class RuleGrouping:
         asso_list = []
         metrics = VictoriaMetricsAPI().query(rule.grouping_rules["query"])
         for metric_info in metrics.get("data", {}).get("result", []):
-            instance_id = tuple([metric_info["metric"].get(i) for i in obj_metric_map["instance_id_keys"]])
+            instance_id = str(tuple([metric_info["metric"].get(i) for i in obj_metric_map["instance_id_keys"]]))
             if instance_id not in obj_instance_id_set:
                 continue
             if instance_id:
-                instance_id = str(instance_id)
                 asso_list.extend([(instance_id, i) for i in rule.organizations])
         return asso_list
 
