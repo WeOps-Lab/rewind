@@ -136,7 +136,11 @@ class MonitorPolicyScan:
 
     def get_active_alerts(self):
         """获取策略的活动告警"""
-        return MonitorAlert.objects.filter(policy_id=self.policy.id, status="new")
+        qs = MonitorAlert.objects.filter(policy_id=self.policy.id, status="new")
+        # 如果设置了实例范围，只查询实例范围内的告警
+        if self.policy.source:
+            qs = qs.filter(monitor_instance_id__in=self.instances_map.keys())
+        return qs
 
     def instances_map(self):
         """获取策略适用的实例"""
@@ -257,6 +261,11 @@ class MonitorPolicyScan:
         # 计算告警
         alert_events, info_events = calculate_alerts(self.policy.alert_name, df, self.policy.threshold)
 
+        # 设置实例范围的需要过滤实例范围外的告警
+        if self.policy.source:
+            alert_events = [event for event in alert_events if event["instance_id"] in self.instances_map.keys()]
+            info_events = [event for event in info_events if event["instance_id"] in self.instances_map.keys()]
+
         if alert_events:
             logger.info(f"=======alert events: {alert_events}")
             logger.info(f"=======alert events search result: {vm_data}")
@@ -267,6 +276,9 @@ class MonitorPolicyScan:
     def no_data_event(self):
         """无数据告警事件"""
         if not self.policy.no_data_period:
+            return []
+
+        if not self.policy.source:
             return []
 
         events = []
@@ -375,7 +387,6 @@ class MonitorPolicyScan:
 
     def notice(self, event_objs):
         """通知"""
-        active_alert_set = {alert.monitor_instance_id for alert in self.active_alerts}
         for event in event_objs:
             # 非异常事件不通知
             if event.level == "info":
@@ -383,9 +394,6 @@ class MonitorPolicyScan:
             if event.level == "no_data":
                 # 无数据告警通知为开启，不进行通知
                 if self.policy.no_data_alert <= 0:
-                    continue
-                # 没有活跃告警，不进行通知
-                if event.monitor_instance_id not in active_alert_set:
                     continue
             notice_results = self.send_email(event)
             event.notice_result = notice_results
@@ -469,6 +477,10 @@ class MonitorPolicyScan:
 
     def run(self):
         """运行"""
+        # 存在source范围并且没有实例，不进行计算
+        if self.policy.source and not self.instances_map:
+            return
+
         self.set_monitor_obj_instance_key()
 
         # 告警事件
@@ -482,6 +494,7 @@ class MonitorPolicyScan:
 
         # 告警恢复
         self.recovery_alert()
+
         # 无数据告警恢复
         self.recovery_no_data_alert()
 

@@ -30,7 +30,7 @@ def calculate_alerts(alert_name, df, thresholds, n=1):
 
     # 遍历每一行数据（每个 instance_id）
     for _, row in df.iterrows():
-        instance_id = row["instance_id"]
+        instance_id = str(row["instance_id"])
 
         # 取最近 n 个数据点，保证窗口长度为 n
         values = row["values"][-n:]
