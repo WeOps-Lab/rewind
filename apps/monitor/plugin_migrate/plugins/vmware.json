@@ -1,32 +1,32 @@
 {
-  "plugin": "VWWare",
+  "plugin": "VMWare",
   "plugin_desc": "...",
   "is_compound_object": true,
   "objects": [
     {
       "name": "vCenter",
-      "type": "VWWare",
+      "type": "VMWare",
       "level": "base",
       "description": "",
       "metrics": []
     },
     {
       "name": "ESXI",
-      "type": "VWWare",
+      "type": "VMWare",
       "level": "derivative",
       "description": "",
       "metrics": []
     },
     {
       "name": "VM",
-      "type": "VWWare",
+      "type": "VMWare",
       "level": "derivative",
       "description": "",
       "metrics": []
     },
     {
       "name": "DataStorage",
-      "type": "VWWare",
+      "type": "VMWare",
       "level": "derivative",
       "description": "",
       "metrics": []
