@@ -120,7 +120,6 @@ class RuleGrouping:
         create_asso_set = monitor_inst_asso_set - set(exist_instance_map.keys())
         delete_asso_set = set(exist_instance_map.keys()) - monitor_inst_asso_set
 
-
         if create_asso_set:
             create_objs = [
                 MonitorInstanceOrganization(monitor_instance_id=asso_tuple[0], organization=asso_tuple[1])
