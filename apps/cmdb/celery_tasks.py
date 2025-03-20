@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 
 from celery import shared_task
 
-from apps.core.logger import celery_logger
+from apps.core.logger import logger
 from apps.cmdb.models.collect_model import CollectModels
 from apps.cmdb.services.sync_collect import ProtocolCollect
 from apps.cmdb.constants import CollectDriverTypes, CollectRunStatusType
@@ -35,7 +35,7 @@ def sync_collect_task(instance_id):
 
     except Exception as err:
         import traceback
-        celery_logger.error("==采集失败== task_id={}, error={}".format(instance_id, traceback.format_exc()))
+        logger.error("==采集失败== task_id={}, error={}".format(instance_id, traceback.format_exc()))
         result = {}
         format_data = {}
         instance.exec_status = CollectRunStatusType.ERROR
@@ -51,7 +51,7 @@ def sync_collect_task(instance_id):
         }
         instance.save()
     except Exception as err:
-        celery_logger.error("==保存采集结果失败== task_id={}, error={}".format(instance_id, err))
+        logger.error("==保存采集结果失败== task_id={}, error={}".format(instance_id, err))
         CollectModels.objects.filter(id=instance_id).update(exec_status=CollectRunStatusType.ERROR)
 
 
@@ -62,9 +62,9 @@ def sync_periodic_update_task_status():
     :param :
     :return:
     """
-    celery_logger.info("==开始周期执行修改采集状态==")
+    logger.info("==开始周期执行修改采集状态==")
     five_minutes_ago = datetime.now() - timedelta(minutes=5)
     rows = CollectModels.objects.filter(exec_status=CollectRunStatusType.RUNNING,
                                         exec_time__lt=five_minutes_ago).update(
         exec_status=CollectRunStatusType.ERROR)
-    celery_logger.info("==开始周期执行修改采集状态完成==, rows={}".format(rows))
+    logger.info("==开始周期执行修改采集状态完成==, rows={}".format(rows))
