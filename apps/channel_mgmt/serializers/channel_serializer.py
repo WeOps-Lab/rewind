@@ -8,11 +8,13 @@ class ChannelSerializer(I18nSerializer):
         fields = "__all__"
 
     def create(self, validated_data):
-        self.encode_config(validated_data)
+        if validated_data.get("config"):
+            self.encode_config(validated_data)
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
-        self.encode_config(validated_data)
+        if validated_data.get("config"):
+            self.encode_config(validated_data)
         return super().update(instance, validated_data)
 
     @staticmethod

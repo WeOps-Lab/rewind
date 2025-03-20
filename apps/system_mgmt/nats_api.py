@@ -152,8 +152,10 @@ def create_default_group(group_name, user_id, default_group_id):
     group_id = client.realm_client.create_group({"name": group_name}, top_group, skip_exists=True)
     if not group_id:
         return {"result": False, "message": f"group named '{group_name}' already exists."}
+    user = client.realm_client.get_user(user_id)
     client.realm_client.group_user_add(user_id, group_id)
     client.realm_client.group_user_remove(user_id, default_group_id)
+    cache.delete(f"group_{user.get('username')}")
     return {"result": True, "data": {"group_id": group_id}}
 
 

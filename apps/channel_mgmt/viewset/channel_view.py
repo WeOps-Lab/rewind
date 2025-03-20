@@ -28,6 +28,8 @@ class ChannelViewSet(viewsets.ModelViewSet):
             obj.encrypt_field("secret", config)
             obj.encrypt_field("token", config)
             obj.encrypt_field("aes_key", config)
+        elif obj.channel_type == "enterprise_wechat_bot":
+            obj.encrypt_field("bot_key", config)
         obj.config = config
         obj.save()
         return JsonResponse({"result": True})
