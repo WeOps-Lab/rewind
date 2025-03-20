@@ -66,9 +66,9 @@ class SkillRequestLog(models.Model):
 
 class SkillTools(MaintainerInfo, TimeInfo):
     name = models.CharField(max_length=100, unique=True)
-    display_name = models.CharField(max_length=100)
     params = models.JSONField(default=dict)
     team = models.JSONField(default=list)
     description = models.TextField()
     tags = models.JSONField(default=list)
     icon = models.CharField(max_length=100, default="")
+    is_build_in = models.BooleanField(default=False)

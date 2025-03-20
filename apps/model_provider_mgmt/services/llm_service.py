@@ -41,6 +41,32 @@ class LLMService:
 
         return {"content": data["content"], "citing_knowledge": citing_knowledge}
 
+    def format_stream_chat_params(self, kwargs: dict):
+        llm_model = LLMModel.objects.get(id=kwargs["llm_model"])
+        context = ""
+        title_map = doc_map = {}
+        if kwargs["enable_rag"]:
+            context, title_map, doc_map = self.search_doc(context, kwargs)
+        num = kwargs["conversation_window_size"] * -1
+        chat_kwargs = {
+            "system_message_prompt": kwargs["skill_prompt"],
+            "openai_api_base": llm_model.decrypted_llm_config["openai_base_url"],
+            "openai_api_key": llm_model.decrypted_llm_config["openai_api_key"],
+            "temperature": kwargs["temperature"],
+            "model": llm_model.decrypted_llm_config["model"],
+            "user_message": kwargs["user_message"],
+            "chat_history": kwargs["chat_history"][num:],
+            "conversation_window_size": kwargs["conversation_window_size"],
+            "rag_context": context,
+            "tools": kwargs.get("tools", []),
+        }
+        group = llm_model.consumer_team or llm_model.team[0]
+        team_info, _ = TeamTokenUseInfo.objects.get_or_create(
+            group=group, llm_model=llm_model.name, defaults={"used_token": 0}
+        )
+        return doc_map, title_map, team_info, chat_kwargs
+        # TODO 需要在chat server增加图片支持
+
     def invoke_chat(self, kwargs):
         show_think = kwargs.pop("show_think", True)
         llm_model = LLMModel.objects.get(id=kwargs["llm_model"])

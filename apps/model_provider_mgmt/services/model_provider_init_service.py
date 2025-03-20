@@ -9,6 +9,7 @@ from apps.model_provider_mgmt.models import (
     RerankModelChoices,
     RerankProvider,
 )
+from apps.model_provider_mgmt.models.llm_skill import SkillTools
 from apps.model_provider_mgmt.models.ocr_provider import OCRProvider
 
 
@@ -47,6 +48,7 @@ class ModelProviderInitService:
             LLMModel.objects.get_or_create(
                 name="GPT-4 32K",
                 llm_model_type=LLMModelChoices.CHAT_GPT,
+                is_build_in=True,
                 defaults={
                     "llm_config": {
                         "openai_api_key": "your_openai_api_key",
@@ -60,6 +62,7 @@ class ModelProviderInitService:
             LLMModel.objects.get_or_create(
                 name="GPT-3.5 Turbo 16K",
                 llm_model_type=LLMModelChoices.CHAT_GPT,
+                is_build_in=True,
                 defaults={
                     "llm_config": {
                         "openai_api_key": "your_openai_api_key",
@@ -73,6 +76,7 @@ class ModelProviderInitService:
             LLMModel.objects.get_or_create(
                 name="GPT-4o",
                 llm_model_type=LLMModelChoices.CHAT_GPT,
+                is_build_in=True,
                 defaults={
                     "llm_config": {
                         "openai_api_key": "your_openai_api_key",
@@ -86,6 +90,7 @@ class ModelProviderInitService:
             LLMModel.objects.get_or_create(
                 name="DeepSeek-R1:1.5b",
                 llm_model_type=LLMModelChoices.DEEP_SEEK,
+                is_build_in=True,
                 defaults={
                     "llm_config": {
                         "openai_api_key": "your_openai_api_key",
@@ -98,6 +103,7 @@ class ModelProviderInitService:
             LLMModel.objects.get_or_create(
                 name="QwQ",
                 llm_model_type=LLMModelChoices.HUGGING_FACE,
+                is_build_in=True,
                 defaults={
                     "llm_config": {
                         "openai_api_key": "your_openai_api_key",
@@ -127,5 +133,25 @@ class ModelProviderInitService:
                 "ocr_config": {
                     "base_url": "http://ocr-server/azure_ocr",
                 },
+            },
+        )
+        SkillTools.objects.update_or_create(
+            name="Online Search",
+            defaults={
+                "params": {"url": "http://127.0.0.1:8003/sse", "name": "Online Search"},
+                "description": "",
+                "tags": ["search"],
+                "icon": "",
+                "is_build_in": True,
+            },
+        )
+        SkillTools.objects.update_or_create(
+            name="General tools",
+            defaults={
+                "params": {"url": "http://127.0.0.1:8002/sse", "name": "General tools"},
+                "description": "",
+                "tags": ["general"],
+                "icon": "",
+                "is_build_in": True,
             },
         )

@@ -1,6 +1,7 @@
 import datetime
 import hashlib
 import json
+import re
 import time
 
 from django.conf import settings
@@ -8,6 +9,7 @@ from django.db.models import Count, Sum
 from django.db.models.functions import TruncDate
 from django.http import FileResponse, JsonResponse, StreamingHttpResponse
 from django_minio_backend import MinioBackend
+from langserve import RemoteRunnable
 
 from apps.base.models import UserAPISecret
 from apps.bot_mgmt.models import Bot, BotConversationHistory
@@ -120,6 +122,47 @@ def format_knowledge_sources(content, skill_obj, doc_map=None, title_map=None):
     return content
 
 
+def get_knowledge_sources(content, skill_obj, doc_map=None, title_map=None):
+    if not skill_obj.enable_rag_knowledge_source:
+        return ""
+    knowledge_titles = {doc_map.get(k, {}).get("name") for k in title_map.keys()}
+    last_content = content.strip().split("\n")[-1]
+    if "引用知识" not in last_content and knowledge_titles:
+        return f'\n引用知识: {", ".join(knowledge_titles)}'
+    return ""
+
+
+def invoke_chat(params, skill_obj, kwargs, current_ip, user_message):
+    data, doc_map, title_map = llm_service.invoke_chat(params)
+    content = format_knowledge_sources(data["content"], skill_obj, doc_map, title_map)
+    return_data = {
+        "id": skill_obj.name,
+        "object": "chat.completion",
+        "created": int(time.time()),
+        "model": kwargs["model"],
+        "usage": {
+            "prompt_tokens": data["input_tokens"],
+            "completion_tokens": data["output_tokens"],
+            "total_tokens": data["input_tokens"] + data["output_tokens"],
+            "completion_tokens_details": {
+                "reasoning_tokens": 0,
+                "accepted_prediction_tokens": 0,
+                "rejected_prediction_tokens": 0,
+            },
+        },
+        "choices": [
+            {
+                "message": {"role": "assistant", "content": content},
+                "logprobs": None,
+                "finish_reason": "stop",
+                "index": 0,
+            }
+        ],
+    }
+    insert_skill_log(current_ip, skill_obj.id, return_data, kwargs, user_message=user_message)
+    return JsonResponse(return_data)
+
+
 @api_exempt
 def openai_completions(request):
     """Main entry point for OpenAI completions"""
@@ -158,57 +201,78 @@ def openai_completions(request):
         else:
             return JsonResponse(error)
     user_message = params.get("user_message")
-    data, doc_map, title_map = llm_service.invoke_chat(params)
-    content = format_knowledge_sources(data["content"], skill_obj, doc_map, title_map)
+    if not stream_mode:
+        return invoke_chat(params, skill_obj, kwargs, current_ip, user_message)
+    return stream_chat(params, skill_obj, kwargs, current_ip, user_message)
 
-    return_data = {
-        "id": skill_obj.name,
-        "object": "chat.completion",
-        "created": int(time.time()),
-        "model": kwargs["model"],
-        "usage": {
-            "prompt_tokens": data["input_tokens"],
-            "completion_tokens": data["output_tokens"],
-            "total_tokens": data["input_tokens"] + data["output_tokens"],
-            "completion_tokens_details": {
-                "reasoning_tokens": 0,
-                "accepted_prediction_tokens": 0,
-                "rejected_prediction_tokens": 0,
-            },
-        },
-        "choices": [
-            {
-                "message": {"role": "assistant", "content": content},
-                "logprobs": None,
-                "finish_reason": "stop",
-                "index": 0,
-            }
-        ],
-    }
-    insert_skill_log(current_ip, skill_obj.id, return_data, kwargs, user_message=user_message)
-    if not kwargs.get("stream", False):
-        return JsonResponse(return_data)
 
-    # Updated streaming logic: yield valid JSON chunks
+def stream_chat(params, skill_obj, kwargs, current_ip, user_message):
+    show_think = params.pop("show_think", True)
+    doc_map, title_map, team_info, chat_kwargs = llm_service.format_stream_chat_params(params)
+    chat_server = RemoteRunnable(settings.OPENAI_CHAT_SERVICE_URL)
+
     def generate_stream():
-        chunk_size = 20  # characters per chunk
-        for i in range(0, len(content), chunk_size):
-            chunk = content[i : i + chunk_size]
+        chat_content = ""
+        input_tokens = output_tokens = 0
+        for result in chat_server.stream(chat_kwargs):
+            if isinstance(result, str):
+                result = json.loads(result)
+            if not result["result"]:
+                raise Exception(result["message"])
+            data = result["data"]
+            used_token = data["input_tokens"] + data["output_tokens"]
+            team_info.used_token += used_token
+            input_tokens += data["input_tokens"]
+            output_tokens += data["output_tokens"]
+            content = data["content"]
+            if not show_think:
+                content = re.sub(r"<think>.*?</think>", "", content, flags=re.DOTALL).strip()
             stream_chunk = {
-                "choices": [{"delta": {"content": chunk}, "index": 0, "finish_reason": None}],
+                "choices": [{"delta": {"content": content}, "index": 0, "finish_reason": None}],
                 "id": skill_obj.name,
                 "object": "chat.completion.chunk",
                 "created": int(time.time()),
             }
+            chat_content += content
             yield f"data: {json.dumps(stream_chunk)}\n\n"
+
         # Final chunk indicating completion
-        final_chunk = {
-            "choices": [{"delta": {}, "index": 0, "finish_reason": "stop"}],
+        source_content = get_knowledge_sources(chat_content, skill_obj, doc_map, title_map)
+        team_info.save()
+        if source_content:
+            final_chunk = {
+                "choices": [{"delta": {"content": source_content}, "index": 0, "finish_reason": "stop"}],
+                "id": skill_obj.name,
+                "object": "chat.completion.chunk",
+                "created": int(time.time()),
+            }
+            yield f"data: {json.dumps(final_chunk)}\n\n"
+            chat_content += source_content
+        return_data = {
             "id": skill_obj.name,
-            "object": "chat.completion.chunk",
+            "object": "chat.completion",
             "created": int(time.time()),
+            "model": kwargs["model"],
+            "usage": {
+                "prompt_tokens": input_tokens,
+                "completion_tokens": output_tokens,
+                "total_tokens": input_tokens + output_tokens,
+                "completion_tokens_details": {
+                    "reasoning_tokens": 0,
+                    "accepted_prediction_tokens": 0,
+                    "rejected_prediction_tokens": 0,
+                },
+            },
+            "choices": [
+                {
+                    "message": {"role": "assistant", "content": chat_content},
+                    "logprobs": None,
+                    "finish_reason": "stop",
+                    "index": 0,
+                }
+            ],
         }
-        yield f"data: {json.dumps(final_chunk)}\n\n"
+        insert_skill_log(current_ip, skill_obj.id, return_data, kwargs, user_message=user_message)
 
     return StreamingHttpResponse(generate_stream(), content_type="text/event-stream")
 
