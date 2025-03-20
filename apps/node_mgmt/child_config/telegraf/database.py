@@ -9,38 +9,56 @@ CONFIG_MAP = {
     username = "${username}"
     password = "${password}"
     interval = "${interval}s"
-    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="database" }""",
+    [inputs.elasticsearch.tags]
+        instance_id = "${instance_id}"
+        instance_type = "${instance_type}"
+        collect_type = "database" """,
 
     "mongodb": """[[inputs.mongodb]]
     servers = ["mongodb://${host}:${port}/?connect=direct"]
     interval = "${interval}s"
-    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="database" }""",
+    [inputs.mongodb.tags]
+        instance_id = "${instance_id}"
+        instance_type = "${instance_type}"
+        collect_type = "database" """,
 
     "mysql": """[[inputs.mysql]]
     servers = ["${username}:${password}@tcp(${host}:${port})/?tls=false"]
     metric_version = 2
     interval = "${interval}s"
-    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="database" }""",
+    [inputs.mysql.tags]
+        instance_id = "${instance_id}"
+        instance_type = "${instance_type}"
+        collect_type = "database" """,
 
     "postgres": """[[inputs.postgresql]]
     address = "host=${host} port=${port} user=${username} password=${password} sslmode=disable"
     ignored_databases = ["template0", "template1"]
     interval = "${interval}s"
-    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="database" }""",
+    [inputs.postgresql.tags]
+        instance_id = "${instance_id}"
+        instance_type = "${instance_type}"
+        collect_type = "database" """,
 
     "redis": """[[inputs.redis]]
     servers = ["tcp://${host}:${port}"]
     username = "${username}"
     password = "${password}"
     interval = "${interval}s"
-    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="database" }""",
+    [inputs.redis.tags]
+        instance_id = "${instance_id}"
+        instance_type = "${instance_type}"
+        collect_type = "database" """,
 
     "sqlserver": """[[inputs.sqlserver]]
     servers = ["Server=${host};Port=${port};User Id=${username};Password=${password};app name=telegraf;log=1;"]
     database_type = "SQLServer"
     exclude_query = ["SQLServerAvailabilityReplicaStates", "SQLServerDatabaseReplicaStates"]
     interval = "${interval}s"
-    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="database" }""",
+    [inputs.sqlserver.tags]
+        instance_id = "${instance_id}"
+        instance_type = "${instance_type}"
+        collect_type = "database" """,
 }
 
 

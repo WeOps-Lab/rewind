@@ -7,8 +7,11 @@ CONFIG_MAP = {
     "ping": """[[inputs.ping]]
     urls = ["${url}"]
     interval = "${interval}s"
-    tags = { "instance_id"="${instance_id}", "instance_type"="${instance_type}", "collect_type"="ping" }""",
-}
+    [inputs.ping.tags]
+        instance_id = "${instance_id}"
+        instance_type = "${instance_type}"
+        collect_type = "ping" """,
+    }
 
 
 class PingConfig:

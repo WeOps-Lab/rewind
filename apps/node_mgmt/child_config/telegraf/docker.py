@@ -7,7 +7,10 @@ CONFIG_MAP = {
     "docker": """[[inputs.docker]]
     endpoint = "${url}"
     interval = "${interval}s"
-    tags = { "instance_id"="${instance_id}", "instance_type"="${instance_type}", "collect_type"="docker" }""",
+    [inputs.docker.tags]
+        instance_id = "${instance_id}"
+        instance_type = "${instance_type}"
+        collect_type = "docker" """,
 }
 
 

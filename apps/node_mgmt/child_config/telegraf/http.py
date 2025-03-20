@@ -9,7 +9,10 @@ CONFIG_MAP = {
     interval = "${interval}s"
     timeout = "30s"
     response_timeout = "30s"
-    tags = { "instance_id"="${instance_id}", "instance_type"="${instance_type}", "collect_type"="http" }""",
+    [inputs.prometheus.tags]
+        instance_id = "${instance_id}"
+        instance_type = "${instance_type}"
+        collect_type = "http" """,
 }
 
 

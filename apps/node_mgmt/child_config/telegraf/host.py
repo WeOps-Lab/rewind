@@ -12,32 +12,60 @@ CONFIG_MAP = {
     report_active = false
     core_tags = false
     interval = "${interval}s"
-    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="host","config_type"="cpu" }""",
+    [inputs.cpu.tags]
+        instance_id = "${instance_id}"
+        instance_type = "${instance_type}"
+        collect_type = "host"
+        config_type = "cpu" """,
 
     "disk": """[[inputs.disk]]
     ignore_fs = ["tmpfs", "devtmpfs", "devfs", "iso9660", "overlay", "aufs", "squashfs"]
     interval = "${interval}s"
-    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="host","config_type"="disk" }""",
+    [inputs.disk.tags]
+        instance_id = "${instance_id}"
+        instance_type = "${instance_type}"
+        collect_type = "host"
+        config_type = "disk" """,
 
     "diskio": """[[inputs.diskio]]
     interval = "${interval}s"
-    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="host","config_type"="diskio" }""",
+    [inputs.diskio.tags]
+        instance_id = "${instance_id}"
+        instance_type = "${instance_type}"
+        collect_type = "host"
+        config_type = "diskio" """,
 
     "mem": """[[inputs.mem]]
     interval = "${interval}s"
-    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="host","config_type"="mem" }""",
+    [inputs.mem.tags]
+        instance_id = "${instance_id}"
+        instance_type = "${instance_type}"
+        collect_type = "host"
+        config_type = "mem" """,
 
     "net": """[[inputs.net]]
     interval = "${interval}s"
-    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="host","config_type"="net" }""",
+    [inputs.net.tags]
+        instance_id = "${instance_id}"
+        instance_type = "${instance_type}"
+        collect_type = "host"
+        config_type = "net" """,
 
     "processes": """[[inputs.processes]]
     interval = "${interval}s"
-    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="host","config_type"="processes" }""",
+    [inputs.processes.tags]
+        instance_id = "${instance_id}"
+        instance_type = "${instance_type}"
+        collect_type = "host"
+        config_type = "processes" """,
 
     "system": """[[inputs.system]]
     interval = "${interval}s"
-    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="host","config_type"="system" }""",
+    [inputs.system.tags]
+        instance_id = "${instance_id}"
+        instance_type = "${instance_type}"
+        collect_type = "host"
+        config_type = "system" """,
 }
 
 class HostConfig:

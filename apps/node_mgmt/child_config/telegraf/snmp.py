@@ -6,207 +6,224 @@ from apps.node_mgmt.models.sidecar import CollectorConfiguration, ChildConfig
 CONFIG_MAP = {
     "switch": """[[inputs.snmp]]
     interval = "${interval}s"
-    tags = { "instance_id"="${instance_id}", "instance_type"="${instance_type}", "collect_type"="snmp" }
+    [inputs.snmp.tags]
+        instance_id = "${instance_id}"
+        instance_type = "${instance_type}"
+        collect_type = "snmp"
+    
     ${snmp_config}
 
     [[inputs.snmp.field]]
         oid = "RFC1213-MIB::sysUpTime.0"
         name = "uptime"
-
     [[inputs.snmp.field]]
         oid = "RFC1213-MIB::sysName.0"
         name = "source"
         is_tag = true
-
     [[inputs.snmp.table]]
         oid = "IF-MIB::ifTable"
         name = "interface"
         inherit_tags = ["source"]
-
     [[inputs.snmp.table.field]]
         oid = "IF-MIB::ifDescr"
         name = "ifDescr"
         is_tag = true""",
+
     "router": """[[inputs.snmp]]
     interval = "${interval}s"
-    tags = { "instance_id"="${instance_id}", "instance_type"="${instance_type}", "collect_type"="snmp" }
+    [inputs.snmp.tags]
+        instance_id = "${instance_id}"
+        instance_type = "${instance_type}"
+        collect_type = "snmp"
+        
     ${snmp_config}
 
     [[inputs.snmp.field]]
         oid = "RFC1213-MIB::sysUpTime.0"
         name = "uptime"
-
     [[inputs.snmp.field]]
         oid = "RFC1213-MIB::sysName.0"
         name = "source"
         is_tag = true
-
     [[inputs.snmp.table]]
         oid = "IF-MIB::ifTable"
         name = "interface"
         inherit_tags = ["source"]
-
     [[inputs.snmp.table.field]]
         oid = "IF-MIB::ifDescr"
         name = "ifDescr"
         is_tag = true""",
+
     "firewall": """[[inputs.snmp]]
     interval = "${interval}s"
-    tags = { "instance_id"="${instance_id}", "instance_type"="${instance_type}", "collect_type"="snmp" }
+    [inputs.snmp.tags]
+        instance_id = "${instance_id}"
+        instance_type = "${instance_type}"
+        collect_type = "snmp"
+        
     ${snmp_config}
 
     [[inputs.snmp.field]]
         oid = "RFC1213-MIB::sysUpTime.0"
         name = "uptime"
-
     [[inputs.snmp.field]]
         oid = "RFC1213-MIB::sysName.0"
         name = "source"
         is_tag = true
-
     [[inputs.snmp.table]]
         oid = "IF-MIB::ifTable"
         name = "interface"
         inherit_tags = ["source"]
-
     [[inputs.snmp.table.field]]
         oid = "IF-MIB::ifDescr"
         name = "ifDescr"
         is_tag = true""",
+
     "loadbalance": """[[inputs.snmp]]
     interval = "${interval}s"
-    tags = { "instance_id"="${instance_id}", "instance_type"="${instance_type}", "collect_type"="snmp" }
+    [inputs.snmp.tags]
+        instance_id = "${instance_id}"
+        instance_type = "${instance_type}"
+        collect_type = "snmp"
+
     ${snmp_config}
 
     [[inputs.snmp.field]]
         oid = "RFC1213-MIB::sysUpTime.0"
         name = "uptime"
-
     [[inputs.snmp.field]]
         oid = "RFC1213-MIB::sysName.0"
         name = "source"
         is_tag = true
-
     [[inputs.snmp.table]]
         oid = "IF-MIB::ifTable"
         name = "interface"
         inherit_tags = ["source"]
-
     [[inputs.snmp.table.field]]
         oid = "IF-MIB::ifDescr"
         name = "ifDescr"
         is_tag = true""",
+
     "detection_device": """[[inputs.snmp]]
     interval = "${interval}s"
-    tags = { "instance_id"="${instance_id}", "instance_type"="${instance_type}", "collect_type"="snmp" }
+    [inputs.snmp.tags]
+        instance_id = "${instance_id}"
+        instance_type = "${instance_type}"
+        collect_type = "snmp"
+        
     ${snmp_config}
 
     [[inputs.snmp.field]]
         oid = "RFC1213-MIB::sysUpTime.0"
         name = "uptime"
-
     [[inputs.snmp.field]]
         oid = "RFC1213-MIB::sysName.0"
         name = "source"
         is_tag = true
-
     [[inputs.snmp.table]]
         oid = "IF-MIB::ifTable"
         name = "interface"
         inherit_tags = ["source"]
-
     [[inputs.snmp.table.field]]
         oid = "IF-MIB::ifDescr"
         name = "ifDescr"
         is_tag = true""",
+
     "scanning_device": """[[inputs.snmp]]
     interval = "${interval}s"
-    tags = { "instance_id"="${instance_id}", "instance_type"="${instance_type}", "collect_type"="snmp" }
+    [inputs.snmp.tags]
+        instance_id = "${instance_id}"
+        instance_type = "${instance_type}"
+        collect_type = "snmp"
+        
     ${snmp_config}
 
     [[inputs.snmp.field]]
         oid = "RFC1213-MIB::sysUpTime.0"
         name = "uptime"
-
     [[inputs.snmp.field]]
         oid = "RFC1213-MIB::sysName.0"
         name = "source"
         is_tag = true
-
     [[inputs.snmp.table]]
         oid = "IF-MIB::ifTable"
         name = "interface"
         inherit_tags = ["source"]
-
     [[inputs.snmp.table.field]]
         oid = "IF-MIB::ifDescr"
         name = "ifDescr"
         is_tag = true""",
+
     "bastion_host": """[[inputs.snmp]]
     interval = "${interval}s"
-    tags = { "instance_id"="${instance_id}", "instance_type"="${instance_type}", "collect_type"="snmp" }
+    [inputs.snmp.tags]
+        instance_id = "${instance_id}"
+        instance_type = "${instance_type}"
+        collect_type = "snmp"
+        
     ${snmp_config}
 
     [[inputs.snmp.field]]
         oid = "RFC1213-MIB::sysUpTime.0"
         name = "uptime"
-
     [[inputs.snmp.field]]
         oid = "RFC1213-MIB::sysName.0"
         name = "source"
         is_tag = true
-
     [[inputs.snmp.table]]
         oid = "IF-MIB::ifTable"
         name = "interface"
         inherit_tags = ["source"]
-
     [[inputs.snmp.table.field]]
         oid = "IF-MIB::ifDescr"
         name = "ifDescr"
         is_tag = true""",
+
     "storage": """[[inputs.snmp]]
     interval = "${interval}s"
-    tags = { "instance_id"="${instance_id}", "instance_type"="${instance_type}", "collect_type"="snmp" }
+    [inputs.snmp.tags]
+        instance_id = "${instance_id}"
+        instance_type = "${instance_type}"
+        collect_type = "snmp"
+        
     ${snmp_config}
 
     [[inputs.snmp.field]]
         oid = "RFC1213-MIB::sysUpTime.0"
         name = "uptime"
-
     [[inputs.snmp.field]]
         oid = "RFC1213-MIB::sysName.0"
         name = "source"
         is_tag = true
-
     [[inputs.snmp.table]]
         oid = "IF-MIB::ifTable"
         name = "interface"
         inherit_tags = ["source"]
-
     [[inputs.snmp.table.field]]
         oid = "IF-MIB::ifDescr"
         name = "ifDescr"
         is_tag = true""",
+
     "hardware_server": """[[inputs.snmp]]
     interval = "${interval}s"
-    tags = { "instance_id"="${instance_id}", "instance_type"="${instance_type}", "collect_type"="snmp" }
+    [inputs.snmp.tags]
+        instance_id = "${instance_id}"
+        instance_type = "${instance_type}"
+        collect_type = "snmp"
+        
     ${snmp_config}
 
     [[inputs.snmp.field]]
         oid = "RFC1213-MIB::sysUpTime.0"
         name = "uptime"
-
     [[inputs.snmp.field]]
         oid = "RFC1213-MIB::sysName.0"
         name = "source"
         is_tag = true
-
     [[inputs.snmp.table]]
         oid = "IF-MIB::ifTable"
         name = "interface"
         inherit_tags = ["source"]
-
     [[inputs.snmp.table.field]]
         oid = "IF-MIB::ifDescr"
         name = "ifDescr"

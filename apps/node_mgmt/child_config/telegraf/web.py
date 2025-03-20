@@ -7,7 +7,10 @@ CONFIG_MAP = {
     "http_response": """[[inputs.http_response]]
     urls = ["${url}"]
     interval = "${interval}s"
-    tags = { "instance_id"="${instance_id}","instance_type"="web","collect_type"="web" }""",
+    [inputs.http_response.tags]
+        instance_id = "${instance_id}"
+        instance_type = "${instance_type}"
+        collect_type = "web" """,
 }
 
 

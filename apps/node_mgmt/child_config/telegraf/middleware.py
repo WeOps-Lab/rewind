@@ -9,56 +9,82 @@ CONFIG_MAP = {
     username = "${username}"
     password = "${password}" 
     interval = "${interval}s"
-    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="middleware" }""",
+    [inputs.rabbitmq.tags]
+        instance_id = "${instance_id}"
+        instance_type = "${instance_type}"
+        collect_type = "middleware" """,
 
     "activemq": """[[inputs.activemq]]
     url = "${url}"
     username = "${username}"
     password = "${password}" 
     interval = "${interval}s"
-    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="middleware" }""",
+    [inputs.activemq.tags]
+        instance_id = "${instance_id}"
+        instance_type = "${instance_type}"
+        collect_type = "middleware" """,
 
     "apache": """[[inputs.apache]]
     urls = ["${url}"]
     interval = "${interval}s"
-    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="middleware" }""",
+    [inputs.apache.tags]
+        instance_id = "${instance_id}"
+        instance_type = "${instance_type}"
+        collect_type = "middleware" """,
 
     "clickhouse": """[[inputs.clickhouse]]
     servers = ["${url}"]
     username = "default"
     interval = "${interval}s"
-    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="middleware" }""",
+    [inputs.clickhouse.tags]
+        instance_id = "${instance_id}"
+        instance_type = "${instance_type}"
+        collect_type = "middleware" """,
 
     "consul": """[[inputs.consul]]
     address = "${url}"
     interval = "${interval}s"
-    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="middleware" }""",
+    [inputs.consul.tags]
+        instance_id = "${instance_id}"
+        instance_type = "${instance_type}"
+        collect_type = "middleware" """,
 
     "nginx": """[[inputs.nginx]]
     urls = ["${url}"]
     interval = "${interval}s"
-    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="middleware" }""",
+    [inputs.nginx.tags]
+        instance_id = "${instance_id}"
+        instance_type = "${instance_type}"
+        collect_type = "middleware" """,
 
     "net": """[[inputs.net]]
     url = "${url}"
     username = "${username}"
     password = "${password}" 
     interval = "${interval}s"
-    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="middleware" }""",
+    [inputs.net.tags]
+        instance_id = "${instance_id}"
+        instance_type = "${instance_type}"
+        collect_type = "middleware" """,
 
     "tomcat": """[[inputs.tomcat]]
     url = "${url}"
     username = "${username}"
     password = "${password}" 
     interval = "${interval}s"
-    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="middleware" }""",
+    [inputs.tomcat.tags]
+        instance_id = "${instance_id}"
+        instance_type = "${instance_type}"
+        collect_type = "middleware" """,
 
     "zookeeper": """[[inputs.zookeeper]]
     servers = ["${url}"]
     timeout = "${timeout}s"
     interval = "${interval}s"
-    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="middleware" }""",
-
+    [inputs.zookeeper.tags]
+        instance_id = "${instance_id}"
+        instance_type = "${instance_type}"
+        collect_type = "middleware" """,
 }
 
 

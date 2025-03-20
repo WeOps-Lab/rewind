@@ -7,11 +7,18 @@ CONFIG_MAP = {
     "storage": """[[inputs.ipmi_sensor]]
     servers = ["${server}"]
     interval = "${interval}s"
-    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="ipmi" }""",
+    [inputs.ipmi_sensor.tags]
+        instance_id = "${instance_id}"
+        instance_type = "${instance_type}"
+        collect_type = "ipmi" """,
+
     "hardware_server": """[[inputs.ipmi_sensor]]
     servers = ["${server}"]
     interval = "${interval}s"
-    tags = { "instance_id"="${instance_id}","instance_type"="${instance_type}","collect_type"="ipmi" }""",
+    [inputs.ipmi_sensor.tags]
+        instance_id = "${instance_id}"
+        instance_type = "${instance_type}"
+        collect_type = "ipmi" """,
 }
 
 
