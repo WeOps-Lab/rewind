@@ -23,7 +23,7 @@ class FileKnowledgeViewSet(viewsets.ModelViewSet):
         kwargs = request.data
         client = get_quota_client(request)
         files = request.FILES.getlist("files")
-        file_size = sum(i.size for i in files)
+        file_size = sum(i.size for i in files) / 1024 / 1024
         file_quota, used_file_size, __ = client.get_file_quota()
         if file_quota != -1 and file_quota < file_size + used_file_size:
             no_used_file_size = file_quota - used_file_size
