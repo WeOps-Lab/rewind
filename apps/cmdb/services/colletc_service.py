@@ -5,7 +5,8 @@
 import urllib.parse
 from django.db import transaction
 
-from apps.cmdb.constants import STARGAZER_URL
+from apps.cmdb.constants import STARGAZER_URL, CollectRunStatusType
+from apps.cmdb.services.sync_collect import ProtocolCollect
 from apps.core.logger import logger
 from apps.core.utils.celery_utils import crontab_format, CeleryUtils
 from apps.rpc.node_mgmt import NodeMgmt
@@ -48,6 +49,7 @@ class CollectModelService(object):
         node = BaseNodeParams(instance)
         node_params = node.main()
         node_mgmt = NodeMgmt()
+        logger.info(f"推送节点参数: {node_params}")
         result = node_mgmt.batch_setting_node_child_config(node_params)
         logger.info(f"推送节点参数结果: {result}")
 
@@ -117,6 +119,36 @@ class CollectModelService(object):
         instance.delete()
         return instance_id
 
+    @classmethod
+    def collect_controller(cls, instance, data) -> dict:
+        """
+        任务审批，和数据纳管的逻辑保持一致即可
+        """
+
+        try:
+            result, format_data = ProtocolCollect(instance, data)
+            instance.exec_status = CollectRunStatusType.SUCCESS
+        except Exception as err:
+            import traceback
+            logger.error("==任务审批采集失败== task_id={}, error={}".format(instance.id, traceback.format_exc()))
+            result = {}
+            format_data = {}
+            instance.exec_status = CollectRunStatusType.ERROR
+
+        instance.examine = True
+        instance.collect_data = result
+        instance.format_data = format_data
+
+        instance.collect_digest = {
+            "add": len(format_data.get("add", [])),
+            "update": len(format_data.get("update", [])),
+            "delete": len(format_data.get("delete", [])),
+            "association": len(format_data.get("association", [])),
+        }
+        instance.save()
+
+        return result
+
 
 class BaseNodeParams(object):
     def __init__(self, instance):
@@ -125,12 +157,20 @@ class BaseNodeParams(object):
         self.base_path = f"{STARGAZER_URL}/api/collect/collect_info"
 
     @property
+    def model_plugin_name(self):
+        """
+        获取插件名称
+        """
+        return "vmware_info"
+
+    @property
     def format_server_path(self):
 
         """
         格式化服务器的路径
         """
         params = getattr(self, f"{self.model_id}_credential")
+        params.update({"plugin_name": self.model_plugin_name})
         encoded_params = {k: urllib.parse.quote(str(v), safe='@') for k, v in params.items()}
         url = f"{self.base_path}?" + "&".join(f"{k}={v}" for k, v in encoded_params.items())
         return url
@@ -158,14 +198,16 @@ class BaseNodeParams(object):
     @property
     def get_instance_type(self):
         if self.model_id == "vmware_vc":
-            return "vmware"
-        return self.model_id
+            instance_type = "vmware"
+        else:
+            instance_type = self.model_id
+        return f"cmdb_{instance_type}"
 
     def get_vmware_vc_instance_id(self, instance):
         """
         获取实例id
         """
-        instance_id = f"{self.model_id}_{instance['_id']}"
+        instance_id = f"{self.instance.id}_{instance['inst_name']}"
         return instance_id
 
     def vmware_vc_params(self):

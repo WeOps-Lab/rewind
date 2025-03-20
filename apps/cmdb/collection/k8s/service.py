@@ -16,7 +16,7 @@ from apps.cmdb.collection.k8s.constants import (
     K8S_POD_CONTAINER_RESOURCE_REQUESTS, K8S_NODE_ROLE, K8S_NODE_INFO, K8S_NODE_STATUS_CAPACITY, REPLICAS_KEY,
     REPLICAS_METRICS, K8S_STATEFULSET_REPLICAS, K8S_REPLICASET_REPLICAS, K8S_DEPLOYMENT_REPLICAS, ANNOTATIONS_METRICS,
     K8S_DEPLOYMENT_ANNOTATIONS, K8S_REPLICASET_ANNOTATIONS, K8S_STATEFULSET_ANNOTATIONS, K8S_DAEMONSET_ANNOTATIONS,
-    K8S_JOB_ANNOTATIONS, K8S_CRONJOB_ANNOTATIONS, POD_NODE_RELATION, VMWARE_CLUSTER,
+    K8S_JOB_ANNOTATIONS, K8S_CRONJOB_ANNOTATIONS, POD_NODE_RELATION, VMWARE_CLUSTER, VMWARE_CLUSTER_MAP,
 )
 from apps.cmdb.constants import INSTANCE
 from apps.cmdb.graph.neo4j import Neo4jClient
@@ -37,15 +37,17 @@ def timestamp_gt_one_day_ago(collect_timestamp):
 
 # 指标纳管（纳管控制器）
 class MetricsCannula:
-    def __init__(self, organization: list, inst_name: str, task_id: int, collect_plugin: Type, manual: bool = False):
+    def __init__(self, inst_id, organization: list, inst_name: str, task_id: int, collect_plugin: Type,
+                 manual: bool = False, default_metrics: dict = None):
+        self.inst_id = inst_id
         self.organization = organization
         self.task_id = str(task_id)
-        self.manual = manual  # 是否手动
+        self.manual = False if default_metrics else manual  # 是否手动
         self.inst_name = inst_name
         self.collect_plugin = collect_plugin
         self.collect_data = {}  # 采集后的原始数据
         self.collect_params = {}
-        self.collection_metrics = self.get_collection_metrics()
+        self.collection_metrics = default_metrics or self.get_collection_metrics()
         self.now_time = datetime.now(timezone.utc).isoformat()
         self.add_list = []
         self.update_list = []
@@ -54,7 +56,7 @@ class MetricsCannula:
 
     def get_collection_metrics(self):
         """获取采集指标"""
-        new_metrics = self.collect_plugin(self.inst_name)
+        new_metrics = self.collect_plugin(self.inst_name, self.inst_id, self.task_id)
         self.collect_data = new_metrics.collect_data
         self.collect_params = new_metrics.collect_params
         return new_metrics.run()
@@ -79,7 +81,7 @@ class MetricsCannula:
         for key, model_id in self.collect_params.items():
             params = [
                 {"field": "model_id", "type": "str=", "value": model_id},
-                {"field": "collect_task", "type": "str=", "value": self.inst_name},
+                {"field": "collect_task", "type": "str=", "value": self.task_id},
             ]
             with Neo4jClient() as ag:
                 already_data, _ = ag.query_entity(INSTANCE, params)
@@ -107,7 +109,7 @@ class MetricsCannula:
 
 
 class CollectK8sMetrics:
-    def __init__(self, cluster_name):
+    def __init__(self, cluster_name, *args, **kwargs):
         self.cluster_name = cluster_name
         self.metrics = self.get_metrics()
         self.collection_metrics_dict = {i: [] for i in COLLECTION_METRICS.keys()}
@@ -194,6 +196,8 @@ class CollectK8sMetrics:
                     name=index_data["namespace"],
                     assos=[
                         {
+
+                            "self_cluster": self.cluster_name,
                             "model_id": "k8s_cluster",
                             "inst_name": self.cluster_name,
                             "asst_id": "belong",
@@ -559,33 +563,46 @@ class CollectK8sMetrics:
 
 
 class CollectVmwareMetrics:
-    def __init__(self, inst_name):
+    def __init__(self, inst_name, inst_id, task_id, *args, **kwargs):
+        self.inst_id = inst_id
+        self.task_id = task_id
         self.vc_name = inst_name
-        self.collection_metrics_dict = {i: [] for i in VMWARE_CLUSTER.keys()}
+        self.collection_metrics_dict = {i: [] for i in VMWARE_CLUSTER}
         self.timestamp_gt = False
-        self.asso = "asso"
+        self.asso = "assos"
         self.result = {}
         self.model_resource_id_mapping = {}
 
-    # @staticmethod
-    # def get_ds_asso(data, inst_name):
-    #     result = [{
-    #         "model_id": "vmware_esxi",
-    #         "inst_name": data["vmware_esxi"],
-    #         "asst_id": "connect",
-    #         "model_asst_id": "vmware_ds_connect_vmware_esxi"
-    #     }]
-    #     return result
+    @property
+    def collect_data(self):
+        """采集数据"""
+        data = {
+            "vmware_vc": self.collection_metrics_dict["vmware_vc_info_gauge"],
+            "vmware_vm": self.collection_metrics_dict["vmware_vm_info_gauge"],
+            "vmware_ds": self.collection_metrics_dict["vmware_ds_info_gauge"],
+            "vmware_esxi": self.collection_metrics_dict["vmware_esxi_info_gauge"]
+        }
+        return data
 
-    def get_esxi_asso(self, data, vc_name):
+    @property
+    def collect_params(self):
+        params = {
+            "vmware_esxi": "vmware_esxi",
+            "vmware_ds": "vmware_ds",
+            "vmware_vm": "vmware_vm",
+            "vmware_vc": "vmware_vc",
+        }
+        return params
+
+    def get_esxi_asso(self, data, *args, **kwargs):
         vmware_ds = data.get("vmware_ds", "")
         vmware_ds_list = vmware_ds.split(",")
         result = [
             {
                 "model_id": "vmware_vc",
-                "inst_name": vc_name,
+                "inst_name": self.vc_name,
                 "asst_id": "group",
-                "model_asst_id": "vmware_esxi_group_vmware_vc"
+                "model_asst_id": "vmware_esxi_group_vmware_vc",
             }
         ]
         for ds in vmware_ds_list:
@@ -623,80 +640,44 @@ class CollectVmwareMetrics:
         return result
 
     @staticmethod
-    def set_inst_name(data):
+    def set_inst_name(*args, **kwargs):
         # {vm的名称}[{moid}]
-        inst_name = f"{data['name']}[{data['resource_id']}]"
+        data = args[0]
+        inst_name = f"{data['inst_name']}[{data['resource_id']}]"
         return inst_name
 
     @property
     def model_field_mapping(self):
-
-        test_data = {
-            "vmware_vc": [{
-                "vc_version": "7.0.3",
-                "inst_name": "VMware vCenter Server"
-            }],
-            "vmware_ds": [{
-                "resource_id": "datastore-1646",
-                "url": "ds:///vmfs/volumes/6385b001-37c96502-d73f-509a4c67b4c3/",
-                "name": "datastore1-16.16",
-                "system_type": "VMFS",
-                "storage_gb": 2505,
-                "vmware_esxi": "host-1645"
-            }],
-            "vmware_vm": [{
-                "resource_id": "vm-1656",
-                "inst_name": "vmdmeo01",
-                "ip_addr": "",
-                "vmware_esxi": "host-1645",
-                "vmware_ds": ["datastore-1646"],
-                "cluster": "GZ-Cluster",
-                "os_name": "CentOS 7 (64-bit)",
-                "vcpus": 4,
-                "memory": 4096
-            }],
-            "vmware_esxi": [{
-                "ip_addr": "10.10.16.16",
-                "inst_name": "10.10.16.16",
-                "resource_id": "host-1645",
-                "memory": 65361,
-                "cpu_model": "Intel(R) Xeon(R) CPU E3-1240 v5 @ 3.50GHz",
-                "cpu_cores": 4,
-                "vcpus": 8,
-                "esxi_version": "7.0.3",
-                "vmware_ds": "datastore-1646"
-            }],
-        }
-
         mapping = {
             "vmware_vc": {
-                "vc_version": "vc_version"
+                "vc_version": "vc_version",
+                "inst_name": self.vc_name
             },
             "vmware_vm": {
-                "inst_name": self.set_inst_name,
+                "inst_name": "inst_name",
                 "ip_addr": "ip_addr",
                 "resource_id": "resource_id",
                 "os_name": "os_name",
-                "vcpus": "vcpus",
-                "memory": "memory",
+                "vcpus": (int, "vcpus"),
+                "memory": (int, "memory"),
                 self.asso: self.get_vm_asso
             },
             "vmware_esxi": {
-                "inst_name": self.set_inst_name,
+                "inst_name": "inst_name",
                 "ip_addr": "ip_addr",
                 "resource_id": "resource_id",
-                "cpu_cores": "cpu_cores",
-                "vcpus": "vcpus",
-                "memory": "memory",
+                "cpu_cores": (int, "cpu_cores"),
+                "vcpus": (int, "vcpus"),
+                "memory": (int, "memory"),
                 "esxi_version": "esxi_version",
-                self.asso: self.get_vm_asso
+                self.asso: self.get_esxi_asso
 
             },
             "vmware_ds": {
-                "inst_name": self.set_inst_name,
+                "inst_name": "inst_name",
                 "system_type": "system_type",
                 "resource_id": "resource_id",
-                "storage": "storage",
+                "storage": (int, "storage"),
                 "url": "url",
                 # self.asso: self.get_ds_asso
             }
@@ -705,10 +686,14 @@ class CollectVmwareMetrics:
 
         return mapping
 
+    @staticmethod
+    def format_instance_id(inst_id):
+        return
+
     def query_data(self):
         """查询数据"""
         sql = " or ".join(
-            "{}{{instance_id=\"{}\"}}".format(j, self.vc_name) for m in VMWARE_CLUSTER.values() for j in m)
+            "{}{{instance_id=\"{}\"}}".format(m, f"{self.task_id}_{self.vc_name}") for m in VMWARE_CLUSTER)
         data = Collection().query(sql)
         return data.get("data", [])
 
@@ -727,14 +712,15 @@ class CollectVmwareMetrics:
             index_dict = dict(
                 index_key=metric_name,
                 index_value=value,
-                index_time=index_data["TimeUnix"],
                 **index_data["metric"],
             )
-            self.collection_metrics_dict[index_dict["model_id"]].append(index_dict)
+
+            self.collection_metrics_dict[metric_name].append(index_dict)
 
     def format_metrics(self):
         """格式化数据"""
-        for model_id, metrics in self.collection_metrics_dict.items():
+        for metric_key, metrics in self.collection_metrics_dict.items():
+            model_id = VMWARE_CLUSTER_MAP[metric_key]
             result = []
             if model_id == "vmware_vc":
                 self.model_resource_id_mapping.update({model_id: {}})
@@ -744,8 +730,10 @@ class CollectVmwareMetrics:
             for index_data in metrics:
                 data = {}
                 for field, key_or_func in mapping.items():
-                    if callable(key_or_func):
-                        data[self.asso] = key_or_func(index_data, index_data["inst_name"])
+                    if isinstance(key_or_func, tuple):
+                        data[field] = key_or_func[0](index_data[key_or_func[1]])
+                    elif callable(key_or_func):
+                        data[field] = key_or_func(index_data, index_data["inst_name"])
                     else:
                         data[field] = index_data.get(key_or_func, "")
 

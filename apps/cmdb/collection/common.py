@@ -23,10 +23,10 @@ class Collection:
 
 # 纳管数据（数据纳管到数据库）
 class Management:
-    def __init__(self, organization, cluster_name, model_id, old_data, new_data, unique_keys, collect_time, task_id):
+    def __init__(self, organization, inst_name, model_id, old_data, new_data, unique_keys, collect_time, task_id):
         self.organization = organization
         self.collect_time = collect_time
-        self.cluster_name = cluster_name
+        self.inst_name = inst_name
         self.model_id = model_id
         self.old_data = old_data
         self.new_data = new_data
@@ -85,16 +85,15 @@ class Management:
         with Neo4jClient() as ag:
             exist_items, _ = ag.query_entity(INSTANCE, [{"field": "model_id", "type": "str=", "value": self.model_id}])
             for instance_info in inst_list:
+                assos = instance_info.pop("assos", [])
                 try:
                     instance_info.update(
                         model_id=self.model_id,
-                        self_cluster=self.cluster_name,
                         organization=self.organization,
-                        collect_task=self.cluster_name,
+                        collect_task=self.task_id,
                         auto_collect=True,
                         collect_time=self.collect_time,
                     )
-                    assos = instance_info.pop("assos", [])
                     entity = ag.create_entity(INSTANCE, instance_info, self.check_attr_map, exist_items)
                     # 创建关联
                     assos_result = self.setting_assos(entity, assos)
@@ -102,6 +101,7 @@ class Management:
                     result["success"].append(dict(inst_info=entity, assos_result=assos_result))
                 except Exception as e:
                     result["failed"].append({"instance_info": instance_info, "error": getattr(e, "message", e)})
+
         return result
 
     def update_inst(self, inst_list):
@@ -117,7 +117,7 @@ class Management:
                     instance_info.update(
                         model_id=self.model_id,
                         organization=self.organization,
-                        collect_task=self.cluster_name,
+                        collect_task=self.task_id,
                         auto_collect=True,
                         collect_time=self.collect_time,
                     )
@@ -127,7 +127,8 @@ class Management:
                         INSTANCE, [instance_info["_id"]], instance_info, self.check_attr_map, exist_items
                     )
                     # 更新关联
-                    assos_result = self.setting_assos(dict(model_id=self.model_id, _id=entity[0]["_id"]), assos)
+                    assos_result = self.setting_assos(
+                        dict(model_id=self.model_id, _id=entity[0]["_id"], inst_name=entity[0]["inst_name"]), assos)
                     exist_items.append(entity[0])
                     result["success"].append(dict(inst_info=entity[0], assos_result=assos_result))
                 except Exception as e:
@@ -152,10 +153,23 @@ class Management:
                     result["failed"].append({"instance_info": instance_info, "error": getattr(e, "message", e)})
         return result
 
+    def set_asso_info(self, dst_id, src_info, dst_info):
+        """设置关联信息"""
+        asso_info = dict(
+            model_asst_id=dst_info["model_asst_id"],
+            src_model_id=src_info["model_id"],
+            src_inst_id=src_info["_id"],
+            dst_model_id=dst_info["model_id"],
+            dst_inst_id=dst_id,
+            asst_id=dst_info["asst_id"],
+        )
+        return asso_info
+
     def setting_assos(self, src_info, dst_list):
         """设置关联关系"""
         assos_result = {"success": [], "failed": []}
         for dst_info in dst_list:
+            dst_id = None
             try:
                 with Neo4jClient() as ag:
                     dst_entity, _ = ag.query_entity(
@@ -167,23 +181,21 @@ class Management:
                     )
                     if not dst_entity:
                         raise Exception(f"target instance {dst_info['model_id']}:{dst_info['inst_name']} not found")
+
                     dst_id = dst_entity[0]["_id"]
-                    asso_info = dict(
-                        model_asst_id=dst_info["model_asst_id"],
-                        src_model_id=src_info["model_id"],
-                        src_inst_id=src_info["_id"],
-                        dst_model_id=dst_info["model_id"],
-                        dst_inst_id=dst_id,
-                        asst_id=dst_info["asst_id"],
-                    )
+                    asso_info = self.set_asso_info(dst_id, src_info, dst_info)
                     ag.create_edge(
                         INSTANCE_ASSOCIATION, src_info["_id"], INSTANCE, dst_id, INSTANCE, asso_info, "model_asst_id"
                     )
+                    asso_info["src_inst_name"] = src_info["inst_name"]
+                    asso_info["dst_inst_name"] = dst_info["inst_name"]
                     assos_result["success"].append(asso_info)
             except Exception as e:
-                assos_result["failed"].append(
-                    {"src_info": src_info, "dst_info": dst_info, "error": getattr(e, "message", e)}
-                )
+                asso_info = self.set_asso_info(dst_id, src_info, dst_info)
+                asso_info["src_inst_name"] = src_info["inst_name"]
+                asso_info["dst_inst_name"] = dst_info["inst_name"]
+                asso_info.update({"src_info": src_info, "dst_info": dst_info, "error": str(getattr(e, "message", e))})
+                assos_result["failed"].append(asso_info)
         return assos_result
 
     def update(self):

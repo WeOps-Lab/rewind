@@ -65,7 +65,7 @@ class CollectModels(MaintainerInfo, TimeInfo):
         add_data = self.format_data.get("add", [])
         update_data = self.format_data.get("update", [])
         delete_data = self.format_data.get("delete", [])
-        relation_data = self.format_data.get("relation", [])
+        relation_data = self.format_data.get("association", [])
 
         return {
             "add": {"data": add_data, "count": len(add_data)},

@@ -97,4 +97,11 @@ POD_NAMESPACE_RELATION = "k8s_pod_group_k8s_namespace"
 # POD_NAMESPACE_RELATION = "k8s_namespace_group_k8s_pod"
 
 
-VMWARE_CLUSTER = ["vmware_vc_info", "vmware_ds_info", "vmware_vm_info", "vmware_esxi_info"]
+VMWARE_CLUSTER = ["vmware_vc_info_gauge", "vmware_ds_info_gauge", "vmware_esxi_info_gauge", "vmware_vm_info_gauge"]
+
+VMWARE_CLUSTER_MAP = {
+    "vmware_vc_info_gauge": "vmware_vc",
+    "vmware_ds_info_gauge": "vmware_ds",
+    "vmware_vm_info_gauge": "vmware_vm",
+    "vmware_esxi_info_gauge": "vmware_esxi"
+}

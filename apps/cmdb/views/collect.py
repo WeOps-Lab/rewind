@@ -33,7 +33,7 @@ class CollectModelViewSet(ModelViewSet):
     @swagger_auto_schema(
         method='get',
         operation_id="tree",
-        operation_description="查询采集模型对象树"
+        operation_description="查询采集模型对象树",
     )
     @action(methods=["get"], detail=False, url_path="collect_model_tree")
     def tree(self, request, *args, **kwargs):
@@ -45,10 +45,11 @@ class CollectModelViewSet(ModelViewSet):
         operation_id="collect_task_list",
         operation_description="查询采集模型任务列表",
         manual_parameters=[
-            openapi.Parameter("page", openapi.IN_QUERY, description="第几页", type=openapi.TYPE_INTEGER),
-            openapi.Parameter("page_size", openapi.IN_QUERY, description="每页条目数", type=openapi.TYPE_INTEGER),
+            openapi.Parameter("page", openapi.IN_QUERY, description="第几页", type=openapi.TYPE_STRING),
+            openapi.Parameter("page_size", openapi.IN_QUERY, description="每页条目数", type=openapi.TYPE_STRING),
             openapi.Parameter("driver_type", openapi.IN_QUERY, description="驱动", type=openapi.TYPE_STRING),
             openapi.Parameter("search", openapi.IN_QUERY, description="任务名称", type=openapi.TYPE_STRING),
+            openapi.Parameter("ordering", openapi.IN_QUERY, description="排序", type=openapi.TYPE_STRING),
             openapi.Parameter("exec_status", openapi.IN_QUERY, description="采集状态", type=openapi.TYPE_STRING),
         ]
     )
@@ -106,12 +107,22 @@ class CollectModelViewSet(ModelViewSet):
 
         return WebUtils.response_success(instance.id)
 
-    @action(methods=["POST"], detail=False)
+    @action(methods=["POST"], detail=True)
     @transaction.atomic
     def approval(self, request, *args, **kwargs):
         """
         任务审批
         """
+        instance = self.get_object()
+        if instance.exec_status != CollectRunStatusType.EXAMINE and not instance.input_method:
+            return WebUtils.response_error(error_message="任务状态错误或录入方式不正确，无法审批！", status_code=400)
+        if instance.examine:
+            return WebUtils.response_error(error_message="任务已审批！无法再次审批！", status_code=400)
+
+        data = request.data
+        instances = data["instances"]
+        model_map = {instance['model_id']: instance for instance in instances}
+        CollectModelService.collect_controller(instance, model_map)
         return WebUtils.response_success()
 
     @action(methods=["GET"], detail=False)
@@ -123,7 +134,7 @@ class CollectModelViewSet(ModelViewSet):
         query_data = {
             "page": int(params.get("page", 1)),
             "page_size": int(params.get("page_size", 10)),
-            "name": params.get("name",""),
+            "name": params.get("name", ""),
         }
         node = NodeMgmt()
         data = node.node_list(query_data)

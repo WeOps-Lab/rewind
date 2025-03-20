@@ -22,7 +22,7 @@ class CollectModelLIstSerializer(serializers.ModelSerializer):
     class Meta:
         model = CollectModels
         fields = ["id", "name", "task_type", "driver_type", "model_id", "exec_status", "updated_at", "message",
-                  "exec_time", "created_by"]
+                  "exec_time", "created_by", "input_method", "examine"]
 
     @staticmethod
     def get_message(instance):

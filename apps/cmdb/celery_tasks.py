@@ -30,23 +30,29 @@ def sync_collect_task(instance_id):
             # 插件采集
             collect = ProtocolCollect(task=instance)
             result, format_data = collect.main()
-        instance.exec_status = CollectRunStatusType.SUCCESS
+
+        instance.exec_status = CollectRunStatusType.EXAMINE if instance.input_method else CollectRunStatusType.SUCCESS
 
     except Exception as err:
-        celery_logger.error("==采集失败== task_id={}, error={}".format(instance_id, err))
+        import traceback
+        celery_logger.error("==采集失败== task_id={}, error={}".format(instance_id, traceback.format_exc()))
         result = {}
         format_data = {}
         instance.exec_status = CollectRunStatusType.ERROR
 
-    instance.collect_data = result
-    instance.format_data = format_data
-    instance.collect_digest = {
-        "add": len(format_data.get("add", [])),
-        "update": len(format_data.get("update", [])),
-        "delete": len(format_data.get("delete", [])),
-        "association": 0,
-    }
-    instance.save()
+    try:
+        instance.collect_data = result
+        instance.format_data = format_data
+        instance.collect_digest = {
+            "add": len(format_data.get("add", [])),
+            "update": len(format_data.get("update", [])),
+            "delete": len(format_data.get("delete", [])),
+            "association": len(format_data.get("association", [])),
+        }
+        instance.save()
+    except Exception as err:
+        celery_logger.error("==保存采集结果失败== task_id={}, error={}".format(instance_id, err))
+        CollectModels.objects.filter(id=instance_id).update(exec_status=CollectRunStatusType.ERROR)
 
 
 @shared_task
