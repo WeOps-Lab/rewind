@@ -174,7 +174,9 @@
           "name": "Tool-list",
           "operation": [
             "View",
-            "Edit"
+            "Edit",
+            "Add",
+            "Delete"
           ]
         }
       ]
