@@ -231,6 +231,27 @@ MONITOR_OBJS = [
         "instance_id_keys": ["instance_id"],
         "supplementary_indicators": [],
     },
+    {
+        "type": "VMWare",
+        "name": "ESXI",
+        "default_metric": 'any({resource_type="vmware_esxi"}) by (instance_id, resource_id)',
+        "instance_id_keys": ["instance_id", "resource_id"],
+        "supplementary_indicators": [],
+    },
+    {
+        "type": "VMWare",
+        "name": "VM",
+        "default_metric": 'any({resource_type="vmware_vm"}) by (instance_id, resource_id)',
+        "instance_id_keys": ["instance_id", "resource_id"],
+        "supplementary_indicators": [],
+    },
+    {
+        "type": "VMWare",
+        "name": "DataStorage",
+        "default_metric": 'any({resource_type="vmware_ds"}) by (instance_id, resource_id)',
+        "instance_id_keys": ["instance_id", "resource_id"],
+        "supplementary_indicators": [],
+    },
 ]
 
 # 阀值对比方法
