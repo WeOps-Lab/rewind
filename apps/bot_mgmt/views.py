@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 import hashlib
 import json
@@ -209,12 +210,12 @@ def openai_completions(request):
 def stream_chat(params, skill_obj, kwargs, current_ip, user_message):
     show_think = params.pop("show_think", True)
     doc_map, title_map, team_info, chat_kwargs = llm_service.format_stream_chat_params(params)
-    chat_server = RemoteRunnable(settings.OPENAI_CHAT_SERVICE_URL)
+    chat_server = RemoteRunnable(settings.OPENAI_CHAT_SERVICE_URL.rstrip("/") + "/stream")
 
-    def generate_stream():
+    async def generate_stream_async():
         chat_content = ""
         input_tokens = output_tokens = 0
-        for result in chat_server.stream(chat_kwargs):
+        async for result in chat_server.astream(chat_kwargs):
             if isinstance(result, str):
                 result = json.loads(result)
             if not result["result"]:
@@ -226,6 +227,7 @@ def stream_chat(params, skill_obj, kwargs, current_ip, user_message):
             output_tokens += data["output_tokens"]
             content = data["content"]
             if not show_think:
+                # TODO
                 content = re.sub(r"<think>.*?</think>", "", content, flags=re.DOTALL).strip()
             stream_chunk = {
                 "choices": [{"delta": {"content": content}, "index": 0, "finish_reason": None}],
@@ -273,6 +275,17 @@ def stream_chat(params, skill_obj, kwargs, current_ip, user_message):
             ],
         }
         insert_skill_log(current_ip, skill_obj.id, return_data, kwargs, user_message=user_message)
+
+    def generate_stream():
+        # 将异步生成器转换为同步生成器
+        loop = asyncio.new_event_loop()
+        async_gen = generate_stream_async()
+        while True:
+            try:
+                chunk = loop.run_until_complete(async_gen.__anext__())
+                yield chunk
+            except StopAsyncIteration:
+                break
 
     return StreamingHttpResponse(generate_stream(), content_type="text/event-stream")
 
