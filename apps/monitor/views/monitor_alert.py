@@ -134,7 +134,10 @@ class MonitorEventVieSet(viewsets.ViewSet):
         if alert_obj.end_event_time:
             event_query["created_at__lte"] = alert_obj.end_event_time
         q_set = MonitorEvent.objects.filter(**event_query).order_by("-created_at")
-        events = q_set[(page - 1) * page_size: page * page_size]
+        if page_size == -1:
+            events = q_set
+        else:
+            events = q_set[(page - 1) * page_size: page * page_size]
         result = [
             {
                 "id": i.id,

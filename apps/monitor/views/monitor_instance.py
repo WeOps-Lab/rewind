@@ -5,8 +5,9 @@ from rest_framework.decorators import action
 
 from apps.core.utils.web_utils import WebUtils
 from apps.monitor.filters.monitor_object import MonitorInstanceGroupingRuleFilter
-from apps.monitor.models import MonitorInstanceGroupingRule, MonitorInstance
+from apps.monitor.models import MonitorInstanceGroupingRule, MonitorInstance, MonitorObject
 from apps.monitor.serializers.monitor_object import MonitorInstanceGroupingRuleSerializer
+from apps.monitor.services.monitor_instance import InstanceSearch
 from apps.monitor.services.monitor_object import MonitorObjectService
 from apps.monitor.utils.node_mgmt_api import NodeUtils
 from config.drf.pagination import CustomPageNumberPagination
@@ -15,10 +16,23 @@ from config.drf.pagination import CustomPageNumberPagination
 class MonitorInstanceVieSet(viewsets.ViewSet):
 
     @swagger_auto_schema(
+        operation_description="获取查询参数枚举",
+        manual_parameters=[
+            openapi.Parameter("name", openapi.IN_PATH, description="对象名称", type=openapi.TYPE_STRING,
+                              required=True),
+        ],
+    )
+    @action(methods=['get'], detail=False, url_path='query_params_enum/(?P<name>[^/.]+)')
+    def get_query_params_enum(self, request, name):
+        data = InstanceSearch.get_query_params_enum(name)
+        return WebUtils.response_success(data)
+
+    @swagger_auto_schema(
         operation_id="monitor_instance_list",
         operation_description="监控实例列表",
         manual_parameters=[
-            openapi.Parameter("monitor_object_id", openapi.IN_PATH, description="指标查询参数", type=openapi.TYPE_INTEGER, required=True),
+            openapi.Parameter("monitor_object_id", openapi.IN_PATH, description="指标查询参数",
+                              type=openapi.TYPE_INTEGER, required=True),
             openapi.Parameter("page", openapi.IN_QUERY, description="页码", type=openapi.TYPE_INTEGER),
             openapi.Parameter("page_size", openapi.IN_QUERY, description="每页数据条数", type=openapi.TYPE_INTEGER),
             openapi.Parameter("add_metrics", openapi.IN_QUERY, description="是否添加指标", type=openapi.TYPE_BOOLEAN),
@@ -37,6 +51,38 @@ class MonitorInstanceVieSet(viewsets.ViewSet):
             request.user.is_superuser,
             bool(request.GET.get("add_metrics", False)),
         )
+        return WebUtils.response_success(data)
+
+    @swagger_auto_schema(
+        operation_id="monitor_instance_search",
+        operation_description="监控实例查询",
+        manual_parameters=[
+            openapi.Parameter("monitor_object_id", openapi.IN_PATH, description="指标查询参数",
+                              type=openapi.TYPE_INTEGER, required=True),
+        ],
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "page": openapi.Schema(type=openapi.TYPE_INTEGER, description="页码"),
+                "page_size": openapi.Schema(type=openapi.TYPE_INTEGER, description="每页数据条数"),
+                "add_metrics": openapi.Schema(type=openapi.TYPE_BOOLEAN, description="是否添加指标"),
+                "name": openapi.Schema(type=openapi.TYPE_STRING, description="监控实例名称"),
+                "vm_params": openapi.Schema(type=openapi.TYPE_OBJECT, description="维度参数"),
+            },
+        )
+    )
+    @action(methods=['post'], detail=False, url_path='(?P<monitor_object_id>[^/.]+)/search')
+    def monitor_instance_search(self, request, monitor_object_id):
+        monitor_obj = MonitorObject.objects.filter(id=monitor_object_id).first()
+        if not monitor_obj:
+            raise ValueError("Monitor object does not exist")
+        search_obj = InstanceSearch(
+            monitor_obj,
+            dict(group_list=[i["id"] for i in request.user.group_list],
+                 is_superuser=request.user.is_superuser,
+                 **request.data)
+        )
+        data = search_obj.search()
         return WebUtils.response_success(data)
 
     @swagger_auto_schema(
