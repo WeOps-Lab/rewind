@@ -94,9 +94,9 @@ class InstanceSearch:
 
     def get_objs(self):
         qs = MonitorInstance.objects.filter(monitor_object_id=self.monitor_obj.id)
-        is_super = self.query_data.get("is_super")
+        is_super = self.query_data.get("is_superuser")
         if not is_super:
-            group_ids = self.query_data["group_ids"]
+            group_ids = self.query_data["group_list"]
             qs = qs.filter(monitorinstanceorganization__organization__in=group_ids)
         qs = qs.prefetch_related(Prefetch('monitorinstanceorganization_set', to_attr='organizations'))
         name = self.query_data.get("name")
@@ -109,7 +109,7 @@ class InstanceSearch:
     def get_vm_metrics(self):
         query = self.obj_metric_map.get("default_metric")
         vm_params = self.query_data.get("vm_params")
-        params_str = ",".join([f"{k}={v}" for k, v in vm_params.items()])
+        params_str = ",".join([f"{k}={v}" for k, v in vm_params.items() if v])
         if vm_params:
             if "}" in query:
                 query = query.replace("}", f",{params_str}}}")
