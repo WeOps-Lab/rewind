@@ -12,7 +12,7 @@
         {
           "metric_group": "Quantity",
           "name": "vmware_esxi_count",
-          "query": "count by (instance_id) (count_values by (instance_id, resource_id) (\"resource_id\", {resource_type=\"vmware_esxi\"}))",
+          "query": "count by (instance_id) (sum by (instance_id, resource_id) ({resource_type=\"vmware_esxi\"}))",
           "display_name": "Number of ESXi",
           "data_type": "Number",
           "unit": "short",
@@ -23,7 +23,7 @@
         {
           "metric_group": "CPU",
           "name": "vmware_datastore_count",
-          "query": "count by (instance_id) (count_values by (instance_id, resource_id) (\"resource_id\", {resource_type=\"vmware_ds\"}))",
+          "query": "count by (instance_id) (sum by (instance_id, resource_id) ({resource_type=\"vmware_ds\"}))",
           "display_name": "Number of Datastores",
           "data_type": "Number",
           "unit": "short",
@@ -34,7 +34,7 @@
         {
           "metric_group": "CPU",
           "name": "vmware_vm_count",
-          "query": "count by (instance_id) (count_values by (instance_id, resource_id) (\"resource_id\", {resource_type=\"vmware_vm\"}))",
+          "query": "count by (instance_id) (sum by (instance_id, resource_id) ({resource_type=\"vmware_vm\"}))",
           "display_name": "Number of VM",
           "data_type": "Number",
           "unit": "short",
