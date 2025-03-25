@@ -139,7 +139,7 @@ class ModelProviderInitService:
             name="Online Search",
             defaults={
                 "params": {"url": "http://127.0.0.1:8003/sse", "name": "Online Search"},
-                "description": "",
+                "description": "Enables quick search and retrieval of information through the internet to obtain real-time data.",  # noqa
                 "tags": ["search"],
                 "icon": "",
                 "is_build_in": True,
@@ -149,7 +149,7 @@ class ModelProviderInitService:
             name="General tools",
             defaults={
                 "params": {"url": "http://127.0.0.1:8002/sse", "name": "General tools"},
-                "description": "",
+                "description": "Built-in commonly used tools, including holiday queries, current time queries, etc., to provide additional information.",  # noqa
                 "tags": ["general"],
                 "icon": "",
                 "is_build_in": True,

@@ -1,3 +1,4 @@
+from django.utils.translation import gettext as _
 from rest_framework import serializers
 
 from apps.model_provider_mgmt.models import LLMModel, LLMSkill
@@ -30,6 +31,12 @@ class SkillRequestLogSerializer(serializers.ModelSerializer):
 
 
 class SkillToolsSerializer(serializers.ModelSerializer):
+    description = serializers.SerializerMethodField()
+
     class Meta:
         model = SkillTools
         fields = "__all__"
+
+    @staticmethod
+    def get_description(instance: SkillTools):
+        return _(instance.description)
