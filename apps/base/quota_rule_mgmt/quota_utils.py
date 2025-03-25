@@ -111,3 +111,29 @@ class QuotaUtils(object):
                 "all_token": min(value) if value else 0,
             }
         return return_data
+
+    @staticmethod
+    def get_remaining_token(current_team, llm_model):
+        if not current_team:
+            return 1
+        quota_list = QuotaRule.objects.filter(
+            target_type="group", target_list__contains=current_team, token_set__contains=llm_model
+        )
+        if not quota_list:
+            return {}
+        unit_map = {"thousand": 1000, "million": 1000000}
+        llm_model_list = []
+        for quota in quota_list:
+            token_config = quota["token_set"]
+            for llm_model_name, value in token_config.items():
+                if llm_model_name == llm_model:
+                    llm_model_list.append(int(value["value"]) * unit_map.get(value["unit"], 1))
+                    break
+        used_token = list(
+            TeamTokenUseInfo.objects.filter(group__contains=current_team, llm_model=llm_model).values_list(
+                "used_token", flat=True
+            )
+        )
+        used_token = sum(used_token) if used_token else 0
+        all_token = min(llm_model_list) if llm_model_list else 0
+        return all_token - used_token

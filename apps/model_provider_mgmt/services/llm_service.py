@@ -9,10 +9,12 @@ from django.utils.translation import gettext as _
 from langserve import RemoteRunnable
 
 from apps.base.models.quota_rule import TeamTokenUseInfo
+from apps.base.quota_rule_mgmt.quota_utils import QuotaUtils
 from apps.core.logger import logger
 from apps.knowledge_mgmt.models import KnowledgeBase, KnowledgeDocument
 from apps.knowledge_mgmt.services.knowledge_search_service import KnowledgeSearchService
 from apps.model_provider_mgmt.models import LLMModel, TokenConsumption
+from apps.model_provider_mgmt.models.llm_skill import SkillTools
 
 
 class LLMService:
@@ -130,6 +132,7 @@ class LLMService:
             文档映射、标题映射、团队令牌使用信息和聊天参数
         """
         llm_model = LLMModel.objects.get(id=kwargs["llm_model"])
+        self.validate_remaining_token(llm_model)
         # 处理用户消息和图片
         chat_kwargs, doc_map, title_map = self.format_chat_server_kwargs(kwargs, llm_model)
         # 获取或创建团队令牌使用信息
@@ -139,6 +142,19 @@ class LLMService:
         )
 
         return doc_map, title_map, team_info, chat_kwargs
+
+    @staticmethod
+    def validate_remaining_token(llm_model):
+        try:
+            current_team = llm_model.consumer_team
+            if not current_team:
+                current_team = llm_model.team[0] if llm_model.team else ""
+            remaining_token = QuotaUtils.get_remaining_token(current_team, llm_model.name)
+        except Exception as e:
+            logger.exception(e)
+            remaining_token = 1
+        if remaining_token <= 0:
+            raise Exception(_("Token used up"))
 
     def format_chat_server_kwargs(self, kwargs, llm_model):
         context = ""
@@ -151,6 +167,7 @@ class LLMService:
         user_message, image_data = self._process_user_message_and_images(kwargs["user_message"])
         # 处理聊天历史
         chat_history = self._process_chat_history(kwargs["chat_history"], kwargs["conversation_window_size"])
+        tools = SkillTools.objects.filter(name__in=kwargs.get("tools", [])).values_list("params", flat=True)
         # 构建聊天参数
         chat_kwargs = {
             "system_message_prompt": kwargs["skill_prompt"],
@@ -162,7 +179,7 @@ class LLMService:
             "chat_history": chat_history,
             "conversation_window_size": kwargs["conversation_window_size"],
             "rag_context": context,
-            "tools": kwargs.get("tools", []),
+            "mcp_servers": tools,
             "image_data": image_data,
         }
         return chat_kwargs, doc_map, title_map
@@ -177,10 +194,10 @@ class LLMService:
         Returns:
             处理后的数据、文档映射和标题映射
         """
+        llm_model = LLMModel.objects.get(id=kwargs["llm_model"])
+        self.validate_remaining_token(llm_model)
         chat_server = RemoteRunnable(settings.OPENAI_CHAT_SERVICE_URL)
         show_think = kwargs.pop("show_think", True)
-        llm_model = LLMModel.objects.get(id=kwargs["llm_model"])
-
         # 处理用户消息和图片
         chat_kwargs, doc_map, title_map = self.format_chat_server_kwargs(kwargs, llm_model)
 

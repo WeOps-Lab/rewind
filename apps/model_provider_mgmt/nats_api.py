@@ -1,7 +1,7 @@
 import nats_client
 from apps.base.models import QuotaRule
 from apps.core.logger import logger
-from apps.model_provider_mgmt.models import LLMModel
+from apps.model_provider_mgmt.models import EmbedProvider, LLMModel
 
 
 @nats_client.register
@@ -31,6 +31,10 @@ def init_user_set(group_id, group_name):
             bot_count=2,
             token_set={key: {"value": 10, "unit": "thousand"} for key in name_list},
         )
+        embed_model = EmbedProvider.objects.filter(name="FastEmbed(BAAI/bge-small-zh-v1.5)").first()
+        if embed_model:
+            embed_model.team.append(group_id)
+            embed_model.save()
         return {"result": True}
     except Exception as e:
         logger.exception(e)

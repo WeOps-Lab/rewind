@@ -8,6 +8,7 @@ from rest_framework.response import Response
 
 from apps.base.quota_rule_mgmt.quota_utils import get_quota_client
 from apps.core.decorators.api_perminssion import HasRole
+from apps.core.logger import logger
 from apps.core.utils.viewset_utils import AuthViewSet
 from apps.knowledge_mgmt.models import KnowledgeBase
 from apps.model_provider_mgmt.models import LLMModel, LLMSkill
@@ -91,7 +92,11 @@ class LLMViewSet(AuthViewSet):
         params = request.data
         params["username"] = request.user.username
         params["user_id"] = request.user.id
-        return_data = llm_service.chat(params)
+        try:
+            return_data = llm_service.chat(params)
+        except Exception as e:
+            logger.exception(e)
+            return JsonResponse({"result": False, "message": str(e)})
         return JsonResponse({"result": True, "data": return_data})
 
 

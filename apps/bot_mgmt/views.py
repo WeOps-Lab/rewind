@@ -25,6 +25,21 @@ from apps.model_provider_mgmt.models import LLMSkill, TokenConsumption
 from apps.model_provider_mgmt.services.llm_service import llm_service
 
 
+def generate_stream_error(message):
+    """通用的流式错误生成函数"""
+
+    def generator():
+        error_chunk = {
+            "choices": [{"delta": {"content": message}, "index": 0, "finish_reason": "stop"}],
+            "id": "error",
+            "object": "chat.completion.chunk",
+            "created": int(time.time()),
+        }
+        yield f"data: {json.dumps(error_chunk)}\n\n"
+
+    return StreamingHttpResponse(generator(), content_type="text/event-stream")
+
+
 @api_exempt
 def get_bot_detail(request, bot_id):
     api_token = request.META.get("HTTP_AUTHORIZATION").split("TOKEN")[-1].strip()
@@ -108,6 +123,7 @@ def get_skill_and_params(kwargs, team):
         ],
         "enable_rag_knowledge_source": skill_obj.enable_rag_knowledge_source,
         "show_think": skill_obj.show_think,
+        "tools": skill_obj.tools,
     }
 
     return skill_obj, params, None
@@ -170,18 +186,6 @@ def openai_completions(request):
     kwargs = json.loads(request.body)
     current_ip = get_client_ip(request)
 
-    def generate_stream_error(message):
-        def generator():
-            error_chunk = {
-                "choices": [{"delta": {"content": message}, "index": 0, "finish_reason": "stop"}],
-                "id": "error",
-                "object": "chat.completion.chunk",
-                "created": int(time.time()),
-            }
-            yield f"data: {json.dumps(error_chunk)}\n\n"
-
-        return StreamingHttpResponse(generator(), content_type="text/event-stream")
-
     stream_mode = kwargs.get("stream", False)
     token = request.META.get("HTTP_AUTHORIZATION") or request.META.get(settings.API_TOKEN_HEADER_NAME)
 
@@ -209,7 +213,12 @@ def openai_completions(request):
 
 def stream_chat(params, skill_obj, kwargs, current_ip, user_message):
     show_think = params.pop("show_think", True)
-    doc_map, title_map, team_info, chat_kwargs = llm_service.format_stream_chat_params(params)
+    try:
+        doc_map, title_map, team_info, chat_kwargs = llm_service.format_stream_chat_params(params)
+    except Exception as e:
+        logger.exception(e)
+        return generate_stream_error(str(e))
+
     chat_server = RemoteRunnable(settings.OPENAI_CHAT_SERVICE_URL.rstrip("/") + "/stream")
 
     async def generate_stream_async():
