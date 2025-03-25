@@ -179,7 +179,7 @@ class LLMService:
             "chat_history": chat_history,
             "conversation_window_size": kwargs["conversation_window_size"],
             "rag_context": context,
-            "mcp_servers": tools,
+            "mcp_servers": list(tools),
             "image_data": image_data,
         }
         return chat_kwargs, doc_map, title_map

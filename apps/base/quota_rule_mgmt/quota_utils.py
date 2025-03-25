@@ -120,7 +120,7 @@ class QuotaUtils(object):
             target_type="group", target_list__contains=current_team, token_set__contains=llm_model
         )
         if not quota_list:
-            return {}
+            return 1
         unit_map = {"thousand": 1000, "million": 1000000}
         llm_model_list = []
         for quota in quota_list:
