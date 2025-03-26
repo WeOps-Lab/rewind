@@ -116,8 +116,9 @@ class QuotaUtils(object):
     def get_remaining_token(current_team, llm_model):
         if not current_team:
             return 1
-        quota_list = QuotaRule.objects.filter(
-            target_type="group", target_list__contains=current_team, token_set__contains=llm_model
+        # 修改查询条件，使用正确的方式查询JSON字段中包含特定键的记录
+        quota_list = QuotaRule.objects.filter(target_type="group", target_list__contains=current_team).filter(
+            **{f"token_set__{llm_model}__isnull": False}  # 查询token_set中包含llm_model作为key的记录
         )
         if not quota_list:
             return 1

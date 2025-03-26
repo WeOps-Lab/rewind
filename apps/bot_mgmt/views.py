@@ -221,7 +221,7 @@ def stream_chat(params, skill_obj, kwargs, current_ip, user_message):
 
     chat_server = RemoteRunnable(settings.OPENAI_CHAT_SERVICE_URL.rstrip("/") + "/stream")
 
-    async def generate_stream_async():
+    async def generate_stream_async(token_data):
         chat_content = ""
         input_tokens = output_tokens = 0
         async for result in chat_server.astream(chat_kwargs):
@@ -230,8 +230,6 @@ def stream_chat(params, skill_obj, kwargs, current_ip, user_message):
             if not result["result"]:
                 raise Exception(result["message"])
             data = result["data"]
-            used_token = data["input_tokens"] + data["output_tokens"]
-            team_info.used_token += used_token
             input_tokens += data["input_tokens"]
             output_tokens += data["output_tokens"]
             content = data["content"]
@@ -249,7 +247,6 @@ def stream_chat(params, skill_obj, kwargs, current_ip, user_message):
 
         # Final chunk indicating completion
         source_content = get_knowledge_sources(chat_content, skill_obj, doc_map, title_map)
-        team_info.save()
         if source_content:
             final_chunk = {
                 "choices": [{"delta": {"content": source_content}, "index": 0, "finish_reason": "stop"}],
@@ -259,15 +256,31 @@ def stream_chat(params, skill_obj, kwargs, current_ip, user_message):
             }
             yield f"data: {json.dumps(final_chunk)}\n\n"
             chat_content += source_content
+        token_data["input_tokens"] = input_tokens
+        token_data["output_tokens"] = output_tokens
+        token_data["chat_content"] = chat_content
+
+    def generate_stream():
+        # 将异步生成器转换为同步生成器
+        token_data = {"input_tokens": 0, "output_tokens": 0, "chat_content": ""}
+        loop = asyncio.new_event_loop()
+        async_gen = generate_stream_async(token_data)
+        while True:
+            try:
+                chunk = loop.run_until_complete(async_gen.__anext__())
+                yield chunk
+            except StopAsyncIteration:
+                break
+        used_token = token_data["input_tokens"] + token_data["output_tokens"]
         return_data = {
             "id": skill_obj.name,
             "object": "chat.completion",
             "created": int(time.time()),
             "model": kwargs["model"],
             "usage": {
-                "prompt_tokens": input_tokens,
-                "completion_tokens": output_tokens,
-                "total_tokens": input_tokens + output_tokens,
+                "prompt_tokens": token_data["input_tokens"],
+                "completion_tokens": token_data["output_tokens"],
+                "total_tokens": used_token,
                 "completion_tokens_details": {
                     "reasoning_tokens": 0,
                     "accepted_prediction_tokens": 0,
@@ -276,25 +289,17 @@ def stream_chat(params, skill_obj, kwargs, current_ip, user_message):
             },
             "choices": [
                 {
-                    "message": {"role": "assistant", "content": chat_content},
+                    "message": {"role": "assistant", "content": token_data["chat_content"]},
                     "logprobs": None,
                     "finish_reason": "stop",
                     "index": 0,
                 }
             ],
         }
-        insert_skill_log(current_ip, skill_obj.id, return_data, kwargs, user_message=user_message)
 
-    def generate_stream():
-        # 将异步生成器转换为同步生成器
-        loop = asyncio.new_event_loop()
-        async_gen = generate_stream_async()
-        while True:
-            try:
-                chunk = loop.run_until_complete(async_gen.__anext__())
-                yield chunk
-            except StopAsyncIteration:
-                break
+        team_info.used_token += used_token
+        team_info.save()
+        insert_skill_log(current_ip, skill_obj.id, return_data, kwargs, user_message=user_message)
 
     return StreamingHttpResponse(generate_stream(), content_type="text/event-stream")
 
