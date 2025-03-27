@@ -25,7 +25,6 @@ ASSOCIATION_TYPE = [
     {"asst_id": "connect", "asst_name": "关联", "is_pre": True},
 ]
 
-
 # 需要进行ID与NAME转化的属性类型
 ENUM = "enum"
 USER = "user"
@@ -183,21 +182,24 @@ COLLECT_OBJ_TREE = [
         "id": "k8s",
         "name": "K8S",
         "children": [
-            {"id": "k8s_cluster", "model_id": "k8s_cluster", "name": "K8S", "type": CollectDriverTypes.PROTOCOL}
+            {"id": "k8s_cluster", "model_id": "k8s_cluster", "name": "K8S", "task_type": CollectPluginTypes.K8S,
+             "type": CollectDriverTypes.PROTOCOL}
         ],
     },
     {
         "id": "vmware",
         "name": "VMware",
         "children": [
-            {"id": "vmware_vc", "model_id": "vmware_vc", "name": "vCenter", "type": CollectDriverTypes.PROTOCOL}
+            {"id": "vmware_vc", "model_id": "vmware_vc", "name": "vCenter", "task_type": CollectPluginTypes.VM,
+             "type": CollectDriverTypes.PROTOCOL}
         ],
     },
     {
         "id": "network",
         "name": "NetWork",
         "children": [
-            {"id": "network", "model_id": "network", "name": "NetWork", "type": CollectDriverTypes.PROTOCOL}
+            {"id": "network", "model_id": "network", "name": "NetWork", "task_type": CollectPluginTypes.SNMP,
+             "type": CollectDriverTypes.PROTOCOL}
         ],
     }
 
@@ -208,4 +210,3 @@ COLLECT_OBJ_TREE = [
 VICTORIAMETRICS_HOST = os.getenv("VICTORIAMETRICS_HOST", "")
 
 STARGAZER_URL = os.getenv("STARGAZER_URL", "http://stargazer:8083")
-

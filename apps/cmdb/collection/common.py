@@ -1,24 +1,10 @@
-import requests
 from dotenv import load_dotenv
 
-from apps.cmdb.constants import INSTANCE, INSTANCE_ASSOCIATION, VICTORIAMETRICS_HOST
+from apps.cmdb.constants import INSTANCE, INSTANCE_ASSOCIATION
 from apps.cmdb.graph.neo4j import Neo4jClient
 from apps.cmdb.services.model import ModelManage
 
 load_dotenv()
-
-
-# 采集数据（数据查询）
-class Collection:
-    def __init__(self):
-        self.url = f"{VICTORIAMETRICS_HOST}/prometheus/api/v1/query"
-
-    def query(self, sql, timeout=60):
-        """查询数据"""
-        resp = requests.post(self.url, data={"query": sql}, timeout=timeout)
-        if resp.status_code != 200:
-            raise Exception(f"request error！{resp.text}")
-        return resp.json()
 
 
 # 纳管数据（数据纳管到数据库）

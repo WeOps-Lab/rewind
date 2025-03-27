@@ -2,7 +2,7 @@
 # @File: collect.py
 # @Time: 2025/2/27 14:00
 # @Author: windyzhao
-
+from django.db.models import Q
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 
@@ -16,9 +16,10 @@ from apps.cmdb.celery_tasks import sync_collect_task
 from config.drf.pagination import CustomPageNumberPagination
 from apps.core.utils.web_utils import WebUtils
 from apps.cmdb.constants import COLLECT_OBJ_TREE, CollectRunStatusType
-from apps.cmdb.filters.collect_filters import CollectModelFilter
-from apps.cmdb.models.collect_model import CollectModels
-from apps.cmdb.serializers.collect_serializer import CollectModelSerializer, CollectModelLIstSerializer
+from apps.cmdb.filters.collect_filters import CollectModelFilter, OidModelFilter
+from apps.cmdb.models.collect_model import CollectModels, OidMapping
+from apps.cmdb.serializers.collect_serializer import CollectModelSerializer, CollectModelLIstSerializer, \
+    MidModelSerializer
 from apps.cmdb.services.colletc_service import CollectModelService
 
 
@@ -102,6 +103,7 @@ class CollectModelViewSet(ModelViewSet):
         instance.collect_data = {}
         instance.collect_digest = {}
         instance.save()
+        # TODO 提交的时候记得改回来
         sync_collect_task.delay(instance.id)
         # sync_collect_task(instance.id)
 
@@ -139,3 +141,23 @@ class CollectModelViewSet(ModelViewSet):
         node = NodeMgmt()
         data = node.node_list(query_data)
         return WebUtils.response_success(data)
+
+    @action(methods=["GET"], detail=False)
+    def model_instances(self, requests, *args, **kwargs):
+        """
+        获取此模型下发过任务的实例
+        """
+        params = requests.GET.dict()
+        task_type = params["task_type"]
+        instances = CollectModels.objects.filter(~Q(instances=[]), task_type=task_type).values_list("instances",flat=True)
+        result = [{"id": instance[0]["_id"], "inst_name": instance[0]["inst_name"]} for instance in instances]
+        return WebUtils.response_success(result)
+
+
+class MidModelViewSet(ModelViewSet):
+    queryset = OidMapping.objects.all()
+    serializer_class = MidModelSerializer
+    ordering_fields = ["updated_at"]
+    ordering = ["-updated_at"]
+    filterset_class = OidModelFilter
+    pagination_class = CustomPageNumberPagination

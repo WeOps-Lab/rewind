@@ -77,3 +77,15 @@ class CollectModels(MaintainerInfo, TimeInfo):
     @property
     def is_k8s(self):
         return self.task_type == CollectPluginTypes.K8S
+
+
+class OidMapping(MaintainerInfo, TimeInfo):
+    """
+    oid库映射表
+    """
+
+    model = models.CharField(max_length=128, null=True, verbose_name="设备型号")
+    oid = models.CharField(max_length=64, unique=True, help_text="设备oid")
+    brand = models.CharField(max_length=64, null=True, help_text="品牌")
+    device_type = models.CharField(max_length=128, help_text="设备类型")
+    built_in = models.BooleanField(default=False, verbose_name="是否内置")

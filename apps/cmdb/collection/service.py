@@ -1,9 +1,10 @@
 import json
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone
 from typing import Type
 
-from apps.cmdb.collection.common import Collection, Management
-from apps.cmdb.collection.k8s.constants import (
+from apps.cmdb.collection.base import timestamp_gt_one_day_ago, CollectBase, Collection
+from apps.cmdb.collection.common import Management
+from apps.cmdb.collection.constants import (
     COLLECTION_METRICS,
     NAMESPACE_CLUSTER_RELATION,
     NODE_CLUSTER_RELATION,
@@ -17,22 +18,12 @@ from apps.cmdb.collection.k8s.constants import (
     REPLICAS_METRICS, K8S_STATEFULSET_REPLICAS, K8S_REPLICASET_REPLICAS, K8S_DEPLOYMENT_REPLICAS, ANNOTATIONS_METRICS,
     K8S_DEPLOYMENT_ANNOTATIONS, K8S_REPLICASET_ANNOTATIONS, K8S_STATEFULSET_ANNOTATIONS, K8S_DAEMONSET_ANNOTATIONS,
     K8S_JOB_ANNOTATIONS, K8S_CRONJOB_ANNOTATIONS, POD_NODE_RELATION, VMWARE_CLUSTER, VMWARE_CLUSTER_MAP,
+    NETWORK_CLUSTER,
 )
 from apps.cmdb.constants import INSTANCE
 from apps.cmdb.graph.neo4j import Neo4jClient
-
-
-def timestamp_gt_one_day_ago(collect_timestamp):
-    """
-    判断时间戳是否大于一天前
-    """
-    # 获取当前时间
-    current_time = datetime.now()
-    # 计算一天前的时间
-    one_day_ago = current_time - timedelta(days=1)
-    # 转换为时间戳
-    one_day_ago_timestamp = int(one_day_ago.timestamp())
-    return collect_timestamp < one_day_ago_timestamp
+from apps.cmdb.models import OidMapping
+from apps.core.logger import logger
 
 
 # 指标纳管（纳管控制器）
@@ -57,9 +48,9 @@ class MetricsCannula:
     def get_collection_metrics(self):
         """获取采集指标"""
         new_metrics = self.collect_plugin(self.inst_name, self.inst_id, self.task_id)
-        self.collect_data = new_metrics.collect_data
-        self.collect_params = new_metrics.collect_params
-        return new_metrics.run()
+        result = new_metrics.run()
+        self.collect_data = new_metrics.result
+        return result
 
     @staticmethod
     def contrast(old_map, new_map):
@@ -78,7 +69,7 @@ class MetricsCannula:
 
     def collect_controller(self) -> dict:
         result = {}
-        for key, model_id in self.collect_params.items():
+        for model_id, metrics in self.collection_metrics.items():
             params = [
                 {"field": "model_id", "type": "str=", "value": model_id},
                 {"field": "collect_task", "type": "str=", "value": self.task_id},
@@ -90,7 +81,7 @@ class MetricsCannula:
                     self.inst_name,
                     model_id,
                     already_data,
-                    self.collection_metrics[key],
+                    metrics,
                     ["inst_name"],
                     self.now_time,
                     self.task_id
@@ -103,7 +94,7 @@ class MetricsCannula:
                 else:
                     collect_result = management.controller()
 
-                result[key] = collect_result
+                result[model_id] = collect_result
 
         return result
 
@@ -114,6 +105,7 @@ class CollectK8sMetrics:
         self.metrics = self.get_metrics()
         self.collection_metrics_dict = {i: [] for i in COLLECTION_METRICS.keys()}
         self.timestamp_gt = False
+        self.result = {}
 
     @property
     def collect_data(self):
@@ -207,6 +199,7 @@ class CollectK8sMetrics:
                 )
             )
         self.collection_metrics_dict["namespace"] = result
+        self.result["k8s_namespace"] = result
 
     def search_replicas(self):
         """查询副本数量"""
@@ -382,6 +375,7 @@ class CollectK8sMetrics:
                 })
 
         self.collection_metrics_dict["workload"] = result
+        self.result["k8s_workload"] = result
 
     def format_pod_metrics(self):
         """
@@ -505,6 +499,7 @@ class CollectK8sMetrics:
             result.append(pod_data)
 
         self.collection_metrics_dict["pod"] = result
+        self.result["k8s_pod"] = result
 
     def format_node_metrics(self):
         """格式化node"""
@@ -554,45 +549,23 @@ class CollectK8sMetrics:
                 info.update(role=role)
             result.append(info)
         self.collection_metrics_dict["node"] = result
+        self.result["k8s_node"] = result
 
     def run(self):
         """执行"""
         data = self.query_data()
         self.format_data(data)
-        return self.collection_metrics_dict
+        return self.result
 
 
-class CollectVmwareMetrics:
+class CollectVmwareMetrics(CollectBase):
     def __init__(self, inst_name, inst_id, task_id, *args, **kwargs):
-        self.inst_id = inst_id
-        self.task_id = task_id
-        self.vc_name = inst_name
-        self.collection_metrics_dict = {i: [] for i in VMWARE_CLUSTER}
-        self.timestamp_gt = False
-        self.asso = "assos"
-        self.result = {}
+        super().__init__(inst_name, inst_id, task_id, *args, **kwargs)
         self.model_resource_id_mapping = {}
 
     @property
-    def collect_data(self):
-        """采集数据"""
-        data = {
-            "vmware_vc": self.collection_metrics_dict["vmware_vc_info_gauge"],
-            "vmware_vm": self.collection_metrics_dict["vmware_vm_info_gauge"],
-            "vmware_ds": self.collection_metrics_dict["vmware_ds_info_gauge"],
-            "vmware_esxi": self.collection_metrics_dict["vmware_esxi_info_gauge"]
-        }
-        return data
-
-    @property
-    def collect_params(self):
-        params = {
-            "vmware_esxi": "vmware_esxi",
-            "vmware_ds": "vmware_ds",
-            "vmware_vm": "vmware_vm",
-            "vmware_vc": "vmware_vc",
-        }
-        return params
+    def _metrics(self):
+        return VMWARE_CLUSTER
 
     def get_esxi_asso(self, data, *args, **kwargs):
         vmware_ds = data.get("vmware_ds", "")
@@ -600,7 +573,7 @@ class CollectVmwareMetrics:
         result = [
             {
                 "model_id": "vmware_vc",
-                "inst_name": self.vc_name,
+                "inst_name": self.inst_name,
                 "asst_id": "group",
                 "model_asst_id": "vmware_esxi_group_vmware_vc",
             }
@@ -641,7 +614,9 @@ class CollectVmwareMetrics:
 
     @staticmethod
     def set_inst_name(*args, **kwargs):
-        # {vm的名称}[{moid}]
+        """
+        {vm的名称}[{moid}]
+        """
         data = args[0]
         inst_name = f"{data['inst_name']}[{data['resource_id']}]"
         return inst_name
@@ -651,7 +626,7 @@ class CollectVmwareMetrics:
         mapping = {
             "vmware_vc": {
                 "vc_version": "vc_version",
-                "inst_name": self.vc_name
+                "inst_name": self.inst_name
             },
             "vmware_vm": {
                 "inst_name": "inst_name",
@@ -686,16 +661,10 @@ class CollectVmwareMetrics:
 
         return mapping
 
-    @staticmethod
-    def format_instance_id(inst_id):
-        return
-
-    def query_data(self):
-        """查询数据"""
+    def prom_sql(self):
         sql = " or ".join(
-            "{}{{instance_id=\"{}\"}}".format(m, f"{self.task_id}_{self.vc_name}") for m in VMWARE_CLUSTER)
-        data = Collection().query(sql)
-        return data.get("data", [])
+            "{}{{instance_id=\"{}\"}}".format(m, f"{self.task_id}_{self.inst_name}") for m in self._metrics)
+        return sql
 
     def format_data(self, data):
         """格式化数据"""
@@ -740,9 +709,92 @@ class CollectVmwareMetrics:
                 result.append(data)
             self.result[model_id] = result
 
-    def run(self):
-        """执行"""
-        data = self.query_data()
-        self.format_data(data)
-        self.format_metrics()
-        return self.result
+
+class CollectNetworkMetrics(CollectBase):
+    def __init__(self, inst_name, inst_id, task_id, *args, **kwargs):
+        super().__init__(inst_name, inst_id, task_id, *args, **kwargs)
+        self.oid_map = self.get_oid_map()
+
+    @property
+    def _metrics(self):
+        return NETWORK_CLUSTER
+
+    def prom_sql(self):
+        sql = " or ".join(m for m in self._metrics)
+        return sql
+
+    @staticmethod
+    def get_oid_map():
+        result = OidMapping.objects.all().values()
+        return {i["oid"]: i for i in result}
+
+    @staticmethod
+    def set_inst_name(*args, **kwargs):
+        # ip-switch
+        data = args[0]
+        inst_name = f"{data['ip_addr']}-{data['device_type']}"
+        return inst_name
+
+    @property
+    def model_field_mapping(self):
+        mapping = {
+            "inst_name": self.set_inst_name,
+            "ip_addr": "ip_addr",
+            "port": "port",
+            "model": "model",
+            "brand": "brand",
+            "model_id": "model_id"
+        }
+
+        return mapping
+
+    def check_task_id(self, instance_id):
+        # TODO 后续补tag字段后 修改查询的promsql 语句
+        task_id, _ = instance_id.split("_", 1)
+        return task_id == self.task_id
+
+    def format_data(self, data):
+        """格式化数据"""
+        for index_data in data["result"]:
+            metric_name = index_data["metric"]["__name__"]
+            instance_id = index_data["metric"]["instance_id"]
+            if not self.check_task_id(instance_id):
+                continue
+            value = index_data["value"]
+            _time, value = value[0], value[1]
+            if not self.timestamp_gt:
+                if timestamp_gt_one_day_ago(_time):
+                    break
+                else:
+                    self.timestamp_gt = True
+
+            index_dict = dict(
+                index_key=metric_name,
+                index_value=value,
+                **index_data["metric"],
+            )
+
+            self.collection_metrics_dict[metric_name].append(index_dict)
+
+    def format_metrics(self):
+        """格式化数据"""
+        mapping = self.model_field_mapping
+        for metric_key, metrics in self.collection_metrics_dict.items():
+            for index_data in metrics:
+                oid = index_data["sysobjectid"]
+                oid_data = self.oid_map.get(oid, "")
+                if not oid_data:
+                    logger.info("==OID不存在，此实例数据跳过 OID={}==".format(oid))
+                    continue
+                model_id = oid_data["device_type"]
+                index_data.update(oid_data)
+                data = {}
+                for field, key_or_func in mapping.items():
+                    if isinstance(key_or_func, tuple):
+                        data[field] = key_or_func[0](index_data[key_or_func[1]])
+                    elif callable(key_or_func):
+                        data[field] = key_or_func(index_data)
+                    else:
+                        data[field] = index_data.get(key_or_func, "")
+
+                self.result.setdefault(model_id, []).append(data)

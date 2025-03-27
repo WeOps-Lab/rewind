@@ -3,7 +3,7 @@
 # @Time: 2025/3/3 13:58
 # @Author: windyzhao
 from rest_framework import serializers
-from apps.cmdb.models.collect_model import CollectModels
+from apps.cmdb.models.collect_model import CollectModels, OidMapping
 
 
 class CollectModelSerializer(serializers.ModelSerializer):
@@ -22,7 +22,7 @@ class CollectModelLIstSerializer(serializers.ModelSerializer):
     class Meta:
         model = CollectModels
         fields = ["id", "name", "task_type", "driver_type", "model_id", "exec_status", "updated_at", "message",
-                  "exec_time", "created_by", "input_method", "examine"]
+                  "exec_time", "created_by", "input_method", "examine", "params"]
 
     @staticmethod
     def get_message(instance):
@@ -36,3 +36,10 @@ class CollectModelLIstSerializer(serializers.ModelSerializer):
             "association": 0,
         }
         return data
+
+
+class MidModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OidMapping
+        fields = "__all__"
+        extra_kwargs = {}

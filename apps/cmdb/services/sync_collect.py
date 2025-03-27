@@ -4,13 +4,23 @@
 # @Author: windyzhao
 from apps.cmdb.constants import CollectPluginTypes
 from apps.cmdb.models.collect_model import CollectModels
-from apps.cmdb.collection.k8s.service import MetricsCannula, CollectK8sMetrics, CollectVmwareMetrics
+from apps.cmdb.collection.service import MetricsCannula, CollectK8sMetrics, CollectVmwareMetrics, \
+    CollectNetworkMetrics
 
 
 class ProtocolCollect(object):
     def __init__(self, task, default_metrics=None):
         self.task = task
         self.default_metrics = default_metrics
+
+    @property
+    def collect_manage(self):
+        result = {
+            CollectPluginTypes.VM: self.collect_vmware,
+            CollectPluginTypes.SNMP: self.collect_network,
+            CollectPluginTypes.K8S: self.collect_k8s
+        }
+        return result
 
     def get_instance(self):
         instance = self.task.instances[0] if self.task.instances else None
@@ -27,13 +37,12 @@ class ProtocolCollect(object):
         data = VmwareCollect(self.task.id, self.default_metrics)()
         return data
 
+    def collect_network(self):
+        data = NetworkCollect(self.task.id)()
+        return data
+
     def main(self):
-        if self.task.task_type == CollectPluginTypes.K8S:
-            result = self.collect_k8s()
-            return result
-        elif self.task.task_type == CollectPluginTypes.VM:
-            result = self.collect_vmware()
-            return result
+        return self.collect_manage[self.task.task_type]()
 
 
 class BaseCollect(object):
@@ -45,12 +54,19 @@ class BaseCollect(object):
         self.model_id, self.inst_name, self.organization, self.inst_id = self.format_params()
 
     def format_params(self):
+        if not self.task.instances:
+            return None, None, self.get_organization, None
+
         instance = self.task.instances[0]
         model_id = instance["model_id"]
         inst_name = instance["inst_name"]
         organization = instance["organization"]
         inst_id = instance["_id"]
         return model_id, inst_name, organization, inst_id
+
+    @property
+    def get_organization(self):
+        return self.task.params["organization"]
 
     @property
     def task_id(self):
@@ -70,9 +86,6 @@ class BaseCollect(object):
         format_data = self.format_collect_data(result)
 
         return metrics_cannula.collect_data, format_data
-
-    def search(self):
-        pass
 
     def format_collect_data(self, result):
         format_data = {"add": [], "update": [], "delete": [], "association": []}
@@ -117,3 +130,7 @@ class K8sCollect(BaseCollect):
 
 class VmwareCollect(BaseCollect):
     COLLECT_PLUGIN = CollectVmwareMetrics
+
+
+class NetworkCollect(BaseCollect):
+    COLLECT_PLUGIN = CollectNetworkMetrics
