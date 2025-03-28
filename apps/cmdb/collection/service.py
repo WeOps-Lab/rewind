@@ -714,6 +714,13 @@ class CollectNetworkMetrics(CollectBase):
     def __init__(self, inst_name, inst_id, task_id, *args, **kwargs):
         super().__init__(inst_name, inst_id, task_id, *args, **kwargs)
         self.oid_map = self.get_oid_map()
+        # 4：other  （冗余用的）
+        self.interface_status_map = {
+            "1": "UP",
+            "2": "Down",
+            "3": "Testing"
+        }
+        self.instance_id_map = {}
 
     @property
     def _metrics(self):
@@ -735,8 +742,33 @@ class CollectNetworkMetrics(CollectBase):
         inst_name = f"{data['ip_addr']}-{data['device_type']}"
         return inst_name
 
+    def set_interface_status(self, data, *args, **kwargs):
+        return self.interface_status_map.get(data, "other")
+
+    def set_interface_inst_name(self, data, *args, **kwargs):
+        inst_name = self.set_self_device(data)
+        return f"{inst_name}-{data['alias']}"
+
+    def set_self_device(self, data, *args, **kwargs):
+        instance_id = data["instance_id"]
+        instance = self.instance_id_map[instance_id]
+        return self.set_inst_name(instance)
+
+    def get_interface_asso(self, data, *args, **kwargs):
+        instance_id = data["instance_id"]
+        instance = self.instance_id_map[instance_id]
+        model_id = instance["device_type"]
+        return [
+            {
+                "model_id": model_id,
+                "inst_name": self.set_inst_name(instance),
+                "asst_id": "belong",
+                "model_asst_id": f"interface_belong_{model_id}"
+            }
+        ]
+
     @property
-    def model_field_mapping(self):
+    def device_map(self):
         mapping = {
             "inst_name": self.set_inst_name,
             "ip_addr": "ip_addr",
@@ -745,7 +777,18 @@ class CollectNetworkMetrics(CollectBase):
             "brand": "brand",
             "model_id": "model_id"
         }
+        return mapping
 
+    @property
+    def model_field_mapping(self):
+        mapping = {
+            "inst_name": self.set_interface_inst_name,
+            "self_device": self.set_self_device,
+            "mac": "mac_address",
+            "name": "alias",
+            "status": (self.set_interface_status, "oper_status"),
+            self.asso: self.get_interface_asso,
+        }
         return mapping
 
     def check_task_id(self, instance_id):
@@ -760,6 +803,16 @@ class CollectNetworkMetrics(CollectBase):
             instance_id = index_data["metric"]["instance_id"]
             if not self.check_task_id(instance_id):
                 continue
+
+            if "sysobjectid" in index_data["metric"]:
+                oid = index_data["metric"]["sysobjectid"]
+                oid_data = self.oid_map.get(oid, "")
+                if not oid_data:
+                    logger.info("==OID不存在，此实例数据跳过 OID={}==".format(oid))
+                    continue
+                else:
+                    index_data["metric"].update(oid_data)
+
             value = index_data["value"]
             _time, value = value[0], value[1]
             if not self.timestamp_gt:
@@ -774,20 +827,22 @@ class CollectNetworkMetrics(CollectBase):
                 **index_data["metric"],
             )
 
+            if "sysobjectid" in index_dict:
+                self.instance_id_map[index_dict["instance_id"]] = index_dict
+
             self.collection_metrics_dict[metric_name].append(index_dict)
 
     def format_metrics(self):
         """格式化数据"""
-        mapping = self.model_field_mapping
         for metric_key, metrics in self.collection_metrics_dict.items():
             for index_data in metrics:
-                oid = index_data["sysobjectid"]
-                oid_data = self.oid_map.get(oid, "")
-                if not oid_data:
-                    logger.info("==OID不存在，此实例数据跳过 OID={}==".format(oid))
-                    continue
-                model_id = oid_data["device_type"]
-                index_data.update(oid_data)
+                if "sysobjectid" in index_data:
+                    model_id = index_data["device_type"]
+                    mapping = self.device_map
+                else:
+                    model_id = "interface"
+                    mapping = self.model_field_mapping
+
                 data = {}
                 for field, key_or_func in mapping.items():
                     if isinstance(key_or_func, tuple):

@@ -107,4 +107,4 @@ VMWARE_CLUSTER_MAP = {
 }
 
 # "network_interfaces_info_gauge"
-NETWORK_CLUSTER = ["network_system_info_gauge"]
+NETWORK_CLUSTER = ["network_system_info_gauge", "network_interfaces_info_gauge"]
