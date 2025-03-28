@@ -6,6 +6,7 @@ from django.core.management import BaseCommand
 from apps.node_mgmt.models.sidecar import SidecarApiToken
 from apps.node_mgmt.node_init.cloud_init import cloud_init
 from apps.node_mgmt.node_init.collector_init import collector_init
+from apps.node_mgmt.node_init.controller_init import controller_init
 
 logger = logging.getLogger(__name__)
 
@@ -17,6 +18,10 @@ class Command(BaseCommand):
         logger.info("初始化默认云区域！")
         cloud_init()
         logger.info("初始化默认云区域完成！")
+
+        logger.info("初始化控制器！")
+        controller_init()
+        logger.info("初始化控制器完成！")
 
         logger.info("初始化采集器！")
         collector_init()

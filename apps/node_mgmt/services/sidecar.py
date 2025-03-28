@@ -8,7 +8,9 @@ from django.utils.http import quote_etag
 
 from apps.node_mgmt.constants import L_INSTALL_DOWNLOAD_URL, L_SIDECAR_DOWNLOAD_URL, W_SIDECAR_DOWNLOAD_URL, LOCAL_HOST, \
     TELEGRAF_CONFIG
-from apps.node_mgmt.models.sidecar import Node, Collector, CollectorConfiguration, SidecarEnv
+from apps.node_mgmt.models.cloud_region import SidecarEnv
+from apps.node_mgmt.models.sidecar import Node, Collector, CollectorConfiguration
+
 
 logger = logging.getLogger("app")
 

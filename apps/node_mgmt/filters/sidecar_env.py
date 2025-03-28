@@ -1,5 +1,5 @@
 from django_filters import rest_framework as filters
-from apps.node_mgmt.models.sidecar import SidecarEnv
+from apps.node_mgmt.models.cloud_region import SidecarEnv
 
 
 class SidecarEnvFilter(filters.FilterSet):

@@ -13,4 +13,14 @@ class CloudRegion(TimeInfo, MaintainerInfo):
         verbose_name_plural = "云区域"
 
 
+class SidecarEnv(models.Model):
+    key = models.CharField(max_length=100)
+    value = models.CharField(max_length=200)
+    description = models.TextField(blank=True, verbose_name="描述")
+    cloud_region = models.ForeignKey(CloudRegion, default=1, on_delete=models.CASCADE, verbose_name="云区域")
 
+    class Meta:
+        verbose_name = "Sidecar环境变量"
+        db_table = "sidecar_env"
+        verbose_name_plural = "Sidecar环境变量"
+        unique_together = ('key', 'cloud_region')

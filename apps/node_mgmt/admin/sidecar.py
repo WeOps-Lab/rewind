@@ -1,7 +1,7 @@
 from django.contrib import admin
 
-from apps.node_mgmt.models.sidecar import Node, Collector, CollectorConfiguration, Action, SidecarApiToken, SidecarEnv
-from apps.node_mgmt.models.cloud_region import CloudRegion
+from apps.node_mgmt.models.sidecar import Node, Collector, CollectorConfiguration, Action, SidecarApiToken
+from apps.node_mgmt.models.cloud_region import CloudRegion, SidecarEnv
 
 
 @admin.register(CloudRegion)

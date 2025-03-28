@@ -13,6 +13,18 @@ OS_TYPE = (
 )
 
 
+class Controller(TimeInfo, MaintainerInfo):
+    os = models.CharField(max_length=50, choices=OS_TYPE, verbose_name="操作系统类型")
+    name = models.CharField(max_length=100, verbose_name="控制器名称")
+    description = models.TextField(blank=True, verbose_name="控制器描述")
+
+    class Meta:
+        verbose_name = "控制器信息"
+        db_table = "controller"
+        verbose_name_plural = "控制器信息"
+        unique_together = ('os', 'name')
+
+
 class Node(TimeInfo, MaintainerInfo):
     id = models.CharField(primary_key=True, max_length=100, verbose_name="节点ID")
     name = models.CharField(max_length=100, verbose_name="节点名称")
@@ -62,6 +74,7 @@ class Collector(TimeInfo, MaintainerInfo):
         verbose_name = "采集器信息"
         db_table = "collector"
         verbose_name_plural = "采集器信息"
+        unique_together = ('node_operating_system', 'name')
 
 
 class CollectorConfiguration(TimeInfo, MaintainerInfo):
@@ -115,16 +128,3 @@ class SidecarApiToken(TimeInfo, MaintainerInfo):
         verbose_name = "Sidecar API Token"
         db_table = "sidecar_api_token"
         verbose_name_plural = "Sidecar API Token"
-
-
-class SidecarEnv(models.Model):
-    key = models.CharField(max_length=100)
-    value = models.CharField(max_length=200)
-    description = models.TextField(blank=True, verbose_name="描述")
-    cloud_region = models.ForeignKey(CloudRegion, default=1, on_delete=models.CASCADE, verbose_name="云区域")
-
-    class Meta:
-        verbose_name = "Sidecar环境变量"
-        db_table = "sidecar_env"
-        verbose_name_plural = "Sidecar环境变量"
-        unique_together = ('key', 'cloud_region')

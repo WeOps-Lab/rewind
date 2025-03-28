@@ -1,7 +1,6 @@
 import os
 
-from apps.node_mgmt.models.cloud_region import CloudRegion
-from apps.node_mgmt.models.sidecar import SidecarEnv
+from apps.node_mgmt.models.cloud_region import CloudRegion, SidecarEnv
 
 
 def cloud_init():

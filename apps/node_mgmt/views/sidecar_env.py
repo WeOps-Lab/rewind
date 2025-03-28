@@ -6,7 +6,7 @@ from rest_framework.viewsets import GenericViewSet
 
 from apps.core.utils.web_utils import WebUtils
 from apps.node_mgmt.filters.sidecar_env import SidecarEnvFilter
-from apps.node_mgmt.models.sidecar import SidecarEnv
+from apps.node_mgmt.models.cloud_region import SidecarEnv
 from apps.node_mgmt.serializers.sidecar_env import SidecarEnvSerializer, EnvVariableCreateSerializer, \
     EnvVariableUpdateSerializer, BulkDeleteEnvVariableSerializer
 
