@@ -83,6 +83,7 @@ class ModelProviderInitService:
                         "openai_base_url": "https://api.openai.com",
                         "temperature": 0.7,
                         "model": "gpt-4o",
+                        "is_demo": True,
                     }
                 },
             )

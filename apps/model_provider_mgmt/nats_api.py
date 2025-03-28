@@ -1,13 +1,16 @@
 import nats_client
 from apps.base.models import QuotaRule
+from apps.bot_mgmt.models import Bot
 from apps.core.logger import logger
-from apps.model_provider_mgmt.models import EmbedProvider, LLMModel
+from apps.knowledge_mgmt.models import KnowledgeBase
+from apps.model_provider_mgmt.models import EmbedProvider, LLMModel, LLMSkill, OCRProvider, RerankProvider
+from apps.model_provider_mgmt.models.llm_skill import SkillTools
 
 
 @nats_client.register
 def init_user_set(group_id, group_name):
     try:
-        llm_model_list = LLMModel.objects.filter(is_build_in=True)
+        llm_model_list = LLMModel.objects.filter(is_demo=True)
         add_model_list = []
         name_list = set()
         for llm_model in llm_model_list:
@@ -15,6 +18,7 @@ def init_user_set(group_id, group_name):
             llm_model.team = [group_id]
             llm_model.consumer_team = group_id
             llm_model.is_build_in = False
+            llm_model.is_demo = False
             decrypted_llm_config = llm_model.decrypted_llm_config
             llm_model.llm_config = decrypted_llm_config
             add_model_list.append(llm_model)
@@ -39,3 +43,36 @@ def init_user_set(group_id, group_name):
     except Exception as e:
         logger.exception(e)
         return {"result": False, "message": str(e)}
+
+
+@nats_client.register
+def get_module_data(module, child_module, page, page_size, group_id):
+    model_map = {
+        "bot": Bot,
+        "skill": LLMSkill,
+        "knowledge": KnowledgeBase,
+        "tools": SkillTools,
+    }
+    provider_model_map = {
+        "llm_model": LLMModel,
+        "ocr_model": OCRProvider,
+        "embed_model": EmbedProvider,
+        "rerank_model": RerankProvider,
+    }
+    if module != "provider":
+        model = model_map[module]
+    else:
+        model = provider_model_map[child_module]
+    queryset = model.objects.filter(team__contains=group_id)
+    # 计算总数
+    total_count = queryset.count()
+    # 计算分页
+    start = (page - 1) * page_size
+    end = page * page_size
+    # 获取当前页的数据
+    data_list = queryset.values("id", "name")[start:end]
+
+    return {
+        "count": total_count,
+        "items": list(data_list),
+    }

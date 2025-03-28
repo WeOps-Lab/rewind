@@ -26,6 +26,7 @@ class LLMModel(models.Model, EncryptMixin):
     enabled = models.BooleanField(default=True, verbose_name="启用")
     team = models.JSONField(default=list)
     is_build_in = models.BooleanField(default=True, verbose_name="是否内置")
+    is_demo = models.BooleanField(default=False)
     consumer_team = models.CharField(default="", blank=True, null=True, max_length=64)
 
     def __str__(self):
