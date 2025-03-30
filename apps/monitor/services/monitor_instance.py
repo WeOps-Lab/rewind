@@ -109,7 +109,7 @@ class InstanceSearch:
     def get_vm_metrics(self):
         query = self.obj_metric_map.get("default_metric")
         vm_params = self.query_data.get("vm_params")
-        params_str = ",".join([f"{k}={v}" for k, v in vm_params.items() if v])
+        params_str = ",".join([f'{k}="{v}"' for k, v in vm_params.items() if v])
         if vm_params:
             if "}" in query:
                 query = query.replace("}", f",{params_str}}}")

@@ -8,6 +8,7 @@ from apps.monitor.constants import MONITOR_OBJS, OBJ_ORDER
 from apps.monitor.models.monitor_metrics import Metric
 from apps.monitor.models.monitor_object import MonitorInstance, MonitorObject
 from apps.monitor.models.setting import Setting
+from apps.monitor.utils.instance import calculation_status
 from apps.monitor.utils.victoriametrics_api import VictoriaMetricsAPI
 from apps.monitor.tasks.grouping_rule import sync_instance_and_group
 
@@ -97,6 +98,13 @@ class MonitorObjectService:
                     _metric_map[instance_id] = value
                 for instance in result:
                     instance[metric_obj.name] = _metric_map.get(instance["instance_id"])
+
+        # 状态计算
+        for conf_info in result:
+            if conf_info["time"] == 0:
+                conf_info["status"] = ""
+            else:
+                conf_info["status"] = calculation_status(conf_info["time"])
 
         return  dict(count=count, results=result)
 

@@ -2,6 +2,7 @@ import ast
 from datetime import datetime, timezone
 
 from apps.monitor.models import MonitorInstance, MonitorInstanceOrganization
+from apps.monitor.utils.instance import calculation_status
 from apps.monitor.utils.node_mgmt_api import NodeUtils, FormatChildConfig
 from apps.monitor.utils.victoriametrics_api import VictoriaMetricsAPI
 
@@ -65,25 +66,10 @@ class InstanceConfigService:
             if conf_info["time"] == 0:
                 conf_info["status"] = ""
             else:
-                conf_info["status"] = InstanceConfigService.calculation_status(conf_info["time"])
+                conf_info["status"] = calculation_status(conf_info["time"])
             result.append(conf_info)
 
         return result
-
-    @staticmethod
-    def calculation_status(data_time: int):
-        """计算状态"""
-        # 获取当前时间时间戳，utc0时区的
-        now_timestamp = int(datetime.now(timezone.utc).timestamp())
-        # 计算时间差
-        time_diff = now_timestamp - data_time
-        # 5分钟内正常，1小时内不活跃，1小时以上异常
-        if time_diff < 300:
-            return "normal"
-        elif time_diff < 3600:
-            return "inactive"
-        else:
-            return "unavailable"
 
     @staticmethod
     def create_monitor_instance_by_node_mgmt(data):
