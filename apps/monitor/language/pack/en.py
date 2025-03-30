@@ -8,6 +8,7 @@ MONITOR_OBJECT_TYPE = {
     "Hardware Device": "Hardware Device",
     "Container Management": "Container Management",
     "Other": "Other",
+    "VMware": "VMware"
 }
 
 MONITOR_OBJECT = {
@@ -41,7 +42,11 @@ MONITOR_OBJECT = {
     "Cluster": "Cluster",
     "Pod": "Pod",
     "Node": "Node",
-    "SNMP Trap": "SNMP Trap"
+    "SNMP Trap": "SNMP Trap",
+    "vCenter": "vCenter",
+    "ESXI": "ESXI",
+    "VM": "VM",
+    "DataStorage": "DataStorage"
 }
 
 MONITOR_OBJECT_PLUGIN = {
@@ -164,6 +169,10 @@ MONITOR_OBJECT_PLUGIN = {
     "Docker": {
         "name": "Docker",
         "desc": "Used for collecting and analyzing the status, resource usage (CPU, memory, network, IO), and performance metrics of Docker containers, helping to identify anomalies and optimize container operational efficiency."
+    },
+    "vCenter": {
+        "name": "vCenter",
+        "desc": "vCenter is VMware's virtualization hub for monitoring resources (CPU/memory/storage/network), analyzing performance, and optimizing configurations. It helps identify VM/host anomalies and improves environment efficiency."
     }
 }
 
@@ -386,6 +395,25 @@ MONITOR_OBJECT_METRIC_GROUP = {
         "Status": "Status",
         "IO": "IO",
     },
+    "vCenter": {
+        "Quantity": "Quantity",
+    },
+    "ESXI": {
+        "Memory": "Memory",
+        "CPU": "CPU",
+        "Disk": "Disk",
+        "Network": "Network",
+    },
+    "DataStorage": {
+        "Default": "Default",
+    },
+    "VM": {
+        "Memory": "Memory",
+        "CPU": "CPU",
+        "Disk": "Disk",
+        "Network": "Network",
+        "Power": "Power",
+    }
 }
 
 MONITOR_OBJECT_METRIC = {
@@ -1816,8 +1844,131 @@ MONITOR_OBJECT_METRIC = {
         "name": "Transmitted Network Bytes",
         "desc": "This metric indicates the number of network bytes sent by the container, in MiB, used to monitor the network traffic of the container."
     }
+},
+"vCenter": {
+        "vmware_esxi_count": {
+            "name": "Number of ESXi",
+            "desc": "This metric counts the number of ESXi hosts in the VMware environment, helping administrators understand the current physical host resources."
+        },
+        "vmware_datastore_count": {
+            "name": "Number of Datastores",
+            "desc": "This metric counts the number of datastores in the VMware environment, facilitating the monitoring of storage resource allocation and usage."
+        },
+        "vmware_vm_count": {
+            "name": "Number of VM",
+            "desc": "This metric counts the number of virtual machines in the VMware environment, used to assess the utilization of virtualization resources."
+        }
+    },
+"ESXI": {
+   "esxi_cpu_usage_average_gauge": {
+        "name": "CPU usage",
+        "desc": "It represents the CPU utilization rate of the system or application program, measured in percent (%), which is a key indicator for measuring CPU load and performance."
+    },
+    "esxi_cpu_usagemhz_average_gauge": {
+        "name": "CPU utilization rate",
+        "desc": "It represents the CPU usage, measured in megahertz (MHz), and reflects the actual operating frequency of the CPU."
+    },
+    "esxi_mem_usage_average_gauge": {
+        "name": "Memory utilization rate",
+        "desc": "The memory utilization rate indicates the usage situation of the memory, measured in percent (%), and is used to evaluate the memory load of the system or application program."
+    },
+    "esxi_mem_consumed_average_gauge": {
+        "name": "Active memory",
+        "desc": "The active memory represents the actual amount of memory used by the system or application program, measured in megabytes (MB), and is a key indicator of memory consumption."
+    },
+    "esxi_disk_read_average_gauge": {
+        "name": "Disk read rate",
+        "desc": "The disk read rate represents the amount of data read from the disk per second, measured in megabytes per second (MB/s), and is an important indicator for measuring the disk read performance."
+    },
+    "esxi_disk_write_average_gauge": {
+        "name": "Disk write rate",
+        "desc": "The disk write rate represents the amount of data written to the disk per second, measured in megabytes per second (MB/s), and is an important indicator for measuring the disk write performance."
+    },
+    "esxi_disk_numberRead_summation_gauge": {
+        "name": "Disk read I/O",
+        "desc": "Represents the number of disk read operations completed per second, measured in IOPS (operations per second), which is an important metric for measuring the frequency of disk read requests. Higher values indicate more frequent read requests."
+    },
+    "esxi_disk_numberWrite_summation_gauge": {
+        "name": "Disk write I/O",
+        "desc": "Represents the number of disk write operations completed per second, measured in IOPS (operations per second), which is an important metric for measuring the frequency of disk write requests. Higher values indicate more frequent write requests."
+    },
+    "esxi_net_bytesRx_average_gauge": {
+        "name": "Network receive rate",
+        "desc": "The network receive rate represents the amount of data received per second, measured in kilobytes per second (KB/s), and is an important criterion for measuring network traffic."
+    },
+    "esxi_net_bytesTx_average_gauge": {
+        "name": "Network transmit rate",
+        "desc": "The network transmit rate represents the amount of data sent out per second, measured in kilobytes per second (KB/s), and is an important criterion for measuring network traffic."
+    }
+},
+"DataStorage": {
+    "data_storage_disk_used_average": {
+        "name": "Disk utilization rate",
+        "desc": "The disk utilization rate indicates the usage situation of disk space and is an indicator for measuring the utilization rate of disk storage."
+    },
+    "data_storage_disk_free_average": {
+        "name": "Disk remaining capacity",
+        "desc": "The remaining disk space represents the amount of unused space in the disk and is a key indicator for evaluating the disk capacity."
+    },
+    "data_storage_base.store_accessible": {
+        "name": "Storage connection status",
+        "desc": "The storage connection status indicates the connectability of the storage device and is an indicator for evaluating the health status of the storage system."
+    }
+},
+"VM": {
+     "vm_cpu_usage_average_gauge": {
+        "name": "CPU utilization rate",
+        "desc": "It represents the CPU utilization rate of the system within a specific time period, usually expressed as a percentage. This indicator helps to understand the CPU load situation, so as to carry out performance optimization and capacity planning."
+    },
+    "vm_cpu_usagemhz_average_gauge": {
+        "name": "CPU usage",
+        "desc": "It represents the CPU usage of the system within a specific time period, usually measured in MHz. This indicator is used to measure the actual operating frequency of the CPU and helps to analyze the consumption of CPU resources."
+    },
+    "vm_mem_usage_average_gauge": {
+        "name": "Memory utilization rate",
+        "desc": "It represents the memory utilization rate of the system within a specific time period, usually expressed as a percentage. This indicator helps to understand the memory load situation, which is helpful for optimizing memory usage and conducting capacity planning."
+    },
+    "vm_mem_consumed_average_gauge": {
+        "name": "Active memory",
+        "desc": "It represents the active memory of the system within a specific time period, usually measured in MB or GB. This indicator is used to measure the actual memory resources consumed by the system and helps to analyze the memory usage situation."
+    },
+    "vm_disk_io_usage_gauge": {
+        "name": "Disk I/O Usage",
+        "desc": "Indicates the I/O usage of the VM's disk, i.e., the busyness of the disk over a period of time. Higher values indicate higher disk load."
+    },
+    "vm_disk_read_average_gauge": {
+        "name": "Disk Read Throughput",
+        "desc": "Represents the average read throughput of the VM's disk over a period of time. Higher values indicate better read performance."
+    },
+    "vm_disk_used_average_gauge": {
+        "name": "Disk Usage",
+        "desc": "Represents the average usage of the VM's disk, i.e., the proportion of disk space used. Higher values indicate tighter disk space."
+    },
+    "vm_disk_numberRead_summation_gauge": {
+        "name": "Disk read I/O",
+        "desc": "Represents the number of disk read operations completed per second, an important metric for measuring the frequency of disk read requests. Higher values indicate more frequent read requests."
+    },
+    "vm_disk_numberWrite_summation_gauge": {
+        "name": "Disk write I/O",
+        "desc": "Represents the number of disk write operations completed per second, an important metric for measuring the frequency of disk write requests."
+    },
+    "vm_disk_write_average_gauge": {
+        "name": "Disk Write Throughput",
+        "desc": "Represents the average write throughput of the VM's disk over a period of time. Higher values indicate better write performance."
+    },
+    "vm_net_bytesRx_average_gauge": {
+        "name": "Network receive rate",
+        "desc": "It represents the network receive rate of the system within a specific time period, usually measured in MB/s or GB/s. This indicator is used to measure the network receiving performance and helps to analyze network traffic and bandwidth usage."
+    },
+    "vm_net_bytesTx_average_gauge": {
+        "name": "Network transmit rate",
+        "desc": "It represents the network transmit rate of the system within a specific time period, usually measured in MB/s or GB/s. This indicator is used to measure the network transmitting performance and helps to analyze network traffic and bandwidth usage."
+    },
+    "vm_power_state_gauge": {
+        "name": "Power state",
+        "desc": "It indicates the current power status of a virtual machine (VM). This metric helps administrators monitor whether a VM is powered on or off. This metric is essential for tracking VM availability, optimizing resource allocation, and automating workflows in VMware environments."
+    }
 }
-
 }
 
 LANGUAGE_DICT = {

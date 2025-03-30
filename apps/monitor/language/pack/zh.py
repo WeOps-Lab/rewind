@@ -8,6 +8,7 @@ MONITOR_OBJECT_TYPE = {
     "Hardware Device": "硬件设备",
     "Container Management": "容器管理",
     "Other": "其他",
+    "VMware": "VMware"
 }
 
 MONITOR_OBJECT = {
@@ -41,7 +42,11 @@ MONITOR_OBJECT = {
     "Cluster": "K8S集群",
     "Pod": "Pod",
     "Node": "Node",
-    "SNMP Trap": "SNMP Trap"
+    "SNMP Trap": "SNMP Trap",
+    "vCenter": "vCenter",
+    "ESXI": "ESXI",
+    "VM": "虚拟机",
+    "DataStorage": "数据存储"
 }
 
 MONITOR_OBJECT_PLUGIN = {
@@ -164,6 +169,10 @@ MONITOR_OBJECT_PLUGIN = {
     "Docker": {
         "name": "Docker",
         "desc": "用于采集和分析 Docker 容器的状态、资源使用情况（CPU、内存、网络、IO）和性能指标，帮助识别异常及优化容器运行效率。"
+    },
+    "vCenter": {
+        "name": "vCenter",
+        "desc": "vCenter是VMware的虚拟化管理中枢，用于监控资源（CPU/内存/存储/网络）、分析性能并优化配置。帮助识别虚拟机/主机异常，提升环境效率。"
     }
 }
 
@@ -396,7 +405,28 @@ MONITOR_OBJECT_METRIC_GROUP = {
         "Status": "状态",
         "IO": "IO",
     },
+    "vCenter": {
+        "Quantity": "数量",
+    },
+    "ESXI": {
+        "Memory": "内存",
+        "CPU": "CPU",
+        "Disk": "磁盘",
+        "Network": "网络",
+    },
+    "DataStorage": {
+        "Default": "默认分组",
+    },
+    "VM": {
+        "Memory": "内存",
+        "CPU": "CPU",
+        "Disk": "磁盘",
+        "Network": "网络",
+        "Power": "电源",
+    }
 }
+
+
 
 MONITOR_OBJECT_METRIC = {
     "Host": {
@@ -1828,7 +1858,131 @@ MONITOR_OBJECT_METRIC = {
         "name": "发送网络字节数",
         "desc": "该指标表示容器发送的网络字节数，单位是MiB，用于监控容器的网络流量。"
     }
-}
+},
+"vCenter": {
+        "vmware_esxi_count": {
+            "name": "ESXI数量",
+            "desc": "该指标用于统计 VMware 环境中 ESXi 主机的数量，帮助管理员了解当前的物理主机资源情况。"
+        },
+        "vmware_datastore_count": {
+            "name": "数据存储数量",
+            "desc": "该指标统计 VMware 环境中数据存储的数量，便于监控存储资源的分配和使用情况。"
+        },
+        "vmware_vm_count": {
+            "name": "虚拟机数量",
+            "desc": "该指标统计 VMware 环境中虚拟机的数量，用于评估虚拟化资源的使用情况。"
+        }
+    },
+"ESXI": {
+        "esxi_cpu_usage_average_gauge": {
+        "name": "CPU使用率",
+        "desc": "表示系统或应用程序的CPU使用率，单位是百分比（%），是衡量CPU负载和性能的关键指标。"
+        },
+        "esxi_cpu_usagemhz_average_gauge": {
+            "name": "CPU使用频率",
+            "desc": "代表CPU的使用量，以兆赫兹（MHz）为单位，反映了CPU的实际工作频率。"
+        },
+        "esxi_mem_usage_average_gauge": {
+            "name": "内存使用率",
+            "desc": "内存使用率，表示内存的使用情况，单位是百分比（%），用于评估系统或应用程序的内存负载。"
+        },
+        "esxi_mem_consumed_average_gauge": {
+            "name": "活动内存",
+            "desc": "活动内存，表示系统或应用程序实际使用的内存量，单位是兆字节（MB），是内存消耗的关键指标。"
+        },
+        "esxi_disk_read_average_gauge": {
+            "name": "磁盘读速率",
+            "desc": "磁盘读速率，表示每秒钟从磁盘读取的数据量，单位是兆字节每秒（MB/s），是衡量磁盘读性能的重要指标。"
+        },
+        "esxi_disk_write_average_gauge": {
+            "name": "磁盘写速率",
+            "desc": "磁盘写速率，表示每秒钟向磁盘写入的数据量，单位是兆字节每秒（MB/s），是衡量磁盘写性能的重要指标。"
+        },
+        "esxi_disk_numberRead_summation_gauge": {
+            "name": "磁盘读I/O",
+            "desc": "表示每秒完成的磁盘读操作次数，单位是IOPS（次/秒），是衡量磁盘读请求频率的重要指标。值越高，表示磁盘读请求越频繁。"
+        },
+        "esxi_disk_numberWrite_summation_gauge": {
+            "name": "磁盘写I/O",
+            "desc": "表示每秒完成的磁盘写操作次数，单位是IOPS（次/秒），是衡量磁盘写请求频率的重要指标。值越高，表示磁盘写请求越频繁。"
+        },
+        "esxi_net_bytesRx_average_gauge": {
+            "name": "网络接收速率",
+            "desc": "网络接收速率，表示每秒钟接收到的数据量，单位是千字节每秒（KB/s），是网络流量的重要衡量标准。"
+        },
+        "esxi_net_bytesTx_average_gauge": {
+            "name": "网络发送速率",
+            "desc": "网络发送速率，表示每秒钟发送出去的数据量，单位是千字节每秒（KB/s），是网络流量的重要衡量标准。"
+        }
+    },
+    "DataStorage": {
+        "data_storage_disk_used_average": {
+            "name": "磁盘使用率",
+            "desc": "磁盘使用率，表示磁盘空间的使用情况，是衡量磁盘存储利用率的指标。"
+        },
+        "data_storage_disk_free_average": {
+            "name": "磁盘剩余量",
+            "desc": "磁盘剩余量，表示磁盘中未使用的空间量，是评估磁盘容量的关键指标。"
+        },
+        "data_storage_base.store_accessible": {
+            "name": "存储连接状态",
+            "desc": "存储连接状态，表示存储设备的可连接性，是评估存储系统健康状态的指标。"
+        }
+    },
+    "VM": {
+        "vm_cpu_usage_average_gauge": {
+        "name": "CPU使用率",
+        "desc": "表示系统在特定时间段内的CPU使用率，通常以百分比表示。这个指标帮助了解CPU的负载情况，以便进行性能优化和容量规划。"
+        },
+        "vm_cpu_usagemhz_average_gauge": {
+            "name": "CPU使用量",
+            "desc": "表示系统在特定时间段内的CPU使用量，通常以MHz为单位。这个指标用于衡量CPU的实际工作频率，帮助分析CPU资源的消耗情况。"
+        },
+        "vm_mem_usage_average_gauge": {
+            "name": "内存使用率",
+            "desc": "表示系统在特定时间段内的内存使用率，通常以百分比表示。这个指标帮助了解内存的负载情况，有助于优化内存使用和进行容量规划。"
+        },
+        "vm_mem_consumed_average_gauge": {
+            "name": "活动内存",
+            "desc": "表示系统在特定时间段内的活动内存，通常以MB或GB为单位。这个指标用于衡量系统实际消耗的内存资源，帮助分析内存使用情况。"
+        },
+        "vm_disk_io_usage_gauge": {
+            "name": "磁盘I/O使用率",
+            "desc": "表示虚拟机磁盘的I/O使用率，即磁盘在特定时间段内的繁忙程度。值越高，表示磁盘负载越高。"
+        },
+        "vm_disk_read_average_gauge": {
+            "name": "磁盘读取吞吐量",
+            "desc": "表示虚拟机磁盘在特定时间段内的平均读取速率。值越高，表示读取性能越好。"
+        },
+        "vm_disk_used_average_gauge": {
+            "name": "磁盘使用率",
+            "desc": "表示虚拟机磁盘的平均使用率，即磁盘已使用的空间比例。值越高，表示磁盘空间越紧张。"
+        },
+        "vm_disk_numberRead_summation_gauge": {
+            "name": "磁盘读IO",
+            "desc": "表示每秒完成的磁盘读操作次数，是衡量磁盘读请求频率的重要指标。值越高，表示磁盘读请求越频繁。"
+        },
+        "vm_disk_numberWrite_summation_gauge": {
+            "name": "磁盘写IO",
+            "desc": "表示每秒完成的磁盘写操作次数，是衡量磁盘写请求频率的重要指标。值越高，表示磁盘写请求越频繁。"
+        },
+        "vm_disk_write_average_gauge": {
+            "name": "磁盘写入吞吐量",
+            "desc": "表示虚拟机磁盘在特定时间段内的平均写入速率。值越高，表示写入性能越好。"
+        },
+        "vm_net_bytesRx_average_gauge": {
+            "name": "网络接收速率",
+            "desc": "表示系统在特定时间段内的网络接收速率，通常以MB/s或GB/s为单位。这个指标用于衡量网络的接收性能，帮助分析网络流量和带宽使用情况。"
+        },
+        "vm_net_bytesTx_average_gauge": {
+            "name": "网络发送速率",
+            "desc": "表示系统在特定时间段内的网络发送速率，通常以MB/s或GB/s为单位。这个指标用于衡量网络的发送性能，帮助分析网络流量和带宽使用情况。"
+        },
+        "vm_power_state_gauge": {
+            "name": "电源状态",
+            "desc": "表示虚拟机（VM）当前的电源状态，用于监控 VM 是处于开机还是关机状态。该指标对于监测 VM 可用性、优化资源分配和自动化运维具有重要作用。"
+        }
+    }
 }
 
 LANGUAGE_DICT = {
