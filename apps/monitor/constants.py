@@ -229,28 +229,28 @@ MONITOR_OBJS = [
         "name": "vCenter",
         "default_metric": 'any({instance_type="vmware"}) by (instance_id)',
         "instance_id_keys": ["instance_id"],
-        "supplementary_indicators": [],
+        "supplementary_indicators": ["vmware_esxi_count", "vmware_datastore_count", "vmware_vm_count"],
     },
     {
         "type": "VMWare",
         "name": "ESXI",
         "default_metric": 'any({resource_type="vmware_esxi"}) by (instance_id, resource_id)',
         "instance_id_keys": ["instance_id", "resource_id"],
-        "supplementary_indicators": [],
+        "supplementary_indicators": ["esxi_cpu_usage_average_gauge", "esxi_mem_usage_average_gauge", "esxi_disk_read_average_gauge"],
     },
     {
         "type": "VMWare",
         "name": "VM",
         "default_metric": 'any({resource_type="vmware_vm"}) by (instance_id, resource_id)',
         "instance_id_keys": ["instance_id", "resource_id"],
-        "supplementary_indicators": [],
+        "supplementary_indicators": ["vm_cpu_usage_average_gauge", "vm_mem_usage_average_gauge", "vm_disk_io_usage_gauge"],
     },
     {
         "type": "VMWare",
         "name": "DataStorage",
         "default_metric": 'any({resource_type="vmware_ds"}) by (instance_id, resource_id)',
         "instance_id_keys": ["instance_id", "resource_id"],
-        "supplementary_indicators": [],
+        "supplementary_indicators": ["data_storage_disk_used_average_gauge", "data_storage_store_accessible_gauge"],
     },
 ]
 
