@@ -37,7 +37,11 @@ def generate_stream_error(message):
         }
         yield f"data: {json.dumps(error_chunk)}\n\n"
 
-    return StreamingHttpResponse(generator(), content_type="text/event-stream")
+    response = StreamingHttpResponse(generator(), content_type="text/event-stream")
+    # 添加必要的头信息以防止缓冲
+    response["Cache-Control"] = "no-cache"
+    response["X-Accel-Buffering"] = "no"
+    return response
 
 
 @api_exempt
@@ -301,7 +305,11 @@ def stream_chat(params, skill_obj, kwargs, current_ip, user_message):
         team_info.save()
         insert_skill_log(current_ip, skill_obj.id, return_data, kwargs, user_message=user_message)
 
-    return StreamingHttpResponse(generate_stream(), content_type="text/event-stream")
+    response = StreamingHttpResponse(generate_stream(), content_type="text/event-stream")
+    # 添加必要的头信息以防止缓冲
+    response["Cache-Control"] = "no-cache"
+    response["X-Accel-Buffering"] = "no"
+    return response
 
 
 @api_exempt
