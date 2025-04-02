@@ -1,3 +1,5 @@
+import copy
+
 import nats_client
 from apps.base.models import QuotaRule
 from apps.bot_mgmt.models import Bot
@@ -13,7 +15,8 @@ def init_user_set(group_id, group_name):
         llm_model_list = LLMModel.objects.filter(is_demo=True)
         add_model_list = []
         name_list = set()
-        for llm_model in llm_model_list:
+        for old_llm_model in llm_model_list:
+            llm_model = copy.deepcopy(old_llm_model)
             llm_model.id = None
             llm_model.team = [group_id]
             llm_model.consumer_team = group_id
