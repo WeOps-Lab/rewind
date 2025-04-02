@@ -2,7 +2,7 @@ import ast
 
 import openpyxl
 
-from apps.cmdb.constants import INSTANCE, NEED_CONVERSION_TYPE, ORGANIZATION, USER
+from apps.cmdb.constants import INSTANCE, NEED_CONVERSION_TYPE, ORGANIZATION, USER, ENUM
 from apps.cmdb.graph.neo4j import Neo4jClient
 
 
@@ -23,7 +23,7 @@ class Import:
                 need_update_type_field_map[attr_info["attr_id"]] = attr_info["attr_type"]
                 continue
 
-            if attr_info["attr_type"] in {ORGANIZATION, USER}:
+            if attr_info["attr_type"] in {ORGANIZATION, USER, ENUM}:
                 need_val_to_id_field_map[attr_info["attr_id"]] = {i["name"]: i["id"] for i in attr_info["option"]}
 
         # 读取临时文件
@@ -55,11 +55,14 @@ class Import:
 
                 # 将需要枚举字段name与id反转的建和值存入字典
                 if keys[i] in need_val_to_id_field_map:
-                    if type(value) != list:
-                        value_list = [value]
+                    if keys[i] in {ORGANIZATION, USER}:
+                        if type(value) != list:
+                            value_list = [value]
+                        else:
+                            value_list = value
+                        enum_id = [need_val_to_id_field_map[keys[i]].get(j) for j in value_list]
                     else:
-                        value_list = value
-                    enum_id = [need_val_to_id_field_map[keys[i]].get(j) for j in value_list]
+                        enum_id = need_val_to_id_field_map[keys[i]].get(value)
                     if enum_id:
                         item[keys[i]] = enum_id
                     continue

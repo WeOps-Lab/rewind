@@ -78,7 +78,7 @@ class Export:
         enum_field_dict = {
             attr_info["attr_id"]: {i["id"]: i["name"] for i in attr_info["option"]}
             for attr_info in self.attrs
-            if attr_info["attr_type"] in {ORGANIZATION, USER}
+            if attr_info["attr_type"] in {ORGANIZATION, USER, ENUM}
         }
         for inst_info in inst_list:
             sheet_data = []
@@ -88,6 +88,10 @@ class Export:
                         str([enum_field_dict[attr["attr_id"]].get(i) for i in inst_info.get(attr["attr_id"], [])])
                     )
                     continue
-                sheet_data.append(inst_info.get(attr["attr_id"]))
+
+                _value = inst_info.get(attr["attr_id"])
+                if attr["attr_type"] == ENUM:
+                    _value = enum_field_dict[attr["attr_id"]].get(_value)
+                sheet_data.append(_value)
             workbook.active.append(sheet_data)
         return self.return_bytesio(workbook)
