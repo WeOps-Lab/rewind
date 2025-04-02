@@ -6,7 +6,7 @@ from apps.node_mgmt.views.collector import CollectorViewSet
 from apps.node_mgmt.views.collector_configuration import CollectorConfigurationViewSet
 from apps.node_mgmt.views.controller import ControllerViewSet
 from apps.node_mgmt.views.installer import InstallerViewSet
-from apps.node_mgmt.views.package import PackageVersionView
+from apps.node_mgmt.views.package import PackageMgmtView
 from apps.node_mgmt.views.sidecar_env import SidecarEnvViewSet
 from apps.node_mgmt.views.node import NodeViewSet
 from apps.node_mgmt.views.sidecar import SidecarViewSet, OpenSidecarViewSet
@@ -21,7 +21,7 @@ router.register(r"api/controller", ControllerViewSet, basename="controller")
 router.register(r"api/configuration", CollectorConfigurationViewSet, basename="configuration")
 router.register(r"api/child_config", ChildConfigViewSet, basename="ChildConfigViewSet")
 router.register(r"api/installer", InstallerViewSet, basename="InstallerViewSet")
-router.register(r"api/package", PackageVersionView, basename="PackageVersionView")
+router.register(r"api/package", PackageMgmtView, basename="PackageMgmtView")
 
 
 router_without_slash = routers.DefaultRouter(trailing_slash=False)
