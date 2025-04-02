@@ -3,6 +3,10 @@ from datetime import datetime, timezone
 
 def calculation_status(data_time: int):
     """计算状态"""
+
+    if not data_time:
+        return ""
+
     # 获取当前时间时间戳，utc0时区的
     now_timestamp = int(datetime.now(timezone.utc).timestamp())
     # 计算时间差
