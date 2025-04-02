@@ -24,7 +24,6 @@ default_sidecar_mode = os.getenv("SIDECAR_INPUT_MODE", "telegraf")
 TELEGRAF_CONFIG = """
 [global_tags]
     agent_id="${node.ip}-${node.cloud_region}"
-    auto="true"
 
 [agent]
     interval = "10s"
