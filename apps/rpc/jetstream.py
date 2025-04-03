@@ -1,15 +1,16 @@
 import logging
-import os
 import nats
 from nats.js.api import ObjectMeta
 from nats.js.errors import BucketNotFoundError
 
+from config.components.nats import NATS_SERVERS, NATS_NAMESPACE
+
 logger = logging.getLogger("app")
 
 
-class JetStreamObjectStore:
-    def __init__(self, servers=None, bucket_name='configs'):
-        self.servers = servers or os.environ.get('NATS_URL', 'nats://localhost:4222').split(',')
+class JetStreamService:
+    def __init__(self, bucket_name=NATS_NAMESPACE):
+        self.servers = NATS_SERVERS
         self.bucket_name = bucket_name
         self.nc = None
         self.js = None
