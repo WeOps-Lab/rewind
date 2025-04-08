@@ -28,7 +28,7 @@ class KnowledgeSearchService:
             "rag_num_candidates": kwargs["rag_num_candidates"],  # 候选数量
             "enable_rerank": kwargs["enable_rerank"],
             "rerank_model_address": rerank_model_address,
-            "rerank_top_k": kwargs["rerank_top_k"],  # Rerank返回结果数量
+            "rerank_top_k": kwargs.get("rerank_top_k", 10),  # Rerank返回结果数量
             "size": knowledge_base_folder.result_count,  # 返回结果数量
             "enable_text_search": kwargs["enable_text_search"],
             "enable_vector_search": kwargs["enable_vector_search"],

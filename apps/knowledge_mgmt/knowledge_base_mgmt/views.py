@@ -34,9 +34,12 @@ class KnowledgeBaseViewSet(AuthViewSet):
             return JsonResponse({"result": False, "message": _("The knowledge base name already exists.")})
         params["created_by"] = request.user.username
         params["rerank_model"] = rerank_model.id
-        params["enable_rerank"] = False
-        params["rag_k"] = 10
-        params["rag_num_candidates"] = 50
+        if params.get("enable_rerank") is None:
+            params["enable_rerank"] = False
+        if params.get("rag_k") is None:
+            params["rag_k"] = 10
+        if params.get("rag_num_candidates") is None:
+            params["rag_num_candidates"] = 50
         serializer = self.get_serializer(data=params)
         serializer.is_valid(raise_exception=True)
         es_client = get_es_client()
@@ -81,6 +84,7 @@ class KnowledgeBaseViewSet(AuthViewSet):
         instance.rerank_model_id = kwargs["rerank_model"]
         instance.text_search_mode = kwargs["text_search_mode"]
         instance.rag_k = kwargs["rag_k"]
+        instance.rerank_top_k = kwargs.get("rerank_top_k", 10)
         instance.result_count = kwargs["result_count"]
         instance.rag_num_candidates = kwargs["rag_num_candidates"]
         instance.save()
