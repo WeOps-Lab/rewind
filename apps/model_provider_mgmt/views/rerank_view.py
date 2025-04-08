@@ -33,3 +33,4 @@ class RerankViewSet(viewsets.ViewSet):
 class RerankProviderViewSet(AuthViewSet):
     queryset = RerankProvider.objects.all()
     serializer_class = RerankProviderSerializer
+    permission_key = "provider.rerank_model"

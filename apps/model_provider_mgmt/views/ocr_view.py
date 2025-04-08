@@ -6,3 +6,4 @@ from apps.model_provider_mgmt.serializers.ocr_serializer import OCRProviderSeria
 class OCRProviderViewSet(AuthViewSet):
     queryset = OCRProvider.objects.all()
     serializer_class = OCRProviderSerializer
+    permission_key = "provider.orc_model"

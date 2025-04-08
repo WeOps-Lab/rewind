@@ -1,9 +1,10 @@
-from rest_framework import serializers
-
 from apps.model_provider_mgmt.models import RerankProvider
+from config.drf.serializers import AuthSerializer
 
 
-class RerankProviderSerializer(serializers.ModelSerializer):
+class RerankProviderSerializer(AuthSerializer):
+    permission_key = "provider.rerank_model"
+
     class Meta:
         model = RerankProvider
         fields = "__all__"

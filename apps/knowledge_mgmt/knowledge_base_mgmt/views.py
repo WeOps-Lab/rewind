@@ -20,12 +20,7 @@ class KnowledgeBaseViewSet(AuthViewSet):
     serializer_class = KnowledgeBaseSerializer
     ordering = ("-id",)
     search_fields = ("name",)
-
-    @HasRole()
-    def list(self, request, *args, **kwargs):
-        name = request.query_params.get("name", "")
-        queryset = KnowledgeBase.objects.filter(name__icontains=name)
-        return self.query_by_groups(request, queryset)
+    permission_key = "knowledge"
 
     @HasRole()
     def create(self, request, *args, **kwargs):

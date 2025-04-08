@@ -3,10 +3,12 @@ from rest_framework.fields import empty
 
 from apps.knowledge_mgmt.models import KnowledgeBase, KnowledgeDocument
 from apps.knowledge_mgmt.models.knowledge_document import DocumentStatus
-from config.drf.serializers import TeamSerializer
+from config.drf.serializers import AuthSerializer, TeamSerializer
 
 
-class KnowledgeBaseSerializer(TeamSerializer):
+class KnowledgeBaseSerializer(TeamSerializer, AuthSerializer):
+    permission_key = "knowledge"
+
     is_training = serializers.SerializerMethodField()
 
     class Meta:

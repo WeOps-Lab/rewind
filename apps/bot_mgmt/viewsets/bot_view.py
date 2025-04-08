@@ -16,6 +16,7 @@ from apps.model_provider_mgmt.models import LLMSkill
 class BotViewSet(AuthViewSet):
     serializer_class = BotSerializer
     queryset = Bot.objects.all()
+    permission_key = "bot"
 
     def create(self, request, *args, **kwargs):
         data = request.data

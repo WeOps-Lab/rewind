@@ -26,6 +26,7 @@ class KnowledgeBase(MaintainerInfo, TimeInfo):
     enable_text_search = models.BooleanField(default=True, verbose_name=_("Enable Text Search"))
     text_search_weight = models.FloatField(default=0.9, verbose_name=_("Text Search Weight"))
     enable_rerank = models.BooleanField(default=True, verbose_name=_("Enable Rerank"))
+    rerank_top_k = models.IntegerField(default=10, verbose_name=_("Rerank Top K"))
     rerank_model = models.ForeignKey(
         "model_provider_mgmt.RerankProvider",
         on_delete=models.CASCADE,

@@ -3,17 +3,22 @@ from rest_framework import serializers
 
 from apps.model_provider_mgmt.models import LLMModel, LLMSkill
 from apps.model_provider_mgmt.models.llm_skill import SkillRequestLog, SkillTools
-from config.drf.serializers import TeamSerializer
+from config.drf.serializers import AuthSerializer, TeamSerializer
 
 
-class LLMModelSerializer(serializers.ModelSerializer):
+class LLMModelSerializer(AuthSerializer):
+    permission_key = "provider.llm_model"
+
     class Meta:
         model = LLMModel
         fields = "__all__"
 
 
-class LLMSerializer(TeamSerializer):
+class LLMSerializer(TeamSerializer, AuthSerializer):
+    permission_key = "skill"
+
     rag_score_threshold = serializers.SerializerMethodField()
+    llm_model_name = serializers.SerializerMethodField()
 
     class Meta:
         model = LLMSkill
@@ -23,6 +28,9 @@ class LLMSerializer(TeamSerializer):
     def get_rag_score_threshold(instance: LLMSkill):
         return [{"knowledge_base": k, "score": v} for k, v in instance.rag_score_threshold_map.items()]
 
+    def get_llm_model_name(self, instance: LLMSkill):
+        return instance.llm_model.name if instance.llm_model is not None else ""
+
 
 class SkillRequestLogSerializer(serializers.ModelSerializer):
     class Meta:
@@ -30,7 +38,9 @@ class SkillRequestLogSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class SkillToolsSerializer(serializers.ModelSerializer):
+class SkillToolsSerializer(AuthSerializer):
+    permission_key = "tools"
+
     description = serializers.SerializerMethodField()
 
     class Meta:

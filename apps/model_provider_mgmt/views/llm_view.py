@@ -30,6 +30,7 @@ class LLMViewSet(AuthViewSet):
     serializer_class = LLMSerializer
     queryset = LLMSkill.objects.all()
     filterset_class = LLMFilter
+    permission_key = "skill"
 
     def create(self, request, *args, **kwargs):
         params = request.data
@@ -104,6 +105,7 @@ class LLMModelViewSet(AuthViewSet):
     serializer_class = LLMModelSerializer
     queryset = LLMModel.objects.all()
     search_fields = ["name"]
+    permission_key = "provider.llm_model"
 
     @action(methods=["POST"], detail=False)
     def search_by_groups(self, request):
@@ -179,3 +181,4 @@ class SkillToolsViewSet(AuthViewSet):
     serializer_class = SkillToolsSerializer
     queryset = SkillTools.objects.all()
     filterset_class = ToolsFilter
+    permission_key = "tools"

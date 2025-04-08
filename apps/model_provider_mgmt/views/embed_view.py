@@ -12,6 +12,7 @@ class EmbedProviderViewSet(AuthViewSet):
     serializer_class = EmbedProviderSerializer
     queryset = EmbedProvider.objects.all()
     search_fields = ["name"]
+    permission_key = "provider.embed_model"
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
