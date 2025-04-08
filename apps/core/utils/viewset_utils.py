@@ -35,13 +35,6 @@ class AuthViewSet(MaintainerViewSet):
 
     def query_by_groups(self, request, queryset):
         if not request.user.is_superuser:
-            if hasattr(self, "permission_key"):
-                if "." in self.permission_key:
-                    keys = self.permission_key.split(".")
-                    rules = request.user.rules.get(keys[0], {}).get(keys[1], [])
-                else:
-                    rules = request.user.rules.get(self.permission_key, [])
-                queryset = self.filter_rules(queryset, rules)
             teams = [i["id"] for i in request.user.group_list]
             query = Q()
             for team_member in teams:

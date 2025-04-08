@@ -42,10 +42,7 @@ class KeycloakAuthBackend(ModelBackend):
             if user_info["locale"] == "zh-CN":
                 user_info["locale"] = "zh-Hans"
             translation.activate(user_info["locale"])
-        current_group = request.COOKIES.get("current_team")
         rules = {}
-        if current_group:
-            rules = client.get_user_rules(app, current_group, user_info["username"])
         return self.set_user_info(user_info, rules)
 
     @staticmethod
