@@ -12,6 +12,7 @@ class ControllerTask(TimeInfo, MaintainerInfo):
     type = models.CharField(max_length=100, verbose_name="任务类型")
     status = models.CharField(max_length=100, verbose_name="任务状态")
     work_node = models.CharField(max_length=100, blank=True, verbose_name="工作节点")
+    package_version_id = models.IntegerField(default=0, verbose_name="控制器版本")
 
     class Meta:
         verbose_name = "控制器任务"
@@ -28,8 +29,7 @@ class ControllerTaskNode(models.Model):
     port = models.IntegerField(verbose_name="端口")
     username = models.CharField(max_length=100, verbose_name="用户名")
     password = models.CharField(max_length=100, verbose_name="密码")
-    sidecar_result = JSONField(default=dict, verbose_name="sidecar结果")
-    executor_result = JSONField(default=dict, verbose_name="executor结果")
+    result = JSONField(default=dict, verbose_name="结果")
 
     class Meta:
         verbose_name = "控制器任务节点"
@@ -40,6 +40,7 @@ class ControllerTaskNode(models.Model):
 class CollectorTask(TimeInfo, MaintainerInfo):
 
     type = models.CharField(max_length=100, verbose_name="任务类型")
+    package_version_id = models.IntegerField(default=0, verbose_name="采集器版本")
     status = models.CharField(max_length=100, verbose_name="任务状态")
 
     class Meta:
@@ -52,11 +53,10 @@ class CollectorTaskNode(models.Model):
 
     task = models.ForeignKey(CollectorTask, on_delete=models.CASCADE, verbose_name="任务")
     node = models.ForeignKey(Node, on_delete=models.CASCADE, verbose_name="节点")
-
     start_time = models.DateTimeField(verbose_name="开始时间")
     end_time = models.DateTimeField(verbose_name="结束时间")
     status = models.CharField(max_length=100, verbose_name="任务状态")
-    message = models.TextField(blank=True, verbose_name="消息")
+    result = JSONField(default=dict, verbose_name="结果")
 
     class Meta:
         verbose_name = "采集器任务节点"
