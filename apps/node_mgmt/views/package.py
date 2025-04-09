@@ -9,7 +9,6 @@ from apps.node_mgmt.filters.package import PackageVersionFilter
 from apps.node_mgmt.models.package import PackageVersion
 from apps.node_mgmt.serializers.package import PackageVersionSerializer
 from apps.node_mgmt.services.package import PackageService
-from apps.node_mgmt.utils.s3 import delete_s3_file
 from config.drf.pagination import CustomPageNumberPagination
 
 
@@ -48,7 +47,7 @@ class PackageMgmtView(
     def destroy(self, request, *args, **kwargs):
         # 删除文件，成功了再删除数据
         obj = self.get_object()
-        delete_s3_file(obj.version)
+        PackageService.delete_file(obj)
         return super().destroy(request, *args, **kwargs)
 
     @swagger_auto_schema(
@@ -59,25 +58,33 @@ class PackageMgmtView(
             properties={
                 'os': openapi.Schema(type=openapi.TYPE_STRING, description='操作系统'),
                 'type': openapi.Schema(type=openapi.TYPE_STRING, description='包类型(控制器/采集器)'),
-                # 'name': openapi.Schema(type=openapi.TYPE_STRING, description='包名称'),
+                'object': openapi.Schema(type=openapi.TYPE_STRING, description='包对象)'),
                 'version': openapi.Schema(type=openapi.TYPE_STRING, description='包版本号'),
                 'file': openapi.Schema(type=openapi.TYPE_FILE, description='文件'),
-            }
+                'description': openapi.Schema(type=openapi.TYPE_STRING, description='包版本描述'),
+            },
+            required=['os', 'type', 'object', 'version', 'file'],
         ),
         tags=['PackageMgmt']
     )
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
         uploaded_file = request.FILES.get('file')
         if not uploaded_file:
             return WebUtils.response_error("请上传文件")
 
-        serializer.name = uploaded_file.name
+        data = dict(
+            os=request.data['os'],
+            type=request.data['type'],
+            object=request.data['object'],
+            version=request.data['version'],
+            name=uploaded_file.name,
+            description=request.data.get('description', ''),
+        )
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
 
         # 上传文件，成功了再保存数据
-        PackageService.upload_file(uploaded_file, serializer)
+        PackageService.upload_file(uploaded_file, data)
         self.perform_create(serializer)
         return WebUtils.response_success(serializer.data)
 
@@ -89,5 +96,5 @@ class PackageMgmtView(
     @action(detail=False, methods=["get"], url_path="download/(?P<pk>.+?)")
     def download(self, request, pk=None):
         obj = PackageVersion.objects.get(pk=pk)
-        download_url = PackageService.get_download_url(obj)
-        return WebUtils.response_success(dict(download_url=download_url))
+        file, name = PackageService.download_file(obj)
+        return WebUtils.response_file(file, name)

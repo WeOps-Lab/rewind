@@ -1,13 +1,20 @@
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.decorators import action
-from rest_framework.viewsets import ViewSet
+from rest_framework.viewsets import ModelViewSet
 
 from apps.core.utils.web_utils import WebUtils
 from apps.node_mgmt.child_config.common import ChildConfigCommon
+from apps.node_mgmt.filters.child_config import ChildConfigFilter
+from apps.node_mgmt.models import ChildConfig
+from apps.node_mgmt.serializers.child_config import ChildConfigSerializer
 
 
-class ChildConfigViewSet(ViewSet):
+class ChildConfigViewSet(ModelViewSet):
+
+    queryset = ChildConfig.objects.all()
+    serializer_class = ChildConfigSerializer
+    filterset_class = ChildConfigFilter
 
     @swagger_auto_schema(
         operation_id="batch_setting_node_config",

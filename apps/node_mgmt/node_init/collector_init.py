@@ -24,6 +24,28 @@ COLLECTORS = [
         "default_template": "",
         "introduction": "Telegraf 是一个插件驱动的服务器代理，用于收集和报告指标。"
     },
+    {
+        "id": "natsexecutor_linux",
+        "name": "nats executor",
+        "node_operating_system": "linux",
+        "service_type": "exec",
+        "executable_path": "/opt/fusion-collectors/bin/nats-executor",
+        "execute_parameters": "--config %s",
+        "validation_parameters": "--config %s --test",
+        "default_template": "",
+        "introduction": "NATS Executor 是一个用于执行命令的轻量级代理。"
+    },
+    {
+        "id": "natsexecutor_windows",
+        "name": "nats executor",
+        "node_operating_system": "windows",
+        "service_type": "exec",
+        "executable_path": "C:\\Program Files\\NATS\\nats-executor.exe",
+        "execute_parameters": "-config C:\\Program Files\\NATS\\nats-executor.conf",
+        "validation_parameters": "-test -config C:\\Program Files\\NATS\\nats-executor.conf",
+        "default_template": "",
+        "introduction": "NATS Executor 是一个用于执行命令的轻量级代理。"
+    }
 ]
 
 

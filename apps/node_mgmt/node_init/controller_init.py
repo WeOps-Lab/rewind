@@ -7,18 +7,8 @@ CONTROLLER = [
         "description": "",
     },
     {
-        "os": "linux",
-        "name": "Nats Executor",
-        "description": "",
-    },
-    {
         "os": "windows",
         "name": "Sidecar",
-        "description": "",
-    },
-    {
-        "os": "windows",
-        "name": "Nats Executor",
         "description": "",
     },
 ]

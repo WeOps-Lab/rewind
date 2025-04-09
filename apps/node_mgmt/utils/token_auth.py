@@ -7,8 +7,9 @@ import logging
 from django.core.cache import cache
 from django.http import JsonResponse
 from functools import wraps
-from config.default import AUTH_TOKEN_HEADER_NAME, SECRET_KEY
 from apps.node_mgmt.models.sidecar import SidecarApiToken
+from config.components.base import SECRET_KEY
+from config.components.drf import AUTH_TOKEN_HEADER_NAME
 
 logger = logging.getLogger("app")
 

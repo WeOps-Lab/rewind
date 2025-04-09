@@ -1,4 +1,6 @@
-from django.http import JsonResponse
+import io
+
+from django.http import JsonResponse, FileResponse
 from rest_framework import status
 
 
@@ -18,3 +20,17 @@ class WebUtils:
     @staticmethod
     def response_403(message):
         return JsonResponse({"result": False, "message": message}, status=status.HTTP_403_FORBIDDEN)
+
+    # @staticmethod
+    # def response_file(file, filename):
+    #     response = FileResponse(file, content_type="application/octet-stream")
+    #     response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    #     return response
+
+    @staticmethod
+    def response_file(file, filename):
+        if isinstance(file, bytes):
+            file = io.BytesIO(file)
+        response = FileResponse(file, content_type="application/octet-stream")
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return response

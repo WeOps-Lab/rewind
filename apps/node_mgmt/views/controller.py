@@ -20,7 +20,6 @@ class ControllerViewSet(mixins.ListModelMixin,
         manual_parameters=[
             openapi.Parameter('os', openapi.IN_QUERY, description="操作系统", type=openapi.TYPE_STRING),
             openapi.Parameter('name', openapi.IN_QUERY, description="控制器名称", type=openapi.TYPE_STRING),
-
         ],
         tags=['Controller']
     )
