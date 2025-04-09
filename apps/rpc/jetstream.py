@@ -34,7 +34,7 @@ class JetStreamService:
     async def get(self, key):
         result = await self.object_store.get(key)
         logger.info(f'Fetched entry {result.info.name} ({result.info.size} bytes)')
-        return result.data
+        return result.data, result.info.description
 
     async def delete(self, key):
         await self.object_store.delete(key)
@@ -56,25 +56,3 @@ class JetStreamService:
     async def close(self):
         await self.nc.close()
         logger.info('Closed connection to NATS')
-
-
-# 示例用法
-# async def main():
-#     store = JetStreamObjectStore()
-#     await store.connect()
-#
-#     # 上传对象
-#     await store.put('example.txt', b'Hello, NATS!', description='Test file')
-#
-#     # 下载对象
-#     data = await store.get('example.txt')
-#     print(f'Downloaded content: {data.decode()}')
-#
-#     # 列出对象
-#     await store.list_objects()
-#
-#     # 删除对象
-#     await store.delete('example.txt')
-#
-#     # 关闭连接
-#     await store.close()
