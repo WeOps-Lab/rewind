@@ -53,8 +53,6 @@ class CollectorTaskNode(models.Model):
 
     task = models.ForeignKey(CollectorTask, on_delete=models.CASCADE, verbose_name="任务")
     node = models.ForeignKey(Node, on_delete=models.CASCADE, verbose_name="节点")
-    start_time = models.DateTimeField(verbose_name="开始时间")
-    end_time = models.DateTimeField(verbose_name="结束时间")
     status = models.CharField(max_length=100, verbose_name="任务状态")
     result = JSONField(default=dict, verbose_name="结果")
 

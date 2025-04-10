@@ -71,7 +71,7 @@ class InstallerService:
         task_obj = CollectorTask.objects.create(
             type="install",
             status="waiting",
-            collector_package=collector_package,
+            package_version_id=collector_package,
         )
         creates = []
         for node_id in nodes:
@@ -79,7 +79,7 @@ class InstallerService:
                 task_id=task_obj.id,
                 node_id=node_id,
                 status="waiting",
-                message="",
+                result={"status": "waiting", "message": ""},
             ))
         CollectorTaskNode.objects.bulk_create(creates, batch_size=100)
         return task_obj.id
@@ -87,14 +87,15 @@ class InstallerService:
     @staticmethod
     def install_collector_nodes(task_id):
         """获取采集器安装节点信息"""
-        task_nodes = CollectorTaskNode.objects.filter(task_id=task_id)
+        task_nodes = CollectorTaskNode.objects.filter(task_id=task_id).select_related("node")
         result = []
         for task_node in task_nodes:
             result.append(dict(
                 node_id=task_node.node_id,
-                start_time=task_node.start_time,
-                end_time=task_node.end_time,
                 status=task_node.status,
                 result=task_node.result,
+                ip=task_node.node.ip,
+                os=task_node.node.operating_system,
+                # organizations=task_node.node.nodeorganization_set.values_list("organization", flat=True),
             ))
         return result

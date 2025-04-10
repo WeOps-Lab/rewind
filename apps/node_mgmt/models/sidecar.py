@@ -69,6 +69,7 @@ class Collector(TimeInfo, MaintainerInfo):
     validation_parameters = models.CharField(blank=True, null=True, max_length=200, verbose_name="验证参数")
     default_template = models.TextField(blank=True, null=True, verbose_name="默认模板")
     introduction = models.TextField(blank=True, verbose_name="采集器介绍")
+    icon = models.CharField(max_length=100, default="", verbose_name="图标key")
 
     class Meta:
         verbose_name = "采集器信息"

@@ -4,48 +4,53 @@ from apps.node_mgmt.models.sidecar import Collector
 COLLECTORS = [
     {
         "id": "telegraf_linux",
-        "name": "telegraf",
+        "name": "Telegraf  Linux",
+        "icon": "shujucaiji ",
         "node_operating_system": "linux",
         "service_type": "exec",
         "executable_path": "/opt/fusion-collectors/bin/telegraf",
         "execute_parameters": "--config %s",
         "validation_parameters": "--config %s --test",
         "default_template": "",
-        "introduction": "Telegraf 是一个插件驱动的服务器代理，用于收集和报告指标。"
+        "introduction": "Telegraf is a lightweight and efficient metrics collector that supports real-time collection, processing, and transmission of multi-source data, widely used in monitoring and data analysis scenarios."
     },
     {
         "id": "telegraf_windows",
-        "name": "telegraf",
+        "name": "Telegraf Windows",
+        "icon": "shujucaiji ",
         "node_operating_system": "windows",
         "service_type": "exec",
         "executable_path": "C:\\Program Files\\Telegraf\\telegraf.exe",
         "execute_parameters": "-config C:\\Program Files\\Telegraf\\telegraf.conf",
         "validation_parameters": "-test -config C:\\Program Files\\Telegraf\\telegraf.conf",
         "default_template": "",
-        "introduction": "Telegraf 是一个插件驱动的服务器代理，用于收集和报告指标。"
+        "introduction": "Telegraf is a lightweight and efficient metrics collector that supports real-time collection, processing, and transmission of multi-source data, widely used in monitoring and data analysis scenarios."
     },
     {
         "id": "natsexecutor_linux",
-        "name": "nats executor",
+        "name": "NAS Executor Linux",
+        "icon": "caijixinxi ",
         "node_operating_system": "linux",
         "service_type": "exec",
         "executable_path": "/opt/fusion-collectors/bin/nats-executor",
         "execute_parameters": "--config %s",
         "validation_parameters": "--config %s --test",
         "default_template": "",
-        "introduction": "NATS Executor 是一个用于执行命令的轻量级代理。"
+        "introduction": "NAS Executor is a task scheduling and management tool that automates data storage, backup, and distributed file processing tasks."
     },
     {
         "id": "natsexecutor_windows",
-        "name": "nats executor",
+        "name": "NAS Executor Windows ",
+        "icon": "caijixinxi ",
         "node_operating_system": "windows",
         "service_type": "exec",
         "executable_path": "C:\\Program Files\\NATS\\nats-executor.exe",
         "execute_parameters": "-config C:\\Program Files\\NATS\\nats-executor.conf",
         "validation_parameters": "-test -config C:\\Program Files\\NATS\\nats-executor.conf",
         "default_template": "",
-        "introduction": "NATS Executor 是一个用于执行命令的轻量级代理。"
+        "introduction": "NAS Executor is a task scheduling and management tool that automates data storage, backup, and distributed file processing tasks."
     }
+
 ]
 
 
