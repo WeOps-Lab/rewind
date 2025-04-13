@@ -34,7 +34,7 @@ class MonitorObjectVieSet(viewsets.ModelViewSet):
             result["display_name"] = lan.get_val("MONITOR_OBJECT", result["name"]) or result["name"]
 
         if request.GET.get("add_instance_count") in ["true", "True"]:
-            inst_qs = MonitorInstance.objects.filter()
+            inst_qs = MonitorInstance.objects.filter(is_deleted=False)
             if not request.user.is_superuser:
                 group_ids = [i["id"] for i in request.user.group_list]
                 inst_qs = inst_qs.filter(monitorinstanceorganization__organization__in=group_ids)

@@ -24,6 +24,7 @@ class MonitorInstance(TimeInfo, MaintainerInfo):
     interval = models.IntegerField(default=10, verbose_name='监控实例采集间隔(s)')
     monitor_object = models.ForeignKey(MonitorObject, on_delete=models.CASCADE, verbose_name='监控对象')
     auto = models.BooleanField(default=False, verbose_name='是否自动发现')
+    is_deleted = models.BooleanField(db_index=True, default=False, verbose_name='是否删除')
 
     class Meta:
         verbose_name = '监控对象实例'

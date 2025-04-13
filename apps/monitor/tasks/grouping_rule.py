@@ -69,9 +69,11 @@ class SyncInstance:
             if instance_id not in exist_instance_set:
                 create_instances.append(MonitorInstance(**instance_info))
         if delete_instances:
-            MonitorInstance.objects.filter(id__in=delete_instances, auto=True).delete()
+            MonitorInstance.objects.filter(id__in=delete_instances, is_deleted=True).delete()
         if create_instances:
             MonitorInstance.objects.bulk_create(create_instances, batch_size=200)
+
+        # todo删除不活跃的实例
 
 
 class RuleGrouping:

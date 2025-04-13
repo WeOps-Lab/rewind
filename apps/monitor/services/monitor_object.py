@@ -39,7 +39,7 @@ class MonitorObjectService:
         """获取监控对象实例"""
         start = (page - 1) * page_size
         end = start + page_size
-        qs = MonitorInstance.objects.filter(monitor_object_id=monitor_object_id)
+        qs = MonitorInstance.objects.filter(monitor_object_id=monitor_object_id, is_deleted=False)
         if not is_super:
             qs = qs.filter(monitorinstanceorganization__organization__in=group_ids)
         qs = qs.prefetch_related(Prefetch('monitorinstanceorganization_set', to_attr='organizations'))

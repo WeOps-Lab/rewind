@@ -109,14 +109,18 @@ class InstanceConfigService:
 
         old_instance_ids = set(
             MonitorInstance.objects.filter(id__in=list(instance_map.keys())).values_list("id", flat=True))
-        creates, assos = [], []
+        creates, updates, assos = [], [], []
         for instance_id, instance_info in instance_map.items():
             group_ids = instance_info.pop("group_ids")
             for group_id in group_ids:
                 assos.append((instance_id, group_id))
             if instance_id not in old_instance_ids:
                 creates.append(MonitorInstance(**instance_info))
+            else:
+                updates.append(instance_id)
         MonitorInstance.objects.bulk_create(creates, batch_size=200)
+        MonitorInstance.objects.filter(id__in=updates).update(is_deleted=False)
+
         # 实例组织关联
         old_asso_objs = MonitorInstanceOrganization.objects.filter(monitor_instance_id__in=old_instance_ids)
         old_asso_set = {(asso.monitor_instance_id, asso.organization) for asso in old_asso_objs}

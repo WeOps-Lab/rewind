@@ -150,7 +150,7 @@ class MonitorInstanceVieSet(viewsets.ViewSet):
     @action(methods=['post'], detail=False, url_path='remove_monitor_instance')
     def remove_monitor_instance(self, request):
         instance_ids = request.data.get("instance_ids", [])
-        MonitorInstance.objects.filter(id__in=instance_ids).delete()
+        MonitorInstance.objects.filter(id__in=instance_ids).update(is_deleted=True)
         if request.data.get("clean_child_config"):
             NodeUtils.delete_instance_child_config(instance_ids)
         return WebUtils.response_success()

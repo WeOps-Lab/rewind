@@ -155,7 +155,7 @@ class MonitorPolicyScan:
             ))
         else:
             instance_list = []
-        objs = MonitorInstance.objects.filter(monitor_object_id=self.policy.monitor_object_id, id__in=instance_list)
+        objs = MonitorInstance.objects.filter(monitor_object_id=self.policy.monitor_object_id, id__in=instance_list, is_deleted=False)
         return {i.id: i.name for i in objs}
 
     def format_to_vm_filter(self, conditions):
