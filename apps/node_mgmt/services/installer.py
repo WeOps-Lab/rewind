@@ -1,7 +1,14 @@
 from apps.node_mgmt.models.installer import ControllerTask, ControllerTaskNode, CollectorTaskNode, CollectorTask
+from apps.node_mgmt.utils.installer import get_install_command
 
 
 class InstallerService:
+
+    @staticmethod
+    def get_install_command(os, package_name):
+        """获取安装命令"""
+        return get_install_command(os, package_name)
+
     @staticmethod
     def install_controller(cloud_region_id, work_node, package_version_id, nodes):
         """安装控制器"""
