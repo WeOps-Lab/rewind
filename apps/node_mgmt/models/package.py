@@ -14,6 +14,5 @@ class PackageVersion(TimeInfo, MaintainerInfo):
 
     class Meta:
         verbose_name = "包版本信息"
-        db_table = "package_version"
         verbose_name_plural = "包版本信息"
         unique_together = ('os', 'object', 'version')

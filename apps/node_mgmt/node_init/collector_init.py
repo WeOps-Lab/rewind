@@ -4,7 +4,8 @@ from apps.node_mgmt.models.sidecar import Collector
 COLLECTORS = [
     {
         "id": "telegraf_linux",
-        "name": "Telegraf  Linux",
+        "name": "Telegraf",
+        "controller_default_run": False,
         "icon": "shujucaiji ",
         "node_operating_system": "linux",
         "service_type": "exec",
@@ -16,7 +17,8 @@ COLLECTORS = [
     },
     {
         "id": "telegraf_windows",
-        "name": "Telegraf Windows",
+        "name": "Telegraf",
+        "controller_default_run": False,
         "icon": "shujucaiji ",
         "node_operating_system": "windows",
         "service_type": "exec",
@@ -28,27 +30,29 @@ COLLECTORS = [
     },
     {
         "id": "natsexecutor_linux",
-        "name": "NAS Executor Linux",
+        "name": "NATS-Executor",
+        "controller_default_run": True,
         "icon": "caijixinxi ",
         "node_operating_system": "linux",
         "service_type": "exec",
         "executable_path": "/opt/fusion-collectors/bin/nats-executor",
         "execute_parameters": "--config %s",
-        "validation_parameters": "--config %s --test",
+        "validation_parameters": "",
         "default_template": "",
-        "introduction": "NAS Executor is a task scheduling and management tool that automates data storage, backup, and distributed file processing tasks."
+        "introduction": "NATS Executor is a task scheduling and management tool that automates data storage, backup, and distributed file processing tasks."
     },
     {
         "id": "natsexecutor_windows",
-        "name": "NAS Executor Windows ",
+        "name": "NATS-Executor",
+        "controller_default_run": True,
         "icon": "caijixinxi ",
         "node_operating_system": "windows",
         "service_type": "exec",
         "executable_path": "C:\\Program Files\\NATS\\nats-executor.exe",
         "execute_parameters": "-config C:\\Program Files\\NATS\\nats-executor.conf",
-        "validation_parameters": "-test -config C:\\Program Files\\NATS\\nats-executor.conf",
+        "validation_parameters": "",
         "default_template": "",
-        "introduction": "NAS Executor is a task scheduling and management tool that automates data storage, backup, and distributed file processing tasks."
+        "introduction": "NATS Executor is a task scheduling and management tool that automates data storage, backup, and distributed file processing tasks."
     }
 
 ]

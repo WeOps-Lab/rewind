@@ -9,7 +9,6 @@ class CloudRegion(TimeInfo, MaintainerInfo):
 
     class Meta:
         verbose_name = "云区域"
-        db_table = "cloud_region"
         verbose_name_plural = "云区域"
 
 
@@ -21,6 +20,5 @@ class SidecarEnv(models.Model):
 
     class Meta:
         verbose_name = "Sidecar环境变量"
-        db_table = "sidecar_env"
         verbose_name_plural = "Sidecar环境变量"
         unique_together = ('key', 'cloud_region')

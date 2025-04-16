@@ -24,7 +24,7 @@ class Executor(object):
             "command": command,
             "execute_timeout": timeout
         }
-        return_data = self.local_client.run(self.instance_id, request_data)
+        return_data = self.local_client.run(self.instance_id, request_data, _timeout=timeout)
         return return_data
 
     def execute_ssh(self, command, host, username, password=None, key_file=None, timeout=60):
@@ -51,7 +51,7 @@ class Executor(object):
         if key_file:
             request_data["key_file"] = key_file
 
-        return_data = self.ssh_client.run(self.instance_id, request_data)
+        return_data = self.ssh_client.run(self.instance_id, request_data, _timeout=timeout)
         return return_data
 
     def download_to_local(self, bucket_name, file_key, file_name, target_path, timeout=60):
@@ -71,7 +71,7 @@ class Executor(object):
             "target_path": target_path,
             "execute_timeout": timeout
         }
-        return_data = self.download_to_local_client.run(self.instance_id, request_data)
+        return_data = self.download_to_local_client.run(self.instance_id, request_data, _timeout=timeout)
         return return_data
 
     def download_to_remote(self, bucket_name, file_key, file_name, target_path, host, username, password=None, timeout=60):
@@ -99,5 +99,5 @@ class Executor(object):
         # 添加可选参数
         if password:
             request_data["password"] = password
-        return_data = self.download_to_remote_client.run(self.instance_id, request_data)
+        return_data = self.download_to_remote_client.run(self.instance_id, request_data, _timeout=timeout)
         return return_data

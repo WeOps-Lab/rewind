@@ -16,7 +16,6 @@ class ControllerTask(TimeInfo, MaintainerInfo):
 
     class Meta:
         verbose_name = "控制器任务"
-        db_table = "controller_task"
         verbose_name_plural = "控制器任务"
 
 
@@ -33,7 +32,6 @@ class ControllerTaskNode(models.Model):
 
     class Meta:
         verbose_name = "控制器任务节点"
-        db_table = "controller_task_node"
         verbose_name_plural = "控制器任务节点"
 
 
@@ -45,7 +43,6 @@ class CollectorTask(TimeInfo, MaintainerInfo):
 
     class Meta:
         verbose_name = "采集器任务"
-        db_table = "collector_task"
         verbose_name_plural = "采集器任务"
 
 
@@ -58,5 +55,4 @@ class CollectorTaskNode(models.Model):
 
     class Meta:
         verbose_name = "采集器任务节点"
-        db_table = "collector_task_node"
         verbose_name_plural = "采集器任务节点"

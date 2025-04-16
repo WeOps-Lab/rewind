@@ -20,7 +20,6 @@ class Controller(TimeInfo, MaintainerInfo):
 
     class Meta:
         verbose_name = "控制器信息"
-        db_table = "controller"
         verbose_name_plural = "控制器信息"
         unique_together = ('os', 'name')
 
@@ -39,7 +38,6 @@ class Node(TimeInfo, MaintainerInfo):
 
     class Meta:
         verbose_name = "节点信息"
-        db_table = "node"
         verbose_name_plural = "节点信息"
 
 
@@ -49,7 +47,6 @@ class NodeOrganization(TimeInfo, MaintainerInfo):
 
     class Meta:
         verbose_name = "节点组织"
-        db_table = "node_organization"
         verbose_name_plural = "节点组织"
         unique_together = ('node', 'organization')
 
@@ -70,10 +67,10 @@ class Collector(TimeInfo, MaintainerInfo):
     default_template = models.TextField(blank=True, null=True, verbose_name="默认模板")
     introduction = models.TextField(blank=True, verbose_name="采集器介绍")
     icon = models.CharField(max_length=100, default="", verbose_name="图标key")
+    controller_default_run = models.BooleanField(default=False, verbose_name="控制器默认运行")
 
     class Meta:
         verbose_name = "采集器信息"
-        db_table = "collector"
         verbose_name_plural = "采集器信息"
         unique_together = ('node_operating_system', 'name')
 
@@ -89,7 +86,6 @@ class CollectorConfiguration(TimeInfo, MaintainerInfo):
 
     class Meta:
         verbose_name = "采集器配置信息"
-        db_table = "collector_configuration"
         verbose_name_plural = "采集器配置信息"
 
     # uuid
@@ -108,7 +104,6 @@ class ChildConfig(TimeInfo, MaintainerInfo):
 
     class Meta:
         verbose_name = "子配置"
-        db_table = "child_config"
         verbose_name_plural = "子配置"
 
 
@@ -118,7 +113,6 @@ class Action(TimeInfo, MaintainerInfo):
 
     class Meta:
         verbose_name = "操作信息"
-        db_table = "action"
         verbose_name_plural = "操作信息"
 
 
@@ -127,5 +121,4 @@ class SidecarApiToken(TimeInfo, MaintainerInfo):
 
     class Meta:
         verbose_name = "Sidecar API Token"
-        db_table = "sidecar_api_token"
         verbose_name_plural = "Sidecar API Token"

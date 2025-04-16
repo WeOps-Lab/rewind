@@ -63,6 +63,10 @@ def generate_token(data: dict, secret: str = SECRET_KEY):
     signature = hmac.new(secret.encode('utf-8'), json_data, hashlib.sha256).digest()
     # 将签名与数据一起返回
     token = base64.urlsafe_b64encode(signature + b"." + json_data).decode('utf-8')
+    # 将 token 存储到数据库
+    obj = SidecarApiToken.objects.filter(token=token).first()
+    if not obj:
+        SidecarApiToken.objects.create(token=token)
     return token
 
 
@@ -77,3 +81,5 @@ def decode_token(token: str, secret: str = SECRET_KEY):
         return json.loads(json_data)
     else:
         raise ValueError("无效的 token")
+
+

@@ -6,8 +6,9 @@ from django.core.cache import cache
 from django.http import JsonResponse
 from django.utils.http import quote_etag
 
-from apps.node_mgmt.constants import L_INSTALL_DOWNLOAD_URL, L_SIDECAR_DOWNLOAD_URL, W_SIDECAR_DOWNLOAD_URL, LOCAL_HOST, \
-    TELEGRAF_CONFIG
+from apps.node_mgmt.constants import L_INSTALL_DOWNLOAD_URL, L_SIDECAR_DOWNLOAD_URL, W_SIDECAR_DOWNLOAD_URL, LOCAL_HOST
+from apps.node_mgmt.default_config.nats_executor import create_nats_executor_config
+from apps.node_mgmt.default_config.telegraf import create_telegraf_config
 from apps.node_mgmt.models.cloud_region import SidecarEnv
 from apps.node_mgmt.models.sidecar import Node, Collector, CollectorConfiguration
 
@@ -89,20 +90,11 @@ class Sidecar:
             # 创建节点
             node = Node.objects.create(**request_data)
 
-            # 创建默认配置
-            try:
-                collector_obj = Collector.objects.filter(
-                    name='telegraf', node_operating_system=node.operating_system
-                ).first()
-                configuration = CollectorConfiguration.objects.create(
-                    name=f'telegraf-{node.id}',
-                    collector=collector_obj,
-                    config_template=TELEGRAF_CONFIG,
-                    is_pre=True,
-                )
-                configuration.nodes.add(node)
-            except Exception as e:
-                logger.error(f"create default configuration failed {e}")
+            # 创建默认的 Telegraf 配置
+            create_telegraf_config(node)
+
+            # 创建默认的 NATS Executor 配置
+            create_nats_executor_config(node)
 
         else:
             # 更新节点
