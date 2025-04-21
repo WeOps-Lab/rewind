@@ -44,7 +44,7 @@ if default_sidecar_mode == "nats":
 servers = ["${NATS_SERVERS}"]
 username = "${NATS_USERNAME}"
 password = "${NATS_PASSWORD}"
-subject = "metrics.${node.ip_filter}"
+subject = "metrics.${node.ip}"
 data_format = "influx"
 """
 

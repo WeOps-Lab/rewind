@@ -1,9 +1,10 @@
 from celery import shared_task
 
-from apps.node_mgmt.constants import CONTROLLER_INSTALL_DIR, COLLECTOR_INSTALL_DIR, LINUX_OS
-from apps.node_mgmt.models import ControllerTask, CollectorTask, PackageVersion
+from apps.node_mgmt.constants import CONTROLLER_INSTALL_DIR, COLLECTOR_INSTALL_DIR, LINUX_OS, \
+    CONTROLLER_DIR_DELETE_COMMAND
+from apps.node_mgmt.models import ControllerTask, CollectorTask, PackageVersion, Node
 from apps.node_mgmt.utils.installer import download_to_remote, exec_command_to_remote, download_to_local, \
-    exec_command_to_local, get_install_command
+    exec_command_to_local, get_install_command, get_uninstall_command
 from config.components.nats import NATS_NAMESPACE
 
 
@@ -73,12 +74,34 @@ def uninstall_controller(task_id):
     nodes = task_obj.controllertasknode_set.all()
     for node_obj in nodes:
         try:
+            # 获取卸载命令
+            uninstall_command = get_uninstall_command(node_obj.os)
             # 执行卸载脚步
-            exec_command_to_remote(task_obj.work_node, node_obj.ip, node_obj.username, node_obj.password, "")
-            node_obj.result.update(run={"status": "success"})
+            exec_command_to_remote(task_obj.work_node, node_obj.ip, node_obj.username, node_obj.password, uninstall_command)
+            node_obj.result.update(stop_run={"status": "success"})
+
+            # 删除控制器安装目录
+            exec_command_to_remote(
+                task_obj.work_node,
+                node_obj.ip,
+                node_obj.username,
+                node_obj.password,
+                CONTROLLER_DIR_DELETE_COMMAND.get(node_obj.os),
+            )
+            node_obj.result.update(delete_dir={"status": "success"})
+
+            # 删除node实例
+            Node.objects.filter(cloud_region_id=task_obj.cloud_region_id, ip=node_obj.ip).delete()
+            node_obj.result.update(delete_node={"status": "success"})
 
         except Exception as e:
-            node_obj.result.update(run={"status": "failed", "message": str(e)})
+
+            if "stop_run" not in node_obj.result:
+                node_obj.result.update(stop_run={"status": "failed", "message": str(e)})
+            elif "delete_dir" not in node_obj.result:
+                node_obj.result.update(delete_dir={"status": "failed", "message": str(e)})
+            elif "delete_node" not in node_obj.result:
+                node_obj.result.update(delete_node={"status": "failed", "message": str(e)})
 
         node_obj.save()
 

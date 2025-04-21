@@ -1,4 +1,4 @@
-from apps.node_mgmt.constants import UNZIP_RUN_COMMAND, SIDECAR_API_URL
+from apps.node_mgmt.constants import UNZIP_RUN_COMMAND, SIDECAR_API_URL, UNINSTALL_COMMAND
 from apps.node_mgmt.utils.token_auth import generate_token
 from apps.rpc.executor import Executor
 
@@ -11,6 +11,13 @@ def get_install_command(os, package_name):
     unzip_run_command = unzip_run_command.format(package_name=package_name, server_url=SIDECAR_API_URL,
                                                  server_token=sidecar_token)
     return unzip_run_command
+
+
+# 获取卸载命令
+def get_uninstall_command(os):
+    """获取卸载命令"""
+    uninstall_command = UNINSTALL_COMMAND.get(os)
+    return uninstall_command
 
 
 # 执行本地命令

@@ -7,8 +7,8 @@ logger = logging.getLogger("app")
 
 
 NATS_EXECUTOR_CONFIG = """
-nats_urls: "{nats_urls}"
-nats_instanceId: "{nats_instanceId}"
+nats_urls: "${NATS_SERVERS}"
+nats_instanceId: "${node.id}"
 """
 
 

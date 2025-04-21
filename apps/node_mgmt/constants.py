@@ -42,3 +42,14 @@ UNZIP_RUN_COMMAND = {
     WINDOWS_OS: "powershell -command \"Expand-Archive -Path {} -DestinationPath {}\"",
 }
 
+# 卸载命令
+UNINSTALL_COMMAND = {
+    LINUX_OS: "cd /opt/fusion-collectors && ./uninstall.sh",
+    WINDOWS_OS: "powershell -command \"Remove-Item -Path {} -Recurse\"",
+}
+
+# 控制器目录删除命令
+CONTROLLER_DIR_DELETE_COMMAND = {
+    LINUX_OS: "rm -rf /opt/fusion-collectors",
+    WINDOWS_OS: "powershell -command \"Remove-Item -Path {} -Recurse\"",
+}
