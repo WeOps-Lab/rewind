@@ -13,8 +13,8 @@ SIDECAR_STATUS_ENUM = {
 # 本服务的地址
 LOCAL_HOST = os.getenv("WEB_SERVER_URL")
 
-# Sidecar api 地址
-SIDECAR_API_URL = f"{LOCAL_HOST}/node_mgmt/open_api/node"
+# 节点服务地址key
+NODE_SERVER_URL_KEY = "NODE_SERVER_URL"
 
 LINUX_OS = "linux"
 WINDOWS_OS = "windows"

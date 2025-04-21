@@ -5,9 +5,9 @@ from apps.node_mgmt.utils.installer import get_install_command
 class InstallerService:
 
     @staticmethod
-    def get_install_command(os, package_name):
+    def get_install_command(os, package_name, cloud_region_id):
         """获取安装命令"""
-        return get_install_command(os, package_name)
+        return get_install_command(os, package_name, cloud_region_id)
 
     @staticmethod
     def install_controller(cloud_region_id, work_node, package_version_id, nodes):

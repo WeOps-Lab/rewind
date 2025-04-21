@@ -150,11 +150,12 @@ class InstallerViewSet(ViewSet):
             properties={
                 'os': openapi.Schema(type=openapi.TYPE_STRING, description="操作系统"),
                 'package_name': openapi.Schema(type=openapi.TYPE_STRING, description="包名称"),
+                'cloud_region_id': openapi.Schema(type=openapi.TYPE_INTEGER, description="云区域ID"),
             }
         ),
         tags=['Installer']
     )
     @action(detail=False, methods=["post"], url_path="get_install_command")
     def get_install_command(self, request):
-        data = InstallerService.get_install_command(request.data["os"], request.data["package_name"])
+        data = InstallerService.get_install_command(request.data["os"], request.data["package_name"], request.data["cloud_region_id"])
         return WebUtils.response_success(data)

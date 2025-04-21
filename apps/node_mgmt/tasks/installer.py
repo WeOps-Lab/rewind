@@ -28,7 +28,7 @@ def install_controller(task_id):
     controller_install_dir = CONTROLLER_INSTALL_DIR.get(package_obj.os)
 
     # 获取安装命令
-    install_command = get_install_command(package_obj.os, package_obj.name)
+    install_command = get_install_command(package_obj.os, package_obj.name, task_obj.cloud_region_id)
 
     for node_obj in nodes:
         try:
